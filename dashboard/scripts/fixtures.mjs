@@ -1175,7 +1175,7 @@ export function fixtures(now = Date.now()) {
     [`/api/dashboard/${ORG.prefix}/trends`]: trends(now),
     [`/api/compute/${ORG.prefix}/pods`]: { pods: livePods },
     [`/api/compute/${ORG.prefix}/settings`]: {
-      settings: { pod_image: 'theaisocietyasu/workshop-base:latest', deployment_pod_image: 'theaisocietyasu/godfather-base:latest' },
+      settings: { pod_image: 'theaisocietyasu/workshop-base:latest', deployment_pod_image: 'ghcr.io/theaisocietyasu/godfather-base:latest' },
     },
     ...Object.fromEntries(
       livePods.map((pod) => [
