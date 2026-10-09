@@ -41,19 +41,31 @@ If Firecrawl is not connected, knowledge reads pages with a plain GET. If SearXN
 
 ## Tools for agents
 
-An agent with a machine token can also use the tools of a connected service, through the same MCP server and `/api/tools`. Platform passes the call to the service's own MCP server with the org's saved keys. The agent never gets the keys.
+An agent with a machine token can use the tools of each service the org connects, through the same MCP server and `/api/tools`. The tools show up when the org connects the service and the token has its scope. The agent never gets the keys.
 
-| Service | Server | Scopes |
+Platform gives tools in two ways:
+
+- It passes the call to the service's own MCP server with the org's saved key. Use this when the server takes an API key.
+- It calls the service's API itself. Use this when the service's MCP server takes only a sign-in in the browser (OAuth), as Notion and Google do.
+
+| Service | How | Scopes and tools |
 | --- | --- | --- |
 | GitHub | `GITHUB_MCP_URL`, default `https://api.githubcopilot.com/mcp/`, with the org's GitHub token | `github:read`: the tools the server marks read-only. `github:write`: the other tools |
+| RunPod | `RUNPOD_MCP_URL`, default `https://mcp.getrunpod.io/`, with the org's RunPod key | `runpod:read`: the tools the server marks read-only. `runpod:write`: the other tools |
+| Google | The Calendar, Drive, Sheets and Gmail APIs, with the org's service account key | `google:read`: `calendar_list`, `calendar_events`, `drive_search`, `drive_read`, `sheets_read`. `google:write`: `calendar_create_event`, `sheets_append`. `gmail:read`: `gmail_search`, `gmail_read`. `gmail:send`: `gmail_send` |
+| Notion | The Notion API, with the org's integration token | `notion:read`: `search`, `read_page`, `query_database`. `notion:write`: `create_page` |
+| Web search | The org's SearXNG, or the one in `.env` | `web:read`: `search` |
 
-- A tool name starts with the service key, such as `github.list_issues`. The token sees the tools only when the org connected the service.
-- A tool that is not read-only runs only with `confirm=true`. Without it, the call returns what it would do.
-- Token limits narrow a token further. `repos` lists the repos a call may act on, as `owner/name` or `owner/*`. With `repos`, the token sees only tools that take one repo. `tools` lists name patterns, such as `github.*issue*`. Set both on the Tokens page.
+- A tool name starts with the service key, such as `github.list_issues` or `google.drive_search`.
+- A tool that changes something runs only with `confirm=true`. Without it, the call returns what it would do.
+- Google and Notion tools use only the org's own keys, never a default in `.env`. So an agent reads only its own org's data.
+- Google: share a calendar, Drive file or Sheet with the service account's email to let the tools see it. A service account has no mailbox, so the Gmail tools show only when the org sets **Act as Workspace user**. That works only in a Google Workspace domain whose admin allows the service account's client ID these scopes under domain-wide delegation: `calendar`, `drive.readonly`, `spreadsheets`, `gmail.readonly`, `gmail.send`.
+- Notion: share each page or database with the integration in Notion.
+- Token limits narrow a token further. `repos` lists the GitHub repos a call may act on, as `owner/name` or `owner/*`. With `repos`, the token sees only tools that take one repo. `tools` lists GitHub tool name patterns, such as `github.*issue*`. Set both on the Tokens page.
 - Each call is in the audit log and its failures are in the error log, as for other tools.
-- The list of tools of each org is kept for 10 minutes. The GitHub token must allow what the tools do: write access to Issues and Pull requests for the write tools.
+- The list of tools of each MCP server is kept for 10 minutes per org. The key must allow what the tools do, for example write access to Issues and Pull requests for the GitHub write tools.
 
-To add the tools of another service, add a `RemoteServer` in `modules/integrations/servers.py`: its URL, the headers that sign in with the org's keys, a read and a write scope, how to find the target in the arguments, and a check for its token limits.
+To pass through another service's MCP server, add a `RemoteServer` in `modules/integrations/servers.py`: its URL, the headers that sign in with the org's keys and a read and a write scope. To call a service's API, add a file in `modules/integrations/` with `@tool(..., integration="<key>", available=<check>)`, and import it in `modules/integrations/tools.py`.
 
 ## Routes
 

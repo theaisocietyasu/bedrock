@@ -11,7 +11,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 
 from core import secrets
-from core.integrations import github
+from core.integrations import github, runpod
 from modules.auth import machine_tokens, scopes
 
 
@@ -25,9 +25,9 @@ class RemoteServer:
     read_scope: str
     write_scope: str
     # The target a call acts on, as owner/name, or None when the arguments name no single target
-    target: Callable[[dict], str | None]
-    # The name of the token limit that lists the allowed targets
-    target_limit: str
+    target: Callable[[dict], str | None] = lambda arguments: None
+    # The name of the token limit that lists the allowed targets, or None when the server has no target limit
+    target_limit: str | None = None
 
 
 SERVERS: dict[str, RemoteServer] = {}
@@ -98,5 +98,29 @@ register(
         write_scope="github:write",
         target=_github_target,
         target_limit="repos",
+    )
+)
+
+
+# RunPod
+
+scopes.declare("runpod:read", "Read the org's RunPod pods, endpoints, templates, volumes and billing", "runpod")
+scopes.declare(
+    "runpod:write", "Create, change, start, stop and delete pods and endpoints on RunPod (with confirm)", "runpod"
+)
+
+
+def _runpod_headers(db, org_id: int) -> dict[str, str] | None:
+    key = secrets.get_secret(db, org_id, runpod.SECRET_NAME)
+    return {"Authorization": f"Bearer {key}"} if key else None
+
+
+register(
+    RemoteServer(
+        key="runpod",
+        url=lambda: os.environ.get("RUNPOD_MCP_URL", "https://mcp.getrunpod.io/"),
+        headers=_runpod_headers,
+        read_scope="runpod:read",
+        write_scope="runpod:write",
     )
 )
