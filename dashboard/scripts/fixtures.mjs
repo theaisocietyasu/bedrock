@@ -1106,7 +1106,14 @@ export function fixtures(now = Date.now()) {
     '/api/superadmin/publishers': { publishers: [{ org_id: orgDetail.id, prefix: orgDetail.prefix, source: 'superadmin' }] },
     [`/api/dashboard/${ORG.prefix}/branding`]: BRANDING,
     [`/api/dashboard/${ORG.prefix}/overview`]: overview,
-    [`/api/dashboard/${ORG.prefix}/integrations`]: { integrations, secrets_key: true },
+    [`/api/dashboard/${ORG.prefix}/integrations`]: {
+      integrations,
+      oauth: {
+        notion: { title: 'Notion', connected: true, connected_by: 'ash', connected_at: at(-2 * DAY), blocked: null },
+        google: { title: 'Google', connected: false, connected_by: null, connected_at: null, blocked: null },
+      },
+      secrets_key: true,
+    },
     [`/api/dashboard/${ORG.prefix}/notifications`]: { notifications, open: notifications.filter((n) => !n.resolved_at).length },
     [`/api/dashboard/${ORG.prefix}/ci`]: ci,
     [`/api/dashboard/${ORG.prefix}/errors`]: { errors: orgErrors, open: orgErrors.length, events: orgErrors.reduce((n, e) => n + e.count, 0), webhook_set: true },

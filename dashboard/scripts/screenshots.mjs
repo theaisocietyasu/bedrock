@@ -52,6 +52,14 @@ const SCREENS = [
       await page.getByPlaceholder('my-org/website, my-org/*').fill('my-org/*');
     },
   },
+  {
+    name: 'integrations-sign-in',
+    path: 'integrations',
+    before: async (page) => {
+      await page.getByRole('button', { name: 'Sign in with Google' }).scrollIntoViewIfNeeded();
+      await page.mouse.wheel(0, -200);
+    },
+  },
   { name: 'settings', path: 'settings' },
   { name: 'webhooks', path: 'webhooks' },
   {

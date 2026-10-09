@@ -23,8 +23,8 @@ logger = get_logger(__name__)
 CACHE_SECONDS = 600
 MAX_RESULT_CHARS = 100_000
 
-for _key in SERVERS:
-    registry.use(_key, "integrations")
+for _server in SERVERS.values():
+    registry.use(_server.integration, "integrations")
 
 _cache: dict[tuple[str, int], tuple[float, list[dict]]] = {}
 
@@ -81,7 +81,7 @@ def _spec(server: RemoteServer, tool: dict, write: bool) -> ToolSpec:
         func=partial(_call, server, str(tool["name"])),
         input_schema=schema,
         confirm=write,
-        integration=server.key,
+        integration=server.integration,
     )
 
 

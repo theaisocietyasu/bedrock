@@ -168,7 +168,7 @@ def test_token_list_groups_integration_scopes(client, officer_headers, soda):
     assert "integrations" in github["used_by"]
     google = next(i for i in body["integrations"] if i["key"] == "google")
     assert google["scopes"] == ["gmail:read", "gmail:send", "google:read", "google:write"]
-    assert "google.calendar_events" in google["tools"]["google:read"] and google["remote"] is False
+    assert "google.calendar_events" in google["tools"]["google:read"] and google["remote"] is True
     notion = next(i for i in body["integrations"] if i["key"] == "notion")
     assert notion["tools"]["notion:write"] == ["notion.create_page"]
     keys = [i["key"] for i in body["integrations"]]

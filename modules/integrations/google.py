@@ -47,9 +47,13 @@ EXPORTS = {
 
 registry.use("google", "integrations")
 scopes.declare("google:read", "Read the org's Google Calendar events, Drive files and Sheets", "google")
-scopes.declare("google:write", "Create Calendar events and add rows to Sheets (with confirm)", "google")
-scopes.declare("gmail:read", "Search and read the mail of the Workspace user that Google acts as", "google")
-scopes.declare("gmail:send", "Send mail as the Workspace user that Google acts as (with confirm)", "google")
+scopes.declare(
+    "google:write", "Create and change Calendar events, Drive files and Sheets rows (with confirm)", "google"
+)
+scopes.declare(
+    "gmail:read", "Search and read the Gmail of the account signed in with Google or the Workspace user", "google"
+)
+scopes.declare("gmail:send", "Send mail, write drafts and label mail as that account (with confirm)", "google")
 
 
 def connected(db, org_id: int) -> bool:

@@ -236,7 +236,7 @@ def token_list(db, org_id: int) -> dict:
             "through": sorted(through.get(key, [])),
             "limits": sorted(machine_tokens.LIMIT_NAMES.get(key, ())),
             "tools": tools.get(key, {}),
-            "remote": key in SERVERS,
+            "remote": any(server.integration == key for server in SERVERS.values()),
             "used_by": sorted(registry.INTEGRATIONS[key].used_by) if key in registry.INTEGRATIONS else [],
         }
         for key in keys

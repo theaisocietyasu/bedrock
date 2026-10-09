@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from core import secrets
 from core.integrations import github, runpod
 from modules.auth import machine_tokens, scopes
+from modules.integrations import oauth
 
 
 @dataclass(frozen=True)
@@ -28,6 +29,12 @@ class RemoteServer:
     target: Callable[[dict], str | None] = lambda arguments: None
     # The name of the token limit that lists the allowed targets, or None when the server has no target limit
     target_limit: str | None = None
+    # The integration the server belongs to, when it differs from key, such as google for gmail
+    of: str | None = None
+
+    @property
+    def integration(self) -> str:
+        return self.of or self.key
 
 
 SERVERS: dict[str, RemoteServer] = {}
@@ -124,3 +131,40 @@ register(
         write_scope="runpod:write",
     )
 )
+
+
+# Services that take an OAuth sign-in instead of a key. modules/integrations/oauth.py keeps the tokens.
+
+
+def _oauth_headers(key: str) -> Callable[[object, int], dict[str, str] | None]:
+    def headers(db, org_id: int) -> dict[str, str] | None:
+        token = oauth.access_token(db, org_id, key)
+        return {"Authorization": f"Bearer {token}"} if token else None
+
+    return headers
+
+
+register(
+    RemoteServer(
+        key="notion",
+        url=lambda: os.environ.get("NOTION_MCP_URL", "https://mcp.notion.com/mcp"),
+        headers=_oauth_headers("notion"),
+        read_scope="notion:read",
+        write_scope="notion:write",
+    )
+)
+for _key, _url, _read, _write in (
+    ("gmail", "https://gmailmcp.googleapis.com/mcp/v1", "gmail:read", "gmail:send"),
+    ("drive", "https://drivemcp.googleapis.com/mcp/v1", "google:read", "google:write"),
+    ("calendar", "https://calendarmcp.googleapis.com/mcp/v1", "google:read", "google:write"),
+):
+    register(
+        RemoteServer(
+            key=_key,
+            url=lambda url=_url: url,
+            headers=_oauth_headers("google"),
+            read_scope=_read,
+            write_scope=_write,
+            of="google",
+        )
+    )

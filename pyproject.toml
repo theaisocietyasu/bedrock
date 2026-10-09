@@ -171,6 +171,7 @@ source_modules = [
     "modules.integrations.google",
     "modules.integrations.mcp_client",
     "modules.integrations.notion",
+    "modules.integrations.oauth",
     "modules.integrations.servers",
     "modules.integrations.web",
     "modules.knowledge.crawl",

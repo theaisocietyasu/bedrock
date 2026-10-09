@@ -88,6 +88,9 @@ Both need a machine token: `Authorization: Bearer plat_...`. A caller sees only 
 | `github.*`: the other tools of GitHub's MCP server (confirm) | `github:write` | integrations |
 | `runpod.*`: the read-only tools of RunPod's MCP server | `runpod:read` | integrations |
 | `runpod.*`: the other tools of RunPod's MCP server (confirm) | `runpod:write` | integrations |
+| `notion.*`: the tools of Notion's MCP server, after an officer signs in | `notion:read`, `notion:write` | integrations |
+| `gmail.*`: the tools of Google's Gmail MCP server, after an officer signs in | `gmail:read`, `gmail:send` | integrations |
+| `drive.*`, `calendar.*`: the tools of Google's Drive and Calendar MCP servers, after an officer signs in | `google:read`, `google:write` | integrations |
 | `google.calendar_list`, `google.calendar_events`, `google.drive_search`, `google.drive_read`, `google.sheets_read` | `google:read` | integrations |
 | `google.calendar_create_event` (confirm), `google.sheets_append` (confirm) | `google:write` | integrations |
 | `google.gmail_search`, `google.gmail_read` | `gmail:read` | integrations |
