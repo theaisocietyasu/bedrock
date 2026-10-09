@@ -60,6 +60,7 @@ const SCREENS = [
       await page.mouse.wheel(0, -200);
     },
   },
+  { name: 'notifications', path: 'notifications' },
   { name: 'settings', path: 'settings' },
   { name: 'webhooks', path: 'webhooks' },
   {

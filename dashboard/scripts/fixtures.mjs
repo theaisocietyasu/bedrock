@@ -672,10 +672,24 @@ export function fixtures(now = Date.now()) {
     subject,
     message,
     link,
+    kind: 'problem',
+    level: 'error',
+    at: null,
     resolved_at: resolvedOffset === null ? null : at(resolvedOffset),
     resolved_by: resolvedOffset === null ? null : 'officer:1290000000000000101',
   });
+  const event = (id, module, subject, message, link, level, offset) => ({
+    ...notice(`event-${id}`, module, subject, message, link),
+    kind: 'event',
+    level,
+    at: at(offset),
+  });
   const notifications = [
+    event(41, 'errors', 'ReadTimeout', 'Exception on /api/compute/robotics/pods [POST]: Read timed out.', 'activity?tab=errors', 'error', -18 * MINUTE),
+    event(40, 'compute', 'Pod started: workshop-a40', 'By an officer or a tool', 'hosting?tab=pods', 'info', -42 * MINUTE),
+    event(39, 'jobs', 'Job failed: knowledge.reindex', 'Embeddings answered 401 Unauthorized', 'activity?tab=knowledge', 'error', -3 * HOUR),
+    event(38, 'order', 'New order: Robotics hoodie', 'Member: dana · 450 points', 'store', 'info', -5 * HOUR),
+    event(37, 'app', 'Deployed: match-scout v1.4.2', 'Healthy after 38 s', 'hosting?tab=services', 'info', -9 * HOUR),
     notice('a1', 'alerts', 'new-grad', 'The feed answered 404 Not Found', 'alerts'),
     notice('k1', 'knowledge', 'club/sponsor-packet', 'sponsors.robotics.example.org does not resolve', 'knowledge'),
     notice('k2', 'knowledge', 'asu/parking_rates', 'The page answered 503 Service Unavailable', 'knowledge'),
