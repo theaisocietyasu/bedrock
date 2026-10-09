@@ -75,7 +75,7 @@ def test_officer_creates_and_lists_a_pod(client, officer_headers, runpod):
     assert response.get_json()["pod"]["status"] == "RUNNING"
     _, body = runpod.calls[0]
     assert body["gpu"] == {"id": "NVIDIA A40", "count": 1} and body["cloud"] == "COMMUNITY"
-    assert body["image"] == "theaisocietyasu/godfather-base:latest" and body["ports"] == ["22/tcp"]
+    assert body["image"] == "ghcr.io/theaisocietyasu/godfather-base:latest" and body["ports"] == ["22/tcp"]
     assert body["disk"] == 20 and "mounts" not in body
     assert body["env"]["HF_HOME"] == "/workspace/hf"
     assert body["env"]["GODFATHER_SSH_CA_PUBLIC_KEY"].startswith("ssh-ed25519 ")
