@@ -37,7 +37,11 @@ class FakeRunPod:
         self.pods[pod_id]["status"] = "EXITED"
 
     def delete_pod(self, pod_id):
+        from core.integrations.runpod import RunPodError
+
         self.calls.append(("delete", pod_id))
+        if pod_id not in self.pods:
+            raise RunPodError("RunPod answered 404: pod not found", 404)
         self.pods.pop(pod_id)
 
 
@@ -162,6 +166,14 @@ def test_actions_and_terminate(client, officer_headers, runpod):
     )
     assert client.get("/api/compute/soda/pods", headers=officer_headers).get_json() == {"pods": []}
     assert client.get("/api/compute/soda/pods/pod1", headers=officer_headers).status_code == 404
+
+
+def test_terminate_forgets_a_pod_already_deleted_on_runpod(client, officer_headers, runpod):
+    _create(client, officer_headers)
+    runpod.pods.clear()
+    gone = client.post("/api/compute/soda/pods/pod1/action", json={"action": "terminate"}, headers=officer_headers)
+    assert gone.status_code == 200
+    assert client.get("/api/compute/soda/pods", headers=officer_headers).get_json() == {"pods": []}
 
 
 def test_keys_are_stored_encrypted_and_reused(client, officer_headers, runpod):
