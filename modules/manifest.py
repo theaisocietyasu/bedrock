@@ -100,7 +100,7 @@ CATALOG = {
     "public": ModuleInfo("Public pages", "Open routes for the leaderboard, the member list and stats."),
     "runpod": ModuleInfo(
         "Hosting",
-        "Deploys the org's own apps to RunPod, checks their health and rolls them back.",
+        "Deploys the org's own apps to a hosting provider, checks their health and rolls them back.",
         needs=(RUNPOD, Need("github", "GitHub", optional=True)),
     ),
     "storefront": ModuleInfo("Store", "A merch store that members pay for with points."),
