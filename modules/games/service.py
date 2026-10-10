@@ -5,6 +5,8 @@ import os
 import re
 
 from core.errors import ServiceError
+from modules.organizations import service as organizations
+from modules.organizations.models import Organization
 
 SAFE_FILENAME = re.compile(r"^[\w\-]+$")
 GAME_KEYS = {"name", "description", "players", "categories", "per_category", "teams", "uuid"}
@@ -13,6 +15,12 @@ QUESTION_KEYS = {"question", "answer", "value", "uuid"}
 
 class GameError(ServiceError):
     pass
+
+
+def enabled_for_guilds(session, guild_ids) -> bool:
+    """Whether an org on one of these Discord servers has the games module on."""
+    orgs = session.query(Organization).filter(Organization.guild_id.in_([str(g) for g in guild_ids])).all()
+    return any(organizations.module_enabled(org, "games") for org in orgs)
 
 
 def is_valid_game(data: dict) -> bool:

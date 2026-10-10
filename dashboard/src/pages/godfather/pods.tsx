@@ -31,7 +31,7 @@ import {
   statusLabel,
   statusTone,
   usePodAction,
-  useRefreshCompute,
+  useRefreshGodfather,
 } from './shared';
 import { UsersEditor } from './members';
 
@@ -209,7 +209,7 @@ export function PodsTable({ prefix, pods, open }: { prefix: string; pods: Pod[];
 export function AccessDialog({ prefix, pod, onClose }: { prefix: string; pod: Pod; onClose: () => void }) {
   const [isPublic, setPublic] = useState(pod.is_public);
   const [users, setUsers] = useState(pod.allowed_users);
-  const refresh = useRefreshCompute(prefix);
+  const refresh = useRefreshGodfather(prefix);
   const save = useMutation({
     mutationFn: () => send(podPath(prefix, pod.id), 'PUT', { is_public: isPublic, allowed_users: users }),
     onSuccess: () => {

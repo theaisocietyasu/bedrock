@@ -6,14 +6,14 @@ import { ApiError, api, send } from '../../lib/api';
 import type { Tone } from '../../lib/format';
 import type { Pod } from '../../lib/types';
 
-export const computePath = (prefix: string) => `/api/compute/${prefix}`;
-export const podPath = (prefix: string, podId: string) => `${computePath(prefix)}/pods/${encodeURIComponent(podId)}`;
-export const podsKey = (prefix: string) => ['compute', prefix, 'pods'];
+export const godfatherPath = (prefix: string) => `/api/compute/${prefix}`;
+export const podPath = (prefix: string, podId: string) => `${godfatherPath(prefix)}/pods/${encodeURIComponent(podId)}`;
+export const podsKey = (prefix: string) => ['godfather', prefix, 'pods'];
 
 export function usePods(prefix: string) {
   return useQuery({
     queryKey: podsKey(prefix),
-    queryFn: () => api<{ pods: Pod[] }>(`${computePath(prefix)}/pods`).then((body) => body.pods),
+    queryFn: () => api<{ pods: Pod[] }>(`${godfatherPath(prefix)}/pods`).then((body) => body.pods),
     enabled: Boolean(prefix),
     refetchInterval: 15_000,
     retry: (count, error) => !(error instanceof ApiError && error.status < 500) && count < 2,
@@ -21,10 +21,10 @@ export function usePods(prefix: string) {
 }
 
 // Refetches the pod list and the overview after a change.
-export function useRefreshCompute(prefix: string) {
+export function useRefreshGodfather(prefix: string) {
   const client = useQueryClient();
   return () => {
-    client.invalidateQueries({ queryKey: ['compute', prefix] });
+    client.invalidateQueries({ queryKey: ['godfather', prefix] });
     client.invalidateQueries({ queryKey: ['overview', prefix] });
   };
 }
@@ -32,7 +32,7 @@ export function useRefreshCompute(prefix: string) {
 export type PodAction = 'start' | 'stop' | 'restart' | 'terminate';
 
 export function usePodAction(prefix: string, podId: string) {
-  const refresh = useRefreshCompute(prefix);
+  const refresh = useRefreshGodfather(prefix);
   return useMutation({
     mutationFn: (action: PodAction) => send(`${podPath(prefix, podId)}/action`, 'POST', { action }),
     onSuccess: refresh,
@@ -150,12 +150,12 @@ export function MenuSeparator() {
   return <div role="separator" className="my-1 h-px bg-line" />;
 }
 
-export type ComputeSettings = { pod_image: string | null; deployment_pod_image: string };
+export type GodfatherSettings = { pod_image: string | null; deployment_pod_image: string };
 
-export function useComputeSettings(prefix: string) {
+export function useGodfatherSettings(prefix: string) {
   return useQuery({
-    queryKey: ['compute', prefix, 'settings'],
-    queryFn: () => api<{ settings: ComputeSettings }>(`${computePath(prefix)}/settings`).then((body) => body.settings),
+    queryKey: ['godfather', prefix, 'settings'],
+    queryFn: () => api<{ settings: GodfatherSettings }>(`${godfatherPath(prefix)}/settings`).then((body) => body.settings),
     enabled: Boolean(prefix),
   });
 }

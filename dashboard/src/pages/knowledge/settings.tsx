@@ -142,7 +142,7 @@ function SettingsDraft({
         </p>
         {chunking ? (
           <CheckOption checked={reindex} onChange={setReindex} title="Crawl every crawled source again now">
-            Pages are fetched one host at a time; a big pack takes a while.
+            Pages are fetched one host at a time; a big sub-module takes a while.
           </CheckOption>
         ) : null}
       </section>

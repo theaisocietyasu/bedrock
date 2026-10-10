@@ -6,8 +6,8 @@ import pytest
 @pytest.fixture
 def clean(app):
     from core.db import db_connect
-    from modules.alerts.models import AlertFeed
     from modules.dashboard import ci
+    from modules.feeds.models import AlertFeed
 
     ci.clear_cache()
     yield
@@ -20,7 +20,7 @@ def clean(app):
 
 def test_overview_covers_every_module(client, officer_headers, clean):
     from core.db import db_connect
-    from modules.alerts.models import AlertFeed
+    from modules.feeds.models import AlertFeed
     from modules.organizations.models import Organization
 
     db = db_connect.SessionLocal()
@@ -35,13 +35,13 @@ def test_overview_covers_every_module(client, officer_headers, clean):
     assert response.status_code == 200
     body = response.get_json()
     assert body["organization"]["prefix"] == "soda"
-    assert {m["name"] for m in body["modules"]} >= {"points", "compute", "alerts"}
+    assert {m["name"] for m in body["modules"]} >= {"points", "godfather", "job_webhook", "hackathon_webhook"}
     assert set(body["sections"]) == {
         "members",
         "points",
         "storefront",
-        "compute",
-        "alerts",
+        "godfather",
+        "feeds",
         "apps",
         "knowledge",
         "agents",
@@ -49,7 +49,7 @@ def test_overview_covers_every_module(client, officer_headers, clean):
         "tokens",
     }
     assert body["sections"]["members"]["total"] >= 1
-    assert body["problems"] == [{"module": "alerts", "subject": "jobs", "message": "README unreachable"}]
+    assert body["problems"] == [{"module": "job_webhook", "subject": "jobs", "message": "README unreachable"}]
     assert "content" not in str(body["sections"]["agents"])
 
 

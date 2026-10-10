@@ -22,6 +22,7 @@ import {
   Users,
 } from 'lucide-react';
 import { DemoVideo } from '@/components/demo-video';
+import { Contributors } from '@/components/contributors';
 import { BuiltBy, OrgMarks } from '@/components/org-marks';
 import { repoUrl } from '@/lib/shared';
 
@@ -46,7 +47,7 @@ const modules: Module[] = [
     text: 'Notion events go to Google Calendar and a public feed.',
     href: '/docs/modules/calendar',
   },
-  { icon: Bell, name: 'Alerts', text: 'Job and hackathon posts in your Discord channels.', href: '/docs/modules/alerts' },
+  { icon: Bell, name: 'Alerts', text: 'Job and hackathon posts in your Discord channels.', href: '/docs/modules/feeds' },
   {
     icon: Gamepad2,
     name: 'Discord bot',
@@ -72,7 +73,7 @@ const modules: Module[] = [
     text: 'Canvas, Google Calendar and Outlook, for agents to use.',
     href: '/docs/modules/accounts',
   },
-  { icon: Cpu, name: 'Compute pods', text: 'GPU and CPU pods that members reach over SSH.', href: '/docs/modules/compute' },
+  { icon: Cpu, name: 'Godfather pods', text: 'GPU and CPU pods that members reach over SSH.', href: '/docs/modules/godfather' },
   {
     icon: Rocket,
     name: 'RunPod apps',
@@ -90,7 +91,7 @@ const modules: Module[] = [
 const shots = [
   { name: 'settings', title: 'Module switches', alt: 'Settings page with a switch for each module' },
   { name: 'tokens', title: 'Scoped tokens', alt: 'Tokens page with a new agent token and its scopes' },
-  { name: 'compute', title: 'Compute pods', alt: 'Compute page with the org pods and their sessions' },
+  { name: 'godfather', title: 'Godfather pods', alt: 'Godfather page with the org pods and their sessions' },
 ];
 
 const access = [
@@ -175,6 +176,7 @@ function Hero() {
           <OrgMarks />
           <BuiltBy />
         </div>
+        <Contributors className="mt-6 flex flex-col items-center" />
         <DemoVideo className="mt-14 w-full" />
       </div>
     </section>

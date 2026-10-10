@@ -19,6 +19,8 @@ const movedDocs = {
 /** @type {import('next').NextConfig} */
 const config = {
   reactStrictMode: true,
+  // Contributor avatars on the landing page
+  images: { remotePatterns: [{ protocol: 'https', hostname: 'avatars.githubusercontent.com' }] },
   async redirects() {
     return Object.entries(movedDocs).map(([source, destination]) => ({ source, destination, permanent: true }));
   },

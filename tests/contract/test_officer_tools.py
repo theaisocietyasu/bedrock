@@ -263,13 +263,13 @@ def test_notification_and_error_deletes_need_confirm(client):
 
 
 def test_create_pod_waits_for_confirm(client, monkeypatch):
-    from modules.compute import service as compute
+    from modules.godfather import service as godfather
 
-    monkeypatch.setattr(compute, "create_pod", lambda *a, **k: pytest.fail("create_pod ran without confirm"))
-    headers = _issue("compute:manage")
-    pending = _result(client, headers, "compute.create_pod", name="gpu-1", use_cpu_only=True)
+    monkeypatch.setattr(godfather, "create_pod", lambda *a, **k: pytest.fail("create_pod ran without confirm"))
+    headers = _issue("godfather:manage")
+    pending = _result(client, headers, "godfather.create_pod", name="gpu-1", use_cpu_only=True)
     assert pending["confirm_required"] is True
-    assert _call(client, headers, "compute.create_pod", name="gpu-1", allowed_users=["abc"]).status_code == 400
+    assert _call(client, headers, "godfather.create_pod", name="gpu-1", allowed_users=["abc"]).status_code == 400
 
 
 def test_app_templates_and_providers(client):

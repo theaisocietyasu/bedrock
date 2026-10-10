@@ -29,15 +29,15 @@ import type { Integration, IntegrationList, IntegrationTest, OAuthState } from '
 // The module names the API sends, with their label and dashboard page.
 const MODULES: Record<string, { label: string; path?: string }> = {
   agents: { label: 'Agents', path: 'agents' },
-  mcp: { label: 'MCP', path: 'mcp' },
+  mcp: { label: 'MCP', path: 'tokens' },
   auth: { label: 'Sign-in' },
   calendar: { label: 'Calendar sync', path: 'calendar' },
-  compute: { label: 'Godfather', path: 'godfather' },
+  godfather: { label: 'Godfather', path: 'godfather' },
   dashboard: { label: 'Activity', path: 'activity' },
   games: { label: 'Games' },
   knowledge: { label: 'Knowledge', path: 'knowledge' },
   leetcode: { label: 'LeetCode', path: 'leetcode' },
-  packs: { label: 'Knowledge', path: 'knowledge' },
+  submodules: { label: 'Knowledge', path: 'knowledge' },
   runpod: { label: 'Hosting', path: 'hosting' },
 };
 

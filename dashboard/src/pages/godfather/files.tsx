@@ -145,7 +145,7 @@ function Editor({ prefix, pod, path, onBack }: { prefix: string; pod: Pod; path:
   const base = podPath(prefix, pod.id);
   const [draft, setDraft] = useState<string | null>(null);
   const file = useQuery({
-    queryKey: ['compute', prefix, 'file', pod.id, path],
+    queryKey: ['godfather', prefix, 'file', pod.id, path],
     queryFn: () => send<{ content: string }>(`${base}/files/read`, 'POST', { path }).then((b) => b.content),
     retry: false,
     gcTime: 0,
@@ -217,11 +217,11 @@ export function FilesDialog({ prefix, pod, onClose }: { prefix: string; pod: Pod
   const upload = useRef<HTMLInputElement>(null);
   const start = usePodAction(prefix, pod.id);
   const list = useQuery({
-    queryKey: ['compute', prefix, 'files', pod.id, path],
+    queryKey: ['godfather', prefix, 'files', pod.id, path],
     queryFn: () => api<{ path: string; files: PodFile[] }>(`${base}/files?path=${encodeURIComponent(path)}`).then((b) => b.files),
     retry: false,
   });
-  const reload = () => client.invalidateQueries({ queryKey: ['compute', prefix, 'files', pod.id] });
+  const reload = () => client.invalidateQueries({ queryKey: ['godfather', prefix, 'files', pod.id] });
   const go = (p: string) => {
     setPath(p);
     setPending(null);

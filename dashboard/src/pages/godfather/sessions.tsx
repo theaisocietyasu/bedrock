@@ -5,7 +5,7 @@ import { Badge, Button, Dialog, EmptyState, ErrorNote, Field, FormActions, Input
 import { api, send } from '../../lib/api';
 import { duration, localToIso, toLocalInput, when } from '../../lib/format';
 import type { Pod, PodSession } from '../../lib/types';
-import { podPath, useRefreshCompute } from './shared';
+import { podPath, useRefreshGodfather } from './shared';
 
 const MAX_HOURS = 24;
 
@@ -34,7 +34,7 @@ function SessionState({ s }: { s: PodSession }) {
 }
 
 function SessionRow({ prefix, pod, s }: { prefix: string; pod: Pod; s: PodSession }) {
-  const refresh = useRefreshCompute(prefix);
+  const refresh = useRefreshGodfather(prefix);
   const remove = useMutation({
     mutationFn: () => send(`${podPath(prefix, pod.id)}/sessions/${s.id}`, 'DELETE'),
     onSuccess: refresh,
@@ -90,9 +90,9 @@ export function SessionsDialog({ prefix, pod, onClose }: { prefix: string; pod: 
   const [title, setTitle] = useState('');
   const [start, setStart] = useState(initialStart);
   const [stop, setStop] = useState(initialStop);
-  const refresh = useRefreshCompute(prefix);
+  const refresh = useRefreshGodfather(prefix);
   const list = useQuery({
-    queryKey: ['compute', prefix, 'sessions', pod.id],
+    queryKey: ['godfather', prefix, 'sessions', pod.id],
     queryFn: () => api<{ sessions: PodSession[] }>(`${podPath(prefix, pod.id)}/sessions`).then((b) => b.sessions),
   });
   const problem = windowProblem(start, stop);

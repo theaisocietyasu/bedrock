@@ -4,7 +4,7 @@ from functools import partial
 
 from core.tools import tool as _tool
 from modules.knowledge import crawl, documents, embedder, reembed, runs, search, service, settings
-from modules.packs import service as packs
+from modules.submodules import service as submodules
 
 # Every tool here needs the knowledge module on for the caller's org
 tool = partial(_tool, module="knowledge")
@@ -165,14 +165,18 @@ def knowledge_crawl_now(db, org, caller, key: str, force: bool = False):
     return {"queued": key}
 
 
-@tool("knowledge.packs", description="Packs the org can add, such as a campus pack.", scope="knowledge:read")
-def knowledge_packs(db, org, caller):
-    return {"packs": packs.list_packs(db, int(org.id))}
+@tool(
+    "knowledge.submodules",
+    description="Submodules the org can add, such as a campus submodule.",
+    scope="knowledge:read",
+)
+def knowledge_submodules(db, org, caller):
+    return {"submodules": submodules.list_submodules(db, int(org.id))}
 
 
 @tool(
-    "knowledge.sync_pack",
-    description="Add or update a pack's pages, then start the crawl of the sources that are due.",
+    "knowledge.sync_submodule",
+    description="Add or update a submodule's pages, then start the crawl of the sources that are due.",
     scope="knowledge:write",
     input_schema={
         "type": "object",
@@ -181,10 +185,10 @@ def knowledge_packs(db, org, caller):
         "additionalProperties": False,
     },
 )
-def knowledge_sync_pack(db, org, caller, name: str):
+def knowledge_sync_submodule(db, org, caller, name: str):
     from core.jobs import defer
 
-    counts = packs.sync(db, int(org.id), str(org.prefix), name)
+    counts = submodules.sync(db, int(org.id), str(org.prefix), name)
     defer("knowledge.crawl_due")
     return counts
 

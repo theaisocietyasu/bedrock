@@ -5,7 +5,7 @@ import { Link } from 'react-router';
 import { Badge, Button, Card, EmptyState, ErrorNote, Spinner } from '../../components/ui';
 import { api, send } from '../../lib/api';
 import { matches } from '../../lib/modules';
-import type { AlertPreset, CatalogModule } from '../../lib/types';
+import type { FeedPreset, CatalogModule } from '../../lib/types';
 
 // The dashboard page of each module that has one.
 const MODULE_PAGES: Record<string, string> = {
@@ -13,18 +13,21 @@ const MODULE_PAGES: Record<string, string> = {
   storefront: 'store',
   calendar: 'calendar',
   leetcode: 'leetcode',
-  compute: 'godfather',
+  godfather: 'godfather',
   runpod: 'hosting',
-  alerts: 'alerts',
+  job_webhook: 'job-alerts',
+  hackathon_webhook: 'hackathons',
   knowledge: 'knowledge',
-  mcp: 'mcp',
   agents: 'agents',
   uptime: 'uptime',
 };
 
-type KnowledgePack = { name: string; title: string; description: string; pages: number; queries: string[]; sources: number };
+// The webhook modules, whose sub-modules are feeds
+const FEED_MODULES = { job_webhook: true, hackathon_webhook: true };
 
-// One sub-module row inside a module card: a pack or an alert feed the module can add.
+type KnowledgeSubmodule = { name: string; title: string; description: string; pages: number; queries: string[]; sources: number };
+
+// One sub-module row inside a module card: a sub-module or a feed the module can add.
 function SubRow({ title, meta, action }: { title: string; meta?: string; action?: ReactNode }) {
   return (
     <div className="flex min-h-9 items-center gap-2 border-t border-line px-4 py-1.5 text-sm">
@@ -37,39 +40,39 @@ function SubRow({ title, meta, action }: { title: string; meta?: string; action?
 
 const subButton = 'h-7 px-2 text-xs';
 
-// The packs of the knowledge module. Add or sync crawls the pack's pages into knowledge.
-function KnowledgePacks({ prefix, onSynced }: { prefix: string; onSynced: (message: string) => void }) {
+// The sub-modules of the knowledge module. Add or sync crawls the sub-module's pages into knowledge.
+function KnowledgeSubmodules({ prefix, onSynced }: { prefix: string; onSynced: (message: string) => void }) {
   const client = useQueryClient();
-  const packs = useQuery({
-    queryKey: ['knowledge', prefix, 'packs'],
-    queryFn: () => api<{ packs: KnowledgePack[] }>(`/api/dashboard/${prefix}/knowledge/packs`),
+  const submodules = useQuery({
+    queryKey: ['knowledge', prefix, 'submodules'],
+    queryFn: () => api<{ submodules: KnowledgeSubmodule[] }>(`/api/dashboard/${prefix}/knowledge/submodules`),
   });
   const sync = useMutation({
-    mutationFn: (pack: KnowledgePack) =>
-      send<{ added: number; updated: number; retired: number }>(`/api/dashboard/${prefix}/knowledge/packs/${pack.name}/sync`, 'POST'),
-    onSuccess: (r, pack) => {
+    mutationFn: (submodule: KnowledgeSubmodule) =>
+      send<{ added: number; updated: number; retired: number }>(`/api/dashboard/${prefix}/knowledge/submodules/${submodule.name}/sync`, 'POST'),
+    onSuccess: (r, submodule) => {
       client.invalidateQueries({ queryKey: ['knowledge', prefix] });
-      onSynced(`${pack.title}: ${r.added} added, ${r.updated} updated, ${r.retired} retired.`);
+      onSynced(`${submodule.title}: ${r.added} added, ${r.updated} updated, ${r.retired} retired.`);
     },
   });
-  const list = (packs.data?.packs ?? []).filter((p) => p.pages || p.queries.length);
+  const list = (submodules.data?.submodules ?? []).filter((p) => p.pages || p.queries.length);
   return (
     <>
-      {list.map((pack) => (
+      {list.map((submodule) => (
         <SubRow
-          key={pack.name}
-          title={pack.title}
-          meta={pack.sources ? `${pack.sources} sources` : `${pack.pages} pages`}
+          key={submodule.name}
+          title={submodule.title}
+          meta={submodule.sources ? `${submodule.sources} sources` : `${submodule.pages} pages`}
           action={
-            <Button variant={pack.sources ? 'ghost' : 'secondary'} className={subButton} disabled={sync.isPending} onClick={() => sync.mutate(pack)}>
-              {sync.isPending && sync.variables?.name === pack.name ? (
+            <Button variant={submodule.sources ? 'ghost' : 'secondary'} className={subButton} disabled={sync.isPending} onClick={() => sync.mutate(submodule)}>
+              {sync.isPending && sync.variables?.name === submodule.name ? (
                 <Spinner className="size-3.5" />
-              ) : pack.sources ? (
+              ) : submodule.sources ? (
                 <RefreshCw className="size-3.5" />
               ) : (
                 <Plus className="size-3.5" />
               )}
-              {pack.sources ? 'Sync' : 'Add'}
+              {submodule.sources ? 'Sync' : 'Add'}
             </Button>
           }
         />
@@ -83,17 +86,19 @@ function KnowledgePacks({ prefix, onSynced }: { prefix: string; onSynced: (messa
   );
 }
 
-// The feeds the alerts module offers. Add opens the new feed form on Alerts, which asks for the webhook.
-function AlertFeeds({ prefix }: { prefix: string }) {
+// The feeds a webhook module offers. Add opens the new feed form on the module's page, which asks for the webhook.
+function ModuleFeeds({ module, prefix }: { module: string; prefix: string }) {
   const presets = useQuery({
-    queryKey: ['alerts', prefix, 'presets'],
-    queryFn: () => api<{ presets: AlertPreset[] }>(`/api/alerts/${prefix}/presets`),
+    queryKey: ['feeds', prefix, 'presets'],
+    queryFn: () => api<{ presets: FeedPreset[] }>(`/api/feeds/${prefix}/presets`),
   });
   return (
     <>
-      {(presets.data?.presets ?? []).map((p) => (
+      {(presets.data?.presets ?? [])
+        .filter((p) => p.module === module)
+        .map((p) => (
         <SubRow
-          key={`${p.pack}/${p.key}`}
+          key={`${p.submodule}/${p.key}`}
           title={p.title}
           meta={`every ${p.every_hours}h`}
           action={
@@ -101,7 +106,7 @@ function AlertFeeds({ prefix }: { prefix: string }) {
               <Badge tone="ok">Added</Badge>
             ) : (
               <Link
-                to={`/${prefix}/alerts?new=${encodeURIComponent(`${p.pack}/${p.key}`)}`}
+                to={`/${prefix}/${MODULE_PAGES[module]}?new=${encodeURIComponent(`${p.submodule}/${p.key}`)}`}
                 className="inline-flex h-7 items-center gap-1 rounded-md border border-line bg-panel px-2 text-xs font-medium shadow-xs hover:bg-panel-2"
               >
                 <Plus className="size-3.5" /> Add
@@ -114,14 +119,14 @@ function AlertFeeds({ prefix }: { prefix: string }) {
   );
 }
 
-// The sub-modules of a module that is on. A module that is off lists its packs by title.
+// The sub-modules of a module that is on. A module that is off lists its sub-modules by title.
 function SubModules({ m, prefix, onSynced }: { m: CatalogModule; prefix: string; onSynced: (message: string) => void }) {
-  if (m.enabled && m.name === 'knowledge') return <KnowledgePacks prefix={prefix} onSynced={onSynced} />;
-  if (m.enabled && m.name === 'alerts') return <AlertFeeds prefix={prefix} />;
-  if (m.enabled || !m.packs.length) return null;
+  if (m.enabled && m.name === 'knowledge') return <KnowledgeSubmodules prefix={prefix} onSynced={onSynced} />;
+  if (m.enabled && m.name in FEED_MODULES) return <ModuleFeeds module={m.name} prefix={prefix} />;
+  if (m.enabled || !m.submodules.length) return null;
   return (
     <>
-      {m.packs.map((p) => (
+      {m.submodules.map((p) => (
         <SubRow key={p.name} title={p.title} meta="Add the module first" />
       ))}
     </>

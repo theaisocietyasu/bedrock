@@ -4,9 +4,11 @@ import type { AuditEntry, Branding, ModuleState } from './org';
 
 export type Problem = { module: string; subject: string; message: string };
 
-export type AlertFeedSummary = {
+export type FeedSummary = {
   key: string;
   kind: string;
+  // The webhook module the feed belongs to
+  module: string;
   enabled: boolean;
   every_hours: number;
   last_run_at: string | null;
@@ -31,11 +33,11 @@ export type Overview = {
     members: { total: number };
     points: { total: number; last_30_days: number };
     storefront: { products: number; pending_orders: number };
-    compute: {
+    godfather: {
       pods: { pod_id: string; name: string; public: boolean }[];
       sessions: { pod_id: string; title: string | null; start_at: string; stop_at: string }[];
     };
-    alerts: { feeds: AlertFeedSummary[] };
+    feeds: { feeds: FeedSummary[] };
     apps: { apps: AppSummary[] };
     knowledge: { sources: number; crawled: number; failing: { key: string; url: string | null; error: string }[] };
     agents: {

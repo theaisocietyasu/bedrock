@@ -3,14 +3,14 @@ import { Check, Plus, X } from 'lucide-react';
 import { useEffect, useId, useState } from 'react';
 import { Button, cx, Input, Select } from '../../components/ui';
 import { ApiError, api } from '../../lib/api';
-import { computePath, isDiscordId } from './shared';
+import { godfatherPath, isDiscordId } from './shared';
 
 type MemberHit = { id: string; name: string; username?: string | null; avatar?: string | null };
 type MemberPage = { members: MemberHit[]; total: number };
 type Role = { id: string; name: string; color: string };
 
 const PAGE = 100;
-// The most ids a pod lists; the same limit as MAX_ALLOWED_USERS in modules/compute/service.py.
+// The most ids a pod lists; the same limit as MAX_ALLOWED_USERS in modules/godfather/service.py.
 const MAX_USERS = 500;
 
 function useDebounced<T>(value: T, ms: number): T {
@@ -58,17 +58,17 @@ export function UsersEditor({
   const candidate = value.trim();
   const typed = useDebounced(candidate, 250);
   const query = /^\d+$/.test(typed) ? '' : typed;
-  const membersPath = `${computePath(prefix)}/members`;
+  const membersPath = `${godfatherPath(prefix)}/members`;
 
   const roles = useQuery({
-    queryKey: ['compute', prefix, 'member-roles'],
+    queryKey: ['godfather', prefix, 'member-roles'],
     queryFn: () => api<{ roles: Role[] }>(`/api/users/${prefix}/discord/roles`).then((body) => body.roles),
     enabled: Boolean(prefix),
     staleTime: 300_000,
     retry: false,
   });
   const list = useQuery({
-    queryKey: ['compute', prefix, 'members', query, role],
+    queryKey: ['godfather', prefix, 'members', query, role],
     queryFn: () => membersQuery(membersPath, query, role, PAGE),
     enabled: Boolean(prefix),
     staleTime: 60_000,
@@ -77,7 +77,7 @@ export function UsersEditor({
   });
   const unnamed = users.filter((user) => !picked[user]);
   const names = useQuery({
-    queryKey: ['compute', prefix, 'member-names', unnamed.join(',')],
+    queryKey: ['godfather', prefix, 'member-names', unnamed.join(',')],
     queryFn: () =>
       api<{ members: MemberHit[] }>(`${membersPath}?ids=${unnamed.join(',')}`).then((body) =>
         Object.fromEntries(body.members.map((m) => [m.id, m.name])),

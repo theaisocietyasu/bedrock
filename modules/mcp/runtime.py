@@ -74,13 +74,8 @@ def _usable(db, spec: ToolSpec, org: Organization, caller: MachineCaller) -> boo
 
 
 def available(db, caller: MachineCaller) -> list[ToolSpec]:
-    """Tools this token may call: its scopes allow them, its org has their module on and their service connected.
-
-    With the mcp module off, the org has no tools.
-    """
+    """Tools this token may call: its scopes allow them, its org has their module on and their service connected."""
     org = _org(db, caller)
-    if not organizations.module_enabled(org, "mcp"):
-        return []
     local = [spec for spec in TOOLS.values() if _usable(db, spec, org, caller)]
     found = local + _remote(db, org, caller)
     return sorted(found + [BATCH_SPEC] if found else found, key=lambda s: s.name)
@@ -100,8 +95,6 @@ def call(db, caller: MachineCaller, name: str, arguments: dict | None, *, source
     pending = False
     try:
         org = _org(db, caller)
-        if not organizations.module_enabled(org, "mcp"):
-            raise ToolError("The mcp module is turned off for this organization", 404)
         if name == BATCH:
             return _batch(db, caller, arguments, source)
         spec = TOOLS.get(name)

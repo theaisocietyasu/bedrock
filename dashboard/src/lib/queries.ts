@@ -110,7 +110,7 @@ export function useModules(id: number | undefined) {
   });
 }
 
-// The modules an org can add, with their switches, needs and packs.
+// The modules an org can add, with their switches, needs and submodules.
 export function useModuleCatalog(prefix: string) {
   return useQuery({
     queryKey: ['catalog', prefix],

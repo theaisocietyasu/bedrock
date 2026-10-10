@@ -1,8 +1,7 @@
 import {
   Activity,
-  BellRing,
+  BriefcaseBusiness,
   Bot,
-  Cable,
   CalendarDays,
   CodeXml,
   Coins,
@@ -16,6 +15,7 @@ import {
   Settings,
   ShieldCheck,
   ShoppingBag,
+  Trophy,
   Webhook,
 } from 'lucide-react';
 import type { QueryClient } from '@tanstack/react-query';
@@ -24,7 +24,7 @@ import { ModuleGate } from '../components/module-gate';
 import { overviewQuery } from '../lib/queries';
 import { ActivityPage } from './activity';
 import { AdminPage } from './admin';
-import { AlertsPage } from './alerts';
+import { HackathonWebhookPage, JobWebhookPage } from './feeds';
 import { CalendarPage } from './calendar';
 import { AgentsPage } from './agents';
 import { ExplorePage } from './explore';
@@ -33,7 +33,6 @@ import { HostingPage } from './hosting';
 import { KnowledgePage } from './knowledge';
 import { KnowledgeSourcePage } from './knowledge/source';
 import { LeetCodePage } from './leetcode';
-import { McpPage } from './mcp';
 import { OverviewPage } from './overview';
 import { PointsPage } from './points';
 import { prefetchPoints } from './points/shared';
@@ -47,11 +46,12 @@ import { WebhooksPage } from './webhooks';
 // The sidebar sections, in order. A section with no title has no header. They follow the categories on Explore.
 export const SECTIONS = [
   { id: 'top' },
-  { id: 'members', title: 'Members' },
+  { id: 'storage', title: 'Storage' },
+  { id: 'agents', title: 'AI and agents' },
   { id: 'webhooks', title: 'Webhooks' },
   { id: 'automations', title: 'Automations' },
-  { id: 'agents', title: 'AI and agents' },
-  { id: 'infrastructure', title: 'Infrastructure' },
+  { id: 'bots', title: 'Bots' },
+  { id: 'compute', title: 'Compute' },
   { id: 'bottom' },
 ] as const;
 
@@ -85,20 +85,20 @@ const prefetchOverview = (client: QueryClient, prefix: string) => void client.pr
 export const PAGES: PageEntry[] = [
   { path: '', label: 'Overview', icon: LayoutDashboard, section: 'top', page: OverviewPage, prefetch: prefetchOverview },
   { path: 'explore', label: 'Explore', icon: Compass, section: 'top', page: ExplorePage },
-  { path: 'points', label: 'Points', icon: Coins, section: 'members', module: 'points', gate: true, page: PointsPage, prefetch: prefetchPoints },
-  { path: 'store', label: 'Store', icon: ShoppingBag, section: 'members', module: 'storefront', gate: true, page: StorePage, prefetch: prefetchStore },
-  { path: 'webhooks', label: 'Webhooks', icon: Webhook, section: 'webhooks', page: WebhooksPage },
-  { path: 'alerts', label: 'Alerts', icon: BellRing, section: 'webhooks', module: 'alerts', gate: true, page: AlertsPage },
+  { path: 'knowledge', label: 'Knowledge', icon: Database, section: 'storage', module: 'knowledge', gate: true, page: KnowledgePage },
+  { path: 'knowledge/sources/*', label: 'Knowledge source', icon: Database, section: 'storage', module: 'knowledge', gate: true, hidden: true, page: KnowledgeSourcePage },
+  { path: 'points', label: 'Points', icon: Coins, section: 'storage', module: 'points', gate: true, page: PointsPage, prefetch: prefetchPoints },
+  { path: 'store', label: 'Store', icon: ShoppingBag, section: 'storage', module: 'storefront', gate: true, page: StorePage, prefetch: prefetchStore },
+  { path: 'agents', label: 'Agents', icon: Bot, section: 'agents', module: 'agents', gate: true, page: AgentsPage },
+  { path: 'job-alerts', label: 'Job alerts webhook', icon: BriefcaseBusiness, section: 'webhooks', module: 'job_webhook', gate: true, page: JobWebhookPage },
+  { path: 'hackathons', label: 'Hackathon webhook', icon: Trophy, section: 'webhooks', module: 'hackathon_webhook', gate: true, page: HackathonWebhookPage },
   { path: 'calendar', label: 'Calendar sync', icon: CalendarDays, section: 'automations', module: 'calendar', gate: true, page: CalendarPage },
   { path: 'uptime', label: 'Uptime', icon: HeartPulse, section: 'automations', module: 'uptime', gate: true, page: UptimePage },
-  { path: 'leetcode', label: 'LeetCode', icon: CodeXml, section: 'automations', module: 'leetcode', gate: true, page: LeetCodePage },
-  { path: 'knowledge', label: 'Knowledge', icon: Database, section: 'agents', module: 'knowledge', gate: true, page: KnowledgePage },
-  { path: 'knowledge/sources/*', label: 'Knowledge source', icon: Database, section: 'agents', module: 'knowledge', gate: true, hidden: true, page: KnowledgeSourcePage },
-  { path: 'mcp', label: 'MCP', icon: Cable, section: 'agents', module: 'mcp', gate: true, page: McpPage },
-  { path: 'agents', label: 'Agents', icon: Bot, section: 'agents', module: 'agents', gate: true, page: AgentsPage },
-  { path: 'hosting', label: 'Hosting', icon: Server, section: 'infrastructure', module: 'runpod', gate: true, page: HostingPage },
-  { path: 'godfather', label: 'Godfather', icon: Cpu, section: 'infrastructure', module: 'compute', gate: true, page: GodfatherPage },
-  { path: 'tokens', label: 'Tokens', icon: KeyRound, section: 'infrastructure', page: TokensPage },
+  { path: 'leetcode', label: 'LeetCode', icon: CodeXml, section: 'bots', module: 'leetcode', gate: true, page: LeetCodePage },
+  { path: 'godfather', label: 'Godfather', icon: Cpu, section: 'compute', module: 'godfather', gate: true, page: GodfatherPage },
+  { path: 'hosting', label: 'Hosting', icon: Server, section: 'compute', module: 'runpod', gate: true, page: HostingPage },
+  { path: 'tokens', label: 'Tokens', icon: KeyRound, section: 'bottom', page: TokensPage },
+  { path: 'webhooks', label: 'Event webhooks', icon: Webhook, section: 'bottom', page: WebhooksPage },
   { path: 'activity', label: 'Activity', icon: Activity, section: 'bottom', page: ActivityPage },
   { path: 'settings', label: 'Settings', icon: Settings, section: 'bottom', page: SettingsPage },
   { path: 'admin', label: 'Superadmin', icon: ShieldCheck, section: 'bottom', superadmin: true, page: AdminPage },
@@ -112,6 +112,8 @@ export const REDIRECTS: { path: string; to: string }[] = [
   { path: 'integrations', to: '../explore?tab=integrations' },
   { path: 'apps', to: '../hosting' },
   { path: 'compute', to: '../godfather' },
+  { path: 'mcp', to: '../tokens' },
+  { path: 'alerts', to: '../job-alerts' },
 ];
 
 // The element for the route of a page, inside a ModuleGate when the entry asks for one.

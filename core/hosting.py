@@ -1,4 +1,4 @@
-"""Hosting providers: the clouds an org runs compute pods and apps on. No Flask here.
+"""Hosting providers: the clouds an org runs Godfather pods and apps on. No Flask here.
 
 A provider gives an org a client for its own account, tells whether the org configured it, and reads the
 provider's pod shape: status, hardware, SSH address and public URL of a port. Modules store the provider
@@ -28,7 +28,7 @@ class ProviderError(ServiceError):
 
 
 class HostingClient(Protocol):
-    """The calls compute and apps make on an org's provider account. The pod dicts are the provider's own."""
+    """The calls Godfather and hosting make on an org's provider account. The pod dicts are the provider's own."""
 
     def list_pods(self) -> list[dict]: ...
 

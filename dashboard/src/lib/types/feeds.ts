@@ -1,0 +1,44 @@
+// The feeds of the webhook modules and their history.
+
+// A feed that a submodule offers, with the kind and config to create it.
+export type FeedPreset = {
+  // The webhook module that runs the feed
+  module: string;
+  submodule: string;
+  submodule_title: string;
+  key: string;
+  title: string;
+  description: string;
+  kind: 'github_jobs' | 'hackathons';
+  config: Record<string, unknown>;
+  every_hours: number;
+  added: boolean;
+};
+
+export type Feed = {
+  key: string;
+  kind: 'github_jobs' | 'hackathons';
+  config: Record<string, unknown>;
+  every_hours: number;
+  enabled: boolean;
+  webhook_set: boolean;
+  seeded_at: string | null;
+  last_run_at: string | null;
+  last_error: string | null;
+  posted: number;
+};
+
+export type FeedRun = {
+  started_at: string;
+  duration_ms: number;
+  found: number | null;
+  new: number | null;
+  posted: number;
+  recorded: boolean;
+  error: string | null;
+};
+
+export type FeedRuns = {
+  runs: FeedRun[];
+  items: { title: string; posted: boolean; created_at: string }[];
+};

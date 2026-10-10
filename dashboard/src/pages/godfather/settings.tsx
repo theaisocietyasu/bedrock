@@ -2,11 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Button, Dialog, Field, FormActions, Input, Spinner } from '../../components/ui';
 import { send } from '../../lib/api';
-import { type ComputeSettings, computePath, useComputeSettings } from './shared';
+import { type GodfatherSettings, godfatherPath, useGodfatherSettings } from './shared';
 
 // The org's default pod image. Empty uses the deployment default from .env.
-export function ComputeSettingsDialog({ prefix, onClose }: { prefix: string; onClose: () => void }) {
-  const current = useComputeSettings(prefix);
+export function GodfatherSettingsDialog({ prefix, onClose }: { prefix: string; onClose: () => void }) {
+  const current = useGodfatherSettings(prefix);
   return (
     <Dialog open onClose={onClose} title="Pod settings">
       {current.data ? <Form prefix={prefix} saved={current.data} onClose={onClose} /> : <Spinner className="size-4" />}
@@ -14,13 +14,13 @@ export function ComputeSettingsDialog({ prefix, onClose }: { prefix: string; onC
   );
 }
 
-function Form({ prefix, saved, onClose }: { prefix: string; saved: ComputeSettings; onClose: () => void }) {
+function Form({ prefix, saved, onClose }: { prefix: string; saved: GodfatherSettings; onClose: () => void }) {
   const client = useQueryClient();
   const [image, setImage] = useState(saved.pod_image ?? '');
   const save = useMutation({
-    mutationFn: () => send<{ settings: ComputeSettings }>(`${computePath(prefix)}/settings`, 'PUT', { pod_image: image.trim() || null }),
+    mutationFn: () => send<{ settings: GodfatherSettings }>(`${godfatherPath(prefix)}/settings`, 'PUT', { pod_image: image.trim() || null }),
     onSuccess: (body) => {
-      client.setQueryData(['compute', prefix, 'settings'], body.settings);
+      client.setQueryData(['godfather', prefix, 'settings'], body.settings);
       onClose();
     },
   });

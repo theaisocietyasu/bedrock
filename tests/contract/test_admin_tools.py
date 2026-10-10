@@ -24,21 +24,21 @@ def _call(client, headers, tool, **arguments):
 
 def test_confirm_tools_change_nothing_until_confirmed(client, restore_soda_config):
     headers = _issue("settings:write", "org:read")
-    first = _call(client, headers, "org.set_modules", modules={"alerts": False})
+    first = _call(client, headers, "org.set_modules", modules={"job_webhook": False})
     assert first.status_code == 200
     result = first.get_json()["result"]
-    assert result["confirm_required"] is True and result["arguments"] == {"modules": {"alerts": False}}
+    assert result["confirm_required"] is True and result["arguments"] == {"modules": {"job_webhook": False}}
     info = _call(client, headers, "org.info").get_json()["result"]
-    assert info["modules"]["alerts"] is True
+    assert info["modules"]["job_webhook"] is True
 
-    done = _call(client, headers, "org.set_modules", modules={"alerts": False}, confirm=True).get_json()["result"]
-    assert {m["name"]: m["enabled"] for m in done["modules"]}["alerts"] is False
-    assert _call(client, headers, "org.info").get_json()["result"]["modules"]["alerts"] is False
+    done = _call(client, headers, "org.set_modules", modules={"job_webhook": False}, confirm=True).get_json()["result"]
+    assert {m["name"]: m["enabled"] for m in done["modules"]}["job_webhook"] is False
+    assert _call(client, headers, "org.info").get_json()["result"]["modules"]["job_webhook"] is False
 
 
 def test_write_tools_need_their_scope(client):
     headers = _issue("org:read")
-    assert _call(client, headers, "org.set_modules", modules={"alerts": False}, confirm=True).status_code == 404
+    assert _call(client, headers, "org.set_modules", modules={"job_webhook": False}, confirm=True).status_code == 404
     assert _call(client, headers, "integrations.list").status_code == 404
     names = [t["name"] for t in client.get("/api/tools", headers=_issue("settings:write")).get_json()["tools"]]
     assert names == [
@@ -99,7 +99,7 @@ def test_pending_calls_are_audited_as_pending(client, restore_soda_config):
     from core.audit import AuditEntry
 
     headers = _issue("settings:write")
-    _call(client, headers, "org.set_modules", modules={"alerts": False})
+    _call(client, headers, "org.set_modules", modules={"job_webhook": False})
     db = db_connect.SessionLocal()
     try:
         entry = db.query(AuditEntry).filter_by(action="tool org.set_modules").order_by(AuditEntry.id.desc()).first()

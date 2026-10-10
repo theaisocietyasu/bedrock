@@ -24,10 +24,10 @@ from modules.knowledge import service as knowledge
 from modules.knowledge.search import search as search_chunks
 from modules.organizations import service as organizations
 from modules.organizations.models import Organization
-from modules.packs import service as packs
 from modules.runpod import service as apps
 from modules.runpod import templates as app_templates
-from packs.asu.signin import service as asu
+from modules.submodules import service as submodules
+from submodules.asu.signin import service as asu
 
 from . import ci, errors, notices, service, webhooks
 from . import trends as trends_service
@@ -354,17 +354,17 @@ def run_crawl(db, org, key):
     return {"queued": True}, 202
 
 
-@_route("/knowledge/packs", ["GET"], module="knowledge")
-def list_packs(db, org):
-    return {"packs": packs.list_packs(db, _org_id(org))}
+@_route("/knowledge/submodules", ["GET"], module="knowledge")
+def list_submodules(db, org):
+    return {"submodules": submodules.list_submodules(db, _org_id(org))}
 
 
-@_route("/knowledge/packs/<string:name>/sync", ["POST"], module="knowledge")
-def sync_pack(db, org, name):
-    """Add or update the pack's sources, then start the crawl job for the sources that are due."""
+@_route("/knowledge/submodules/<string:name>/sync", ["POST"], module="knowledge")
+def sync_submodule(db, org, name):
+    """Add or update the submodule's sources, then start the crawl job for the sources that are due."""
     from core.jobs import defer
 
-    counts = packs.sync(db, _org_id(org), str(org.prefix), name)
+    counts = submodules.sync(db, _org_id(org), str(org.prefix), name)
     defer("knowledge.crawl_due")
     return counts
 

@@ -4,7 +4,7 @@ from flask import Blueprint, current_app, jsonify, request
 
 from core.db import db_connect as db
 from core.log import get_logger
-from modules.auth.access import any_officer_denial
+from modules.auth.access import any_officer_denial, current_principal, is_superadmin, officer_guild_ids
 
 from . import service
 
@@ -21,7 +21,24 @@ def require_officer():
     denial = any_officer_denial()
     if denial:
         return jsonify({"message": denial[0]}), denial[1]
+    if not _games_on():
+        return jsonify({"message": "The games module is off for your organization"}), 404
     return None
+
+
+def _games_on() -> bool:
+    """Whether the caller is an officer of an org with the games module on. The superadmin always is."""
+    principal = current_principal()
+    if principal is None or not principal.discord_id or is_superadmin(principal.discord_id):
+        return True
+    guilds = officer_guild_ids(principal.discord_id)
+    if not guilds:
+        return True
+    session = db.SessionLocal()
+    try:
+        return service.enabled_for_guilds(session, guilds)
+    finally:
+        session.close()
 
 
 @game_blueprint.route("/", methods=["GET"])

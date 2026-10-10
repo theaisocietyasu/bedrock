@@ -20,12 +20,13 @@ def test_modules_are_on_by_default(client, officer_headers, soda_id):
         "points": True,
         "storefront": True,
         "calendar": True,
+        "games": True,
         "leetcode": True,
-        "compute": True,
-        "alerts": True,
+        "godfather": True,
+        "job_webhook": True,
+        "hackathon_webhook": True,
         "uptime": True,
         "knowledge": True,
-        "mcp": True,
         "agents": True,
         "integrations": True,
         "accounts": True,
@@ -74,19 +75,21 @@ def test_module_catalog_lists_every_module_but_core(client, officer_headers, sod
     from modules.manifest import CATALOG, CATEGORIES, CORE
 
     monkeypatch.delenv("BOT_TOKEN", raising=False)
-    client.put(f"/api/organizations/{soda_id}/modules", json={"modules": {"alerts": False}}, headers=officer_headers)
+    client.put(
+        f"/api/organizations/{soda_id}/modules", json={"modules": {"job_webhook": False}}, headers=officer_headers
+    )
     response = client.get("/api/dashboard/soda/modules", headers=officer_headers)
     assert response.status_code == 200
     body = response.get_json()
     assert CORE not in body["categories"]
     found = {m["name"]: m for m in body["modules"]}
     assert set(found) == set(CATALOG) - set(CATEGORIES[CORE])
-    assert found["alerts"]["enabled"] is False and found["alerts"]["switchable"] is True
+    assert found["job_webhook"]["enabled"] is False and found["job_webhook"]["switchable"] is True
     assert found["points"]["enabled"] is True
     assert found["knowledge"]["switchable"] is True and found["knowledge"]["enabled"] is True
-    assert found["games"]["switchable"] is False
-    assert [p["name"] for p in found["knowledge"]["packs"]] == ["asu"]
-    assert [p["name"] for p in found["alerts"]["packs"]] == ["careers"]
+    assert found["games"]["switchable"] is True
+    assert [p["name"] for p in found["knowledge"]["submodules"]] == ["asu"]
+    assert [p["name"] for p in found["job_webhook"]["submodules"]] == ["careers"]
     games = found["games"]
     assert games["needs"] == [
         {"key": "discord", "label": "Discord bot", "kind": "integration", "optional": False, "connected": False}
@@ -143,6 +146,24 @@ def test_agent_modules_off_close_their_routes_and_tools(client, officer_headers,
     assert client.get("/api/dashboard/soda/knowledge/sources", headers=officer_headers).status_code == 404
     assert "knowledge.search" not in tools()
 
-    client.put(f"/api/organizations/{soda_id}/modules", json={"modules": {"mcp": False}}, headers=officer_headers)
-    assert tools() == []
-    assert client.post("/api/tools/org.info", json={}, headers=headers).status_code == 404
+    refused = client.put(
+        f"/api/organizations/{soda_id}/modules", json={"modules": {"mcp": False}}, headers=officer_headers
+    )
+    assert refused.status_code == 400
+
+
+def test_games_follow_the_switch_of_the_officers_org(client, officer_headers, soda_id, restore_soda_config):
+    from core.db import db_connect
+    from modules.games import service
+    from modules.organizations.models import Organization
+
+    db = db_connect.SessionLocal()
+    try:
+        guild = db.get(Organization, soda_id).guild_id
+        assert service.enabled_for_guilds(db, [guild]) is True
+        client.put(f"/api/organizations/{soda_id}/modules", json={"modules": {"games": False}}, headers=officer_headers)
+        db.expire_all()
+        assert service.enabled_for_guilds(db, [guild]) is False
+        assert service.enabled_for_guilds(db, []) is False
+    finally:
+        db.close()

@@ -7,9 +7,9 @@ from core.tools import ToolError
 from core.tools import tool as _tool
 from modules.auth import scopes
 from modules.knowledge import fetch
-from modules.packs import web
-from modules.packs.search import query_scope
-from modules.packs.types import QueryError
+from modules.submodules import web
+from modules.submodules.search import query_scope
+from modules.submodules.types import QueryError
 
 # Every tool here needs the integrations module on for the caller's org
 tool = partial(_tool, module="integrations")

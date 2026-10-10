@@ -15,18 +15,19 @@ from core.integrations import registry as integrations
 from core.time import iso, utcnow
 from modules.accounts.models import AccountGrant
 from modules.agents.models import AgentConversation, AgentMemory, AgentPendingAction
-from modules.alerts.models import AlertFeed, AlertPost
 from modules.auth import scopes
 from modules.auth.models import MachineToken
-from modules.compute.models import ComputePod, ComputeSession
+from modules.feeds import service as feed_service
+from modules.feeds.models import AlertFeed, AlertPost
+from modules.godfather.models import ComputePod, ComputeSession
 from modules.knowledge.models import KnowledgeSource
 from modules.manifest import CATALOG, CATEGORIES, CORE, Need
 from modules.organizations import service as organizations
 from modules.organizations.models import Organization
-from modules.packs import catalog as packs
 from modules.points.models import Points
 from modules.runpod.models import App, AppDeployment
 from modules.storefront.models import Order, Product
+from modules.submodules import catalog as submodules
 from modules.users.models import UserOrganizationMembership
 
 from . import notices
@@ -43,8 +44,8 @@ def overview(db, org: Organization) -> dict:
         "members": _members(db, org_id),
         "points": _points(db, org_id, now),
         "storefront": _storefront(db, org_id),
-        "compute": _compute(db, org_id, now),
-        "alerts": _alerts(db, org_id, now),
+        "godfather": _godfather(db, org_id, now),
+        "feeds": _feeds(db, org_id, now),
         "apps": _apps(db, org_id),
         "knowledge": _knowledge(db, org_id),
         "agents": _agents(db, org_id, now),
@@ -72,7 +73,7 @@ def overview(db, org: Organization) -> dict:
 
 
 def modules(db, org: Organization) -> dict:
-    """Each module that is not Core, in category order, with its switch, its needs and its packs."""
+    """Each module that is not Core, in category order, with its switch, its needs and its submodules."""
     org_id = cast(int, org.id)
     result = []
     for category, names in CATEGORIES.items():
@@ -91,9 +92,9 @@ def modules(db, org: Organization) -> dict:
                     "enabled": organizations.module_enabled(org, name),
                     "ready": all(n["connected"] for n in needs if not n["optional"]),
                     "needs": needs,
-                    "packs": [
+                    "submodules": [
                         {"name": p.name, "title": p.title, "description": p.description}
-                        for p in map(packs.get, info.packs)
+                        for p in map(submodules.get, info.submodules)
                         if p is not None
                     ],
                 }
@@ -144,7 +145,7 @@ def _storefront(db, org_id: int) -> dict:
     return {"products": products, "pending_orders": pending}
 
 
-def _compute(db, org_id: int, now: datetime.datetime) -> dict:
+def _godfather(db, org_id: int, now: datetime.datetime) -> dict:
     pods = db.query(ComputePod).filter_by(organization_id=org_id).order_by(ComputePod.name).all()
     upcoming = (
         db.query(ComputeSession)
@@ -166,8 +167,9 @@ def _compute(db, org_id: int, now: datetime.datetime) -> dict:
     }
 
 
-def _alerts(db, org_id: int, now: datetime.datetime) -> dict:
-    feeds = db.query(AlertFeed).filter_by(organization_id=org_id).order_by(AlertFeed.key).all()
+def _feeds(db, org_id: int, now: datetime.datetime) -> dict:
+    on = feed_service.kinds_on(db, org_id)
+    feeds = [f for f in db.query(AlertFeed).filter_by(organization_id=org_id).order_by(AlertFeed.key) if f.kind in on]
     since = now - datetime.timedelta(days=7)
     counts = dict(
         db.query(AlertPost.feed_id, func.count(AlertPost.id))
@@ -180,6 +182,7 @@ def _alerts(db, org_id: int, now: datetime.datetime) -> dict:
             {
                 "key": f.key,
                 "kind": f.kind,
+                "module": feed_service.KIND_MODULES[str(f.kind)],
                 "enabled": f.enabled,
                 "every_hours": f.every_hours,
                 "last_run_at": iso(f.last_run_at),
@@ -265,9 +268,9 @@ def _tokens(db, org_id: int, now: datetime.datetime) -> dict:
 def _problems(sections: dict) -> list[dict]:
     """Things an officer should look at, from the sections above. The same problems as notices.problems."""
     problems = []
-    for feed in sections["alerts"]["feeds"]:
+    for feed in sections["feeds"]["feeds"]:
         if feed["enabled"] and feed["last_error"]:
-            problems.append({"module": "alerts", "subject": feed["key"], "message": feed["last_error"]})
+            problems.append({"module": feed["module"], "subject": feed["key"], "message": feed["last_error"]})
     for app in sections["apps"]["apps"]:
         if app["status"] == "failed":
             problems.append({"module": "apps", "subject": app["name"], "message": app["error"] or "Deploy failed"})

@@ -9,13 +9,24 @@ from dataclasses import dataclass
 # Each module and its category. modules/ stays flat; the categories group modules in modules/README.md and on the
 # Explore page of the dashboard. Core modules are always on and do not show on Explore.
 CATEGORIES = {
-    "Core": ["auth", "bot", "dashboard", "organizations", "packs", "public", "superadmin", "users"],
-    "AI and agents": ["knowledge", "mcp", "agents", "integrations"],
-    "Members": ["points", "storefront", "accounts"],
-    "Webhooks": ["alerts"],
+    "Core": [
+        "auth",
+        "bot",
+        "dashboard",
+        "feeds",
+        "mcp",
+        "organizations",
+        "public",
+        "submodules",
+        "superadmin",
+        "users",
+    ],
+    "Storage": ["knowledge", "points", "storefront", "accounts"],
+    "AI and agents": ["agents", "integrations"],
+    "Webhooks": ["job_webhook", "hackathon_webhook"],
     "Automations": ["calendar", "uptime"],
     "Bots": ["leetcode", "games"],
-    "Infrastructure": ["runpod", "compute"],
+    "Compute": ["godfather", "runpod"],
 }
 
 CORE = "Core"
@@ -42,8 +53,8 @@ class ModuleInfo:
     title: str
     description: str
     needs: tuple[Need, ...] = ()
-    # The packs in packs/ that the module reads
-    packs: tuple[str, ...] = ()
+    # The sub-modules in submodules/ that the module reads
+    submodules: tuple[str, ...] = ()
 
 
 DISCORD_BOT = Need("discord", "Discord bot")
@@ -61,7 +72,6 @@ CATALOG = {
         "Conversations, memories and pending actions of the org's agents.",
         needs=(Need("openrouter", "OpenRouter", optional=True),),
     ),
-    "alerts": ModuleInfo("Alerts", "Job and hackathon listings posted to Discord webhooks.", packs=("careers",)),
     "auth": ModuleInfo(
         "Sign-in", "Discord sign-in for officers and members, tokens and access checks.", (DISCORD_BOT,)
     ),
@@ -71,10 +81,21 @@ CATALOG = {
         "Copies Notion events to Google Calendar and the public events feed.",
         needs=(Need("notion", "Notion"), Need("google", "Google service account")),
     ),
-    "compute": ModuleInfo("Godfather", "GPU and CPU pods that members connect to with the Godfather CLI.", (RUNPOD,)),
+    "godfather": ModuleInfo("Godfather", "GPU and CPU pods that members connect to with the Godfather CLI.", (RUNPOD,)),
     "dashboard": ModuleInfo("Dashboard", "This dashboard: overview, activity, errors, branding and webhooks."),
+    "feeds": ModuleInfo("Feeds", "Runs the feeds of the webhook modules and posts their new items to Discord."),
     "games": ModuleInfo("Games", "Jeopardy games in the org's Discord server.", (DISCORD_BOT,)),
+    "hackathon_webhook": ModuleInfo(
+        "Hackathon webhook",
+        "Posts upcoming hackathons from Hack Club, Euro-Hackathons and Hackalist to a Discord channel.",
+        submodules=("careers",),
+    ),
     "integrations": ModuleInfo("Integration tools", "Gives agents the tools of the services that the org connects."),
+    "job_webhook": ModuleInfo(
+        "Job alerts webhook",
+        "Posts new internship and new grad roles from GitHub job lists to a Discord channel.",
+        submodules=("careers",),
+    ),
     "knowledge": ModuleInfo(
         "Knowledge",
         "Pages and documents that agents search, with crawls on a schedule.",
@@ -82,18 +103,18 @@ CATALOG = {
             Need("embeddings", "Embeddings service", optional=True),
             Need("firecrawl", "Firecrawl", optional=True),
         ),
-        packs=("asu",),
+        submodules=("asu",),
     ),
     "leetcode": ModuleInfo(
         "LeetCode", "Posts the daily LeetCode question in a Discord channel and checks who solved it.", (DISCORD_BOT,)
     ),
     "mcp": ModuleInfo("MCP", "The MCP server that gives agents and apps the tools of each module."),
     "organizations": ModuleInfo("Organizations", "The org record, module switches, secrets and machine tokens."),
-    "packs": ModuleInfo(
-        "Packs",
-        "Loads content packs: campus pages and live queries for knowledge, and feeds for alerts.",
+    "submodules": ModuleInfo(
+        "Sub-modules",
+        "Loads sub-modules: campus pages and live queries for knowledge, and feeds for the webhook modules.",
         needs=(Need("searxng", "Web search (SearXNG)", optional=True),),
-        packs=("asu", "careers"),
+        submodules=("asu", "careers"),
     ),
     "points": ModuleInfo("Points", "Points, leaderboards and event check-ins."),
     "public": ModuleInfo("Public pages", "Open routes for the leaderboard, the member list and stats."),
@@ -119,14 +140,14 @@ MODEL_MODULES = [
     "core.secrets",
     "core.webhooks",
     "modules.accounts.models",
-    "modules.alerts.models",
+    "modules.feeds.models",
     "modules.agents.models",
     "modules.auth.models",
     "modules.games.models",
     "modules.knowledge.models",
     "modules.leetcode.models",
     "modules.calendar.models",
-    "modules.compute.models",
+    "modules.godfather.models",
     "modules.organizations.models",
     "modules.points.models",
     "modules.runpod.models",
@@ -146,10 +167,10 @@ JOB_MODULES = [
     "modules.accounts.jobs",
     "modules.runpod.jobs",
     "modules.knowledge.jobs",
-    "modules.packs.jobs",
+    "modules.submodules.jobs",
     "modules.leetcode.jobs",
-    "modules.compute.jobs",
-    "modules.alerts.jobs",
+    "modules.godfather.jobs",
+    "modules.feeds.jobs",
     "modules.uptime.jobs",
 ]
 
@@ -160,17 +181,17 @@ TOOL_MODULES = [
     "modules.points.tools",
     "modules.knowledge.tools",
     "modules.runpod.tools",
-    "modules.packs.tools",
+    "modules.submodules.tools",
     "modules.dashboard.tools",
-    "modules.alerts.tools",
-    "modules.compute.tools",
+    "modules.feeds.tools",
+    "modules.godfather.tools",
     "modules.integrations.tools",
     "modules.accounts.tools",
     "modules.uptime.tools",
     "modules.users.tools",
     "modules.storefront.tools",
     "modules.leetcode.tools",
-    "packs.asu.signin.tools",
+    "submodules.asu.signin.tools",
 ]
 
 

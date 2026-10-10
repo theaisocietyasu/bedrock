@@ -164,7 +164,7 @@ const OrganizationNavbar = ({ children }) => {
                 </div>
                 )}
 
-                {isEnabled('compute') && (
+                {isEnabled('godfather') && (
                 <div>
                   <div className="text-sm font-semibold text-cyan-400 mb-4 flex items-center">
                     <FaServer className="mr-2 text-cyan-400" />

@@ -1,6 +1,6 @@
-// Outbound webhooks, the events they send, and the alert feeds that post to their own webhooks.
+// Outbound webhooks, the events they send, and the feeds of the webhook modules, which post to their own webhooks.
 
-import type { AlertFeed } from './alerts';
+import type { Feed } from './feeds';
 
 export type WebhookEvent = {
   key: string;
@@ -25,14 +25,13 @@ export type Webhook = {
   created_by: string | null;
 };
 
-export type WebhookFeed = Pick<AlertFeed, 'key' | 'kind' | 'enabled' | 'webhook_set' | 'last_run_at' | 'last_error'>;
+export type WebhookFeed = Pick<Feed, 'key' | 'kind' | 'enabled' | 'webhook_set' | 'last_run_at' | 'last_error'>;
 
 export type WebhookList = {
   webhooks: Webhook[];
   events: WebhookEvent[];
   kinds: WebhookKind[];
-  // The alerts module is on, and feeds lists its feeds.
-  alerts: boolean;
+  // The feeds of the webhook modules that are on
   feeds: WebhookFeed[];
   secrets_key: boolean;
 };

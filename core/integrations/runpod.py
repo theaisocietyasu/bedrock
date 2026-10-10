@@ -171,7 +171,7 @@ register(
         title="RunPod",
         description="Connect the org's RunPod account.",
         fields=(Field(SECRET_NAME, "API key", "RunPod > Settings > API Keys, with read and write access."),),
-        docs="modules/compute",
+        docs="modules/godfather",
         test=_test,
     )
 )

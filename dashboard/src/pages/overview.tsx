@@ -73,12 +73,12 @@ export function OverviewPage() {
               icon={<Coins className="size-4" />}
             />
           ) : null,
-          on('compute') ? (
+          on('godfather') ? (
             <Stat
               key="pods"
               label="Pods"
-              value={s.compute.pods.length}
-              sub={`${s.compute.sessions.length} upcoming sessions`}
+              value={s.godfather.pods.length}
+              sub={`${s.godfather.sessions.length} upcoming sessions`}
               icon={<Cpu className="size-4" />}
             />
           ) : null,
@@ -170,18 +170,11 @@ export function OverviewPage() {
         </Card>
         ) : null}
 
-        {on('alerts') ? (
+        {on('job_webhook') || on('hackathon_webhook') ? (
         <Card>
-          <CardHeader
-            title="Alert feeds"
-            action={
-              <Link to="alerts" className={quietLink}>
-                Manage
-              </Link>
-            }
-          />
-          {s.alerts.feeds.length ? (
-            s.alerts.feeds.map((f) => (
+          <CardHeader title="Webhook feeds" />
+          {s.feeds.feeds.length ? (
+            s.feeds.feeds.map((f) => (
               <Row key={f.key}>
                 <Dot tone={!f.enabled ? 'muted' : f.last_error ? 'bad' : 'ok'} />
                 <span className="flex-1 truncate text-sm">{f.key}</span>
@@ -189,12 +182,12 @@ export function OverviewPage() {
               </Row>
             ))
           ) : (
-            <EmptyState icon={BellRing}>No alert feeds.</EmptyState>
+            <EmptyState icon={BellRing}>No feeds.</EmptyState>
           )}
         </Card>
         ) : null}
 
-        {on('compute') ? (
+        {on('godfather') ? (
         <Card>
           <CardHeader
             title="Upcoming sessions"
@@ -204,8 +197,8 @@ export function OverviewPage() {
               </Link>
             }
           />
-          {s.compute.sessions.length ? (
-            s.compute.sessions.slice(0, 5).map((session) => (
+          {s.godfather.sessions.length ? (
+            s.godfather.sessions.slice(0, 5).map((session) => (
               <Row key={`${session.pod_id}-${session.start_at}`}>
                 <span className="flex-1 truncate text-sm">{session.title ?? session.pod_id}</span>
                 <span className="text-xs text-muted tabular-nums">{timeAgo(session.start_at)}</span>

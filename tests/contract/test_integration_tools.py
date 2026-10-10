@@ -175,7 +175,7 @@ def test_token_list_groups_integration_scopes(client, officer_headers, soda):
     assert {"discord", "embeddings", "notion", "runpod"} <= set(keys)
     runpod = next(i for i in body["integrations"] if i["key"] == "runpod")
     assert runpod["scopes"] == ["runpod:read", "runpod:write"] and runpod["remote"] is True
-    assert "compute:manage" in runpod["through"]
+    assert "godfather:manage" in runpod["through"]
     assert body["uses"]["knowledge:write"] == ["embeddings", "firecrawl"]
     assert "org:read" not in body["uses"]
 

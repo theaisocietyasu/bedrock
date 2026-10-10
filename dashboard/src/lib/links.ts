@@ -3,7 +3,7 @@
 // The original repo of Platform, by SoDA. LICENSE clause 4b requires a link to it.
 export const SOURCE_URL = 'https://github.com/asusoda/platform';
 
-// The repo that holds the docs and packs.
+// The repo that holds the docs and submodules.
 export const REPO_URL = SOURCE_URL;
 
 // The URL of the site/ deployment. Without it, the links go to the docs and README in the repo.
