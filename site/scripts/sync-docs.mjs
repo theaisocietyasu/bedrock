@@ -1,4 +1,5 @@
-// Copies the repo's docs/*.md into content/docs as MDX, so docs/ stays the only source.
+// Copies the repo's docs/*.md into content/docs as MDX, so docs/ stays the only source. A mermaid block becomes
+// a Mermaid component.
 import { mkdir, readFile, rm, writeFile } from 'node:fs/promises';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -91,9 +92,21 @@ function toMdx(markdown, from) {
   const lines = markdown.replace(/\r\n/g, '\n').split('\n');
   let title = '';
   let fence = null;
+  let chart = null;
   const body = [];
   for (const line of lines) {
     const opener = line.match(/^\s*(```+|~~~+)/);
+    if (chart) {
+      if (opener && opener[1].startsWith(chart.fence)) {
+        body.push(`<Mermaid chart={${JSON.stringify(chart.lines.join('\n'))}} />`);
+        chart = null;
+      } else chart.lines.push(line);
+      continue;
+    }
+    if (opener && /^\s*(```+|~~~+)mermaid\s*$/.test(line)) {
+      chart = { fence: opener[1], lines: [] };
+      continue;
+    }
     if (fence) {
       body.push(line);
       if (opener && opener[1].startsWith(fence)) fence = null;

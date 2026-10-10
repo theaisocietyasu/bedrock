@@ -84,7 +84,7 @@ export function ExplorePage() {
   const deferred = useDeferredValue(query);
   return (
     <>
-      <PageHeader title="Explore" description="Add modules and connect services." docs="writing-a-module" />
+      <PageHeader title="Explore" description="Add modules and connect services." docs="codebase/writing-a-module" />
       <TabBar
         label="Explore"
         tabs={TABS}

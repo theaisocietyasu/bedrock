@@ -312,7 +312,7 @@ export function TokensPage() {
       <PageHeader
         title="Tokens"
         description="Keys that apps and agents use to call Platform."
-        docs="authentication"
+        docs="codebase/authentication"
         action={
           <Button variant="primary" onClick={() => setAdding(true)} disabled={!list.data}>
             <Plus className="size-4" /> New token

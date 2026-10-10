@@ -29,7 +29,7 @@ from modules.runpod import templates as app_templates
 from modules.submodules import service as submodules
 from submodules.asu.signin import service as asu
 
-from . import ci, errors, notices, service, webhooks
+from . import ci, errors, notices, service
 from . import trends as trends_service
 
 dashboard_blueprint = Blueprint("dashboard", __name__)
@@ -38,7 +38,6 @@ _route = partial(officer_route, dashboard_blueprint)
 # Searches are reads sent as POST
 audit_hook.SKIPPED_ROUTES.add("/api/dashboard/<string:org_prefix>/knowledge/search")
 audit_hook.SKIPPED_ROUTES.add("/api/dashboard/<string:org_prefix>/integrations/<string:key>/test")
-audit_hook.SKIPPED_ROUTES.add("/api/dashboard/<string:org_prefix>/webhooks/<int:webhook_id>/test")
 # Error reports from the dashboard are not officer changes
 audit_hook.SKIPPED_ROUTES.add("/api/dashboard/<string:org_prefix>/errors/report")
 
@@ -204,35 +203,6 @@ def delete_errors(db, org):
 @_route("/errors/report", ["POST"])
 def report_error(db, org):
     return errors.report(org, json_body())
-
-
-# Outbound webhooks
-
-
-@_route("/webhooks", ["GET"])
-def list_webhooks(db, org):
-    return webhooks.listing(db, org)
-
-
-@_route("/webhooks", ["POST"])
-def create_webhook(db, org):
-    return webhooks.create(db, org, json_body(), _actor()), 201
-
-
-@_route("/webhooks/<int:webhook_id>", ["PUT"])
-def update_webhook(db, org, webhook_id):
-    return webhooks.update(db, org, webhook_id, json_body())
-
-
-@_route("/webhooks/<int:webhook_id>", ["DELETE"])
-def delete_webhook(db, org, webhook_id):
-    webhooks.delete(db, org, webhook_id)
-    return {"deleted": True}
-
-
-@_route("/webhooks/<int:webhook_id>/test", ["POST"])
-def test_webhook(db, org, webhook_id):
-    return webhooks.send_test(db, org, webhook_id)
 
 
 @_route("/ci/repos", ["PUT"])

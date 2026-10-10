@@ -41,6 +41,7 @@ Core modules are always on. The Explore page of the dashboard does not show them
 
 | Module | Does | Org switch |
 | --- | --- | --- |
+| [event_webhook](event_webhook/README.md) | Events of the org, such as a failed job, sent to Discord webhooks | `event_webhook` |
 | [job_webhook](job_webhook/README.md) | New internship and new grad roles posted to a Discord webhook | `job_webhook` |
 | [hackathon_webhook](hackathon_webhook/README.md) | Upcoming hackathons posted to a Discord webhook | `hackathon_webhook` |
 

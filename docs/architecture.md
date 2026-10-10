@@ -73,7 +73,7 @@ flowchart LR
 | Core | `auth`, `bot`, `dashboard`, `feeds`, `mcp`, `organizations`, `public`, `submodules`, `superadmin`, `users`. Always on and not on Explore |
 | Storage | `knowledge`, `points`, `storefront`, `accounts` |
 | AI and agents | `agents`, `integrations` |
-| Webhooks | `job_webhook`, `hackathon_webhook` |
+| Webhooks | `event_webhook`, `job_webhook`, `hackathon_webhook` |
 | Automations | `calendar`, `uptime` |
 | Bots | `leetcode`, `games` |
 | Compute | `godfather`, `runpod` (Hosting) |
@@ -163,5 +163,5 @@ Each call, allowed or refused, is a row in `audit_log` with `action=tool <name>`
 | RunPod | Godfather pods and app deploys, through the hosting provider registry in `core/hosting.py` | `core/integrations/runpod.py` |
 | LeetCode GraphQL | The daily question and solve checks | `modules/leetcode/client.py` |
 | Error log | Errors of each process and the dashboard, grouped in `error_groups`, shown on Activity, Errors | `core/error_log.py`, `modules/dashboard/errors.py` |
-| Webhooks | Org events (errors, failed jobs, pods, deploys, orders, new members, failed crawls) posted to Discord webhooks | `core/webhooks.py`, `modules/dashboard/webhooks.py` |
+| Webhooks | Org events (errors, failed jobs, pods, deploys, orders, new members, failed crawls) posted to Discord webhooks | `core/webhooks.py`, `modules/event_webhook/` |
 | Sentry | Optional: errors, logs and sampled traces if `SENTRY_DSN` is set | `core/log.py` |

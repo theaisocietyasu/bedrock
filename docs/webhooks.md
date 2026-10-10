@@ -1,8 +1,18 @@
 # Webhooks
 
-Platform sends a message to a channel when an event happens in an org. Officers add webhooks on the dashboard page Event webhooks, at the bottom of the sidebar. Each webhook has a name, a destination and the events it sends.
+The Event webhooks module (`modules/event_webhook/`) sends a message to a channel when an event happens in an org. Officers turn it on in Explore, under Webhooks, and add webhooks on its page. Each webhook has a name, a destination and the events it sends. With the module off, no event goes to a webhook, and the routes and tools return 404.
 
-Each event also shows on the dashboard page Notifications, with or without a webhook. The hourly limit applies only to webhook messages.
+Each event also shows on the Activity page, with or without the module. The hourly limit applies only to webhook messages.
+
+```mermaid
+flowchart LR
+  module["A module calls emit()"] --> saved["Activity notification"]
+  module --> on{"event_webhook on?"}
+  on -- yes --> hooks["Each webhook that takes the event"] --> discord["Discord channel"]
+  on -- no --> stop["No message"]
+```
+
+The Webhooks category has three modules. Event webhooks sends events. Job alerts webhook and Hackathon webhook post feed listings to their own webhooks (see [Feeds and the webhook modules](./modules/feeds.md)).
 
 ## Events
 
@@ -20,7 +30,7 @@ Each event also shows on the dashboard page Notifications, with or without a web
 | `monitor.up` | Monitors up | `modules/uptime/service.py` | A check is up after a down check |
 | `asu.session_expired` | ASU sign-in expired | `submodules/asu/signin/service.py` | An `asu.*` tool finds that the saved ASU sign-in expired. Sent one time for each sign-in |
 
-The page lists an event only when its module is on for the org. Pods need `godfather`, orders need `storefront` and monitors need `uptime`.
+The page lists an event only when its module is on for the org. Pods need `godfather`, orders need `storefront` and monitors need `uptime`. Uptime checks each Hosting app; `app.deployed` says only how a deploy ended.
 
 ## Delivery
 
@@ -59,7 +69,7 @@ To add a kind, such as Slack, add a `Kind` to `KINDS` in `core/webhooks.py`: a U
 
 ## Routes
 
-All routes are under `/api/dashboard/<org>/webhooks`, for officers of the org.
+All routes are under `/api/dashboard/<org>/webhooks`, for officers of the org, behind the `event_webhook` switch.
 
 | Route | Does |
 | --- | --- |

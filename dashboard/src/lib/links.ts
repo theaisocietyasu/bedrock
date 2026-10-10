@@ -6,11 +6,11 @@ export const SOURCE_URL = 'https://github.com/asusoda/platform';
 // The repo that holds the docs and submodules.
 export const REPO_URL = SOURCE_URL;
 
-// The URL of the site/ deployment. Without it, the links go to the docs and README in the repo.
-const SITE_URL = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '') || null;
+// The docs and landing site of Platform. VITE_SITE_URL points the links at another deployment of site/.
+const SITE_URL = (import.meta.env.VITE_SITE_URL as string | undefined)?.replace(/\/$/, '') || 'https://platform.ais-asu.com';
 
-export const DOCS_URL = SITE_URL ? `${SITE_URL}/docs` : `${REPO_URL}/tree/main/docs`;
-export const ABOUT_URL = SITE_URL ?? `${REPO_URL}#readme`;
+export const DOCS_URL = `${SITE_URL}/docs`;
+export const ABOUT_URL = SITE_URL;
 
 // background is the fill of the mark. The logos have fixed colors, so it does not follow the theme.
 export type BuiltBy = { name: string; short: string; url: string; logo: string; background: string };
@@ -42,5 +42,5 @@ export function joinNames(names: string[]): string {
 export const builtByLabel = (orgs: BuiltBy[] = BUILT_BY, short = false) =>
   `Built by ${joinNames(orgs.map((o) => o.short))}${short ? '' : ' at ASU'}`;
 
-// A page of the docs, such as modules/calendar.
-export const docsPage = (path: string) => (SITE_URL ? `${SITE_URL}/docs/${path}` : `${REPO_URL}/blob/main/docs/${path}.md`);
+// A page of the docs site, such as modules/calendar or codebase/webhooks.
+export const docsPage = (path: string) => `${SITE_URL}/docs/${path}`;

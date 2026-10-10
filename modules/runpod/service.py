@@ -26,6 +26,7 @@ from core.log import get_logger
 from core.time import iso, utcnow
 from modules.auth import scopes
 from modules.runpod.models import App, AppDeployment
+from modules.uptime import service as uptime
 
 logger = get_logger("runpod")
 
@@ -259,6 +260,7 @@ def put_app(
     else:
         _validated(manifest)
     app = db.query(App).filter_by(organization_id=org_id, name=name).first()
+    new = app is None
     chosen = _provider(provider).name if provider is not None else None
     if app is None:
         app = App(organization_id=org_id, name=name, provider=chosen or hosting.DEFAULT)
@@ -271,6 +273,8 @@ def put_app(
     app.manifest = json.dumps(manifest, sort_keys=True)
     app.updated_at = utcnow()
     db.commit()
+    if new:
+        uptime.watch_app(db, org_id, name)
     return _app_dict(db, app)
 
 
@@ -287,6 +291,7 @@ def delete_app(db, org_id: int, name: str) -> dict:
     app = _find(db, org_id, name)
     pod_id = app.pod_id
     db.query(AppDeployment).filter_by(app_id=app.id).delete(synchronize_session=False)
+    uptime.forget_app(db, org_id, name)
     db.delete(app)
     db.commit()
     return {"deleted": True, "pod_id": pod_id}

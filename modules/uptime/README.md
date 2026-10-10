@@ -1,13 +1,13 @@
 # uptime
 
-Checks public URLs and the health URLs of Hosting apps on a schedule. Keeps each result. Sends `monitor.down` and `monitor.up` when a monitor changes state.
+Checks public URLs and the health URLs of Hosting apps on a schedule. Keeps each result. Sends `monitor.down` and `monitor.up` when a monitor changes state. Each new Hosting app gets a monitor when the module is on, and a deleted app loses its monitors.
 
 ## Files
 
 | File | Holds |
 | --- | --- |
 | `api.py` | Officer routes to list, add, change, delete and check monitors |
-| `service.py` | Monitors, checks, uptime percents, state changes and events; declares `uptime:read` |
+| `service.py` | Monitors, checks, uptime percents, state changes and events, the monitors of Hosting apps; declares `uptime:read` |
 | `probe.py` | One HTTP check. Each URL and redirect must resolve to public addresses (`core/net.py`) |
 | `models.py` | Monitors and their checks |
 | `jobs.py` | The scheduled checks and the removal of old checks |

@@ -136,7 +136,7 @@ export function AsuCard({ prefix, initial }: { prefix: string; initial: AsuState
           </Button>
         )}
         <a
-          href={`${docsPage('integrations')}#sign-in-to-asu`}
+          href={`${docsPage('codebase/integrations')}#sign-in-to-asu`}
           target="_blank"
           rel="noreferrer"
           className="ml-auto flex items-center gap-1 text-xs text-muted transition-colors hover:text-fg"

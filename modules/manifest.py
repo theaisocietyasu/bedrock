@@ -23,7 +23,7 @@ CATEGORIES = {
     ],
     "Storage": ["knowledge", "points", "storefront", "accounts"],
     "AI and agents": ["agents", "integrations"],
-    "Webhooks": ["job_webhook", "hackathon_webhook"],
+    "Webhooks": ["event_webhook", "job_webhook", "hackathon_webhook"],
     "Automations": ["calendar", "uptime"],
     "Bots": ["leetcode", "games"],
     "Compute": ["godfather", "runpod"],
@@ -82,7 +82,10 @@ CATALOG = {
         needs=(Need("notion", "Notion"), Need("google", "Google service account")),
     ),
     "godfather": ModuleInfo("Godfather", "GPU and CPU pods that members connect to with the Godfather CLI.", (RUNPOD,)),
-    "dashboard": ModuleInfo("Dashboard", "This dashboard: overview, activity, errors, branding and webhooks."),
+    "dashboard": ModuleInfo("Dashboard", "This dashboard: overview, activity, errors and branding."),
+    "event_webhook": ModuleInfo(
+        "Event webhooks", "Sends events of the org, such as a failed job or a site that is down, to Discord webhooks."
+    ),
     "feeds": ModuleInfo("Feeds", "Runs the feeds of the webhook modules and posts their new items to Discord."),
     "games": ModuleInfo("Games", "Jeopardy games in the org's Discord server.", (DISCORD_BOT,)),
     "hackathon_webhook": ModuleInfo(
@@ -120,12 +123,14 @@ CATALOG = {
     "public": ModuleInfo("Public pages", "Open routes for the leaderboard, the member list and stats."),
     "runpod": ModuleInfo(
         "Hosting",
-        "Deploys the org's apps to a hosting provider and checks their health.",
+        "Deploys the org's apps to a hosting provider, and rolls back to an earlier tag.",
         needs=(RUNPOD, Need("github", "GitHub", optional=True)),
     ),
     "storefront": ModuleInfo("Store", "A merch store that members pay for with points."),
     "superadmin": ModuleInfo("Superadmin", "Orgs for the whole deployment. Only the superadmin uses it."),
-    "uptime": ModuleInfo("Uptime", "Checks the org's sites and apps, with an event when one goes down."),
+    "uptime": ModuleInfo(
+        "Uptime", "Checks the org's sites and Hosting apps, with an event when one goes down or comes back."
+    ),
     "users": ModuleInfo("Member list", "The members of the org and their profile fields."),
 }
 
@@ -183,6 +188,7 @@ TOOL_MODULES = [
     "modules.runpod.tools",
     "modules.submodules.tools",
     "modules.dashboard.tools",
+    "modules.event_webhook.tools",
     "modules.feeds.tools",
     "modules.godfather.tools",
     "modules.integrations.tools",

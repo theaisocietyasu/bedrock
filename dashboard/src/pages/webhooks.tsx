@@ -210,7 +210,7 @@ export function WebhooksPage() {
       <PageHeader
         title="Webhooks"
         description="Messages to your channels when events happen."
-        docs="webhooks"
+        docs="codebase/webhooks"
         action={
           <Button variant="primary" disabled={!data?.secrets_key} onClick={() => setEditing('new')}>
             <Plus className="size-4" /> New webhook

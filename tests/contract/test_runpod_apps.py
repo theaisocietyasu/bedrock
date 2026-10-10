@@ -403,3 +403,23 @@ def test_deploy_tool_previews_a_dry_run_until_confirmed(client, manager, deploye
     assert fake.calls[-1][0] == "POST"
     app = client.post("/api/tools/apps.get", json={"name": name}, headers=manager).get_json()["result"]
     assert app["deployments"][0]["tag"] == "v1"
+
+
+def _monitors(name):
+    from modules.uptime.models import UptimeMonitor
+
+    db = db_connect.SessionLocal()
+    try:
+        return [(m.name, m.target_kind) for m in db.query(UptimeMonitor).filter_by(target=name).all()]
+    finally:
+        db.close()
+
+
+def test_uptime_watches_a_new_app_and_forgets_a_deleted_one(client, manager):
+    name = _register(client, manager)
+    assert _monitors(name) == [(name, "app")]
+    again = client.put(f"/api/apps/{name}", json={"manifest": MANIFEST}, headers=manager)
+    assert again.status_code == 200
+    assert len(_monitors(name)) == 1
+    assert client.delete(f"/api/apps/{name}", headers=manager).get_json()["deleted"] is True
+    assert _monitors(name) == []
