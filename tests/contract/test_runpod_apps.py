@@ -421,5 +421,6 @@ def test_uptime_watches_a_new_app_and_forgets_a_deleted_one(client, manager):
     again = client.put(f"/api/apps/{name}", json={"manifest": MANIFEST}, headers=manager)
     assert again.status_code == 200
     assert len(_monitors(name)) == 1
-    assert client.delete(f"/api/apps/{name}", headers=manager).get_json()["deleted"] is True
+    deleted = client.delete(f"/api/apps/{name}", headers=manager)
+    assert deleted.get_json()["deleted"] is True
     assert _monitors(name) == []
