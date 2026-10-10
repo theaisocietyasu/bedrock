@@ -225,6 +225,31 @@ def create_monitor(db, org_id: int, body: dict) -> dict:
     return _describe_all(db, [monitor], RECENT)[0]
 
 
+def watch_app(db, org_id: int, name: str) -> None:
+    """Add a monitor of a new Hosting app when the org has uptime on and no monitor checks the app. Commits."""
+    org = db.get(Organization, org_id)
+    if org is None or not organizations.module_enabled(org, "uptime"):
+        return
+    monitors = db.query(UptimeMonitor).filter_by(organization_id=org_id)
+    if monitors.count() >= MAX_MONITORS or _name_taken(db, org_id, name, None):
+        return
+    if monitors.filter_by(target_kind="app", target=name).first() is not None:
+        return
+    fields = _fields(db, org_id, {"name": name, "target_kind": "app", "target": name}, None)
+    db.add(UptimeMonitor(organization_id=org_id, **fields))
+    db.commit()
+
+
+def forget_app(db, org_id: int, name: str) -> None:
+    """Delete the monitors of a Hosting app and their checks. The caller commits."""
+    ids = [
+        i for (i,) in db.query(UptimeMonitor.id).filter_by(organization_id=org_id, target_kind="app", target=name).all()
+    ]
+    if ids:
+        db.query(UptimeCheck).filter(UptimeCheck.monitor_id.in_(ids)).delete(synchronize_session=False)
+        db.query(UptimeMonitor).filter(UptimeMonitor.id.in_(ids)).delete(synchronize_session=False)
+
+
 def update_monitor(db, org_id: int, monitor_id: int, body: dict) -> dict:
     """Change a monitor. A new target, a new expected status or a resume clears the state. Commits."""
     monitor = _find(db, org_id, monitor_id)

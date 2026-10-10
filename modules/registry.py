@@ -14,6 +14,7 @@ from modules.agents.api import agents_blueprint
 from modules.auth.api import auth_blueprint
 from modules.calendar.api import calendar_blueprint
 from modules.dashboard.api import dashboard_blueprint
+from modules.event_webhook.api import event_webhook_blueprint
 from modules.feeds.api import feeds_blueprint
 from modules.games.api import game_blueprint
 from modules.godfather.api import godfather_blueprint
@@ -62,6 +63,7 @@ MOUNTS = [
     Mount(feeds_blueprint, "/api/feeds"),
     Mount(uptime_blueprint, "/api/uptime", module="uptime"),
     Mount(dashboard_blueprint, "/api/dashboard"),
+    Mount(event_webhook_blueprint, "/api/dashboard", module="event_webhook"),
 ]
 
 

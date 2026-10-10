@@ -122,6 +122,21 @@ def test_events_go_only_to_webhooks_that_take_them(client, officer_headers, sent
     assert len(sent) == 2
 
 
+def test_the_switch_stops_delivery_and_hides_the_routes(client, officer_headers, sent):
+    _create(client, officer_headers, events=["order.created"])
+    switch = f"/api/organizations/{_ais_id()}/modules"
+    turned_off = client.put(switch, json={"modules": {"event_webhook": False}}, headers=officer_headers)
+    assert turned_off.status_code == 200
+
+    webhooks.emit("ais", "order.created", webhooks.Message(title="New store order #1"))
+    assert sent == []
+    assert client.get(BASE, headers=officer_headers).status_code == 404
+
+    client.put(switch, json={"modules": {"event_webhook": True}}, headers=officer_headers)
+    webhooks.emit("ais", "order.created", webhooks.Message(title="New store order #2"))
+    assert [url for url, _ in sent] == [URL]
+
+
 def test_hourly_limit(client, officer_headers, sent, monkeypatch):
     monkeypatch.setattr(webhooks, "LIMIT_PER_HOUR", 2)
     _create(client, officer_headers, events=["order.created"])

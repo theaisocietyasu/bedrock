@@ -78,7 +78,7 @@ register(
                 "OpenRouter > Settings > API Keys. Embeddings uses this key when its base URL is OpenRouter.",
             ),
         ),
-        docs="integrations",
+        docs="codebase/integrations",
         deployment=lambda: deployment_key() is not None,
         test=_test,
     )

@@ -70,7 +70,7 @@ All routes are under `/api/apps`. They need a machine token, and the org is the 
 
 The `apps.list` tool returns the same list as `GET /`.
 
-The first deploy creates the pod, named `<org>-<app>`. A later deploy changes its image, which restarts it: the container disk is erased and volumes stay. A new deploy replaces one that is still in progress. The `runpod.check_deployments` job runs each minute. It marks a deployment healthy when its health path returns a status below 400, or failed after 15 minutes. There is no automatic rollback.
+The first deploy creates the pod, named `<org>-<app>`. A later deploy changes its image, which restarts it: the container disk is erased and volumes stay. A new deploy replaces one that is still in progress. The `runpod.check_deployments` job runs each minute. It marks a deployment healthy when its health path returns a status below 400, or failed after 15 minutes. There is no automatic rollback. After the deploy, the Uptime module checks the app: a new app gets a monitor when Uptime is on, and a deleted app loses its monitors.
 
 ## Deploy from GitHub Actions
 

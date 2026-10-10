@@ -1,6 +1,6 @@
 # Uptime
 
-Checks the org's sites and Hosting apps on a schedule. Officers manage monitors on the dashboard page Uptime.
+Checks the org's sites and Hosting apps on a schedule. Officers manage monitors on the dashboard page Uptime. Each new Hosting app gets a monitor named after the app, and a deleted app loses its monitors.
 
 ## Monitors
 

@@ -34,6 +34,7 @@ OPTIONAL_MODULES = {
     "games": "Jeopardy games in the org's Discord server",
     "leetcode": "Daily LeetCode post in the org's channel, with solve checks",
     "godfather": "GPU and CPU pods on the org's RunPod account that members SSH into",
+    "event_webhook": "Events of the org, such as a failed job, sent to Discord webhooks",
     "job_webhook": "New internship and new grad roles posted to a Discord webhook",
     "hackathon_webhook": "Upcoming hackathons posted to a Discord webhook",
     "uptime": "Checks of sites and Hosting apps, with an event when one goes down or up",

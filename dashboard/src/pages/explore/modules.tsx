@@ -15,6 +15,7 @@ const MODULE_PAGES: Record<string, string> = {
   leetcode: 'leetcode',
   godfather: 'godfather',
   runpod: 'hosting',
+  event_webhook: 'webhooks',
   job_webhook: 'job-alerts',
   hackathon_webhook: 'hackathons',
   knowledge: 'knowledge',

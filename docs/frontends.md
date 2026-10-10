@@ -6,7 +6,7 @@ Platform has two officer frontends. `dashboard/` is the new one. Officers use it
 
 `dashboard/` is a Vite and React app with Tailwind and TanStack Query. It calls the API and has no server code.
 
-The sidebar puts the pages in sections that follow the module categories on Explore: Storage (Knowledge, Points, Store), AI and agents (Agents), Webhooks (Job alerts webhook, Hackathon webhook), Automations (Calendar sync, Uptime), Bots (LeetCode) and Compute (Godfather, Hosting). Tokens, Event webhooks, Activity and Settings are at the bottom. Core modules have no section.
+The sidebar puts the pages in sections that follow the module categories on Explore: Storage (Knowledge, Points, Store), AI and agents (Agents), Webhooks (Event webhooks, Job alerts webhook, Hackathon webhook), Automations (Calendar sync, Uptime), Bots (LeetCode) and Compute (Godfather, Hosting). Tokens, Activity and Settings are at the bottom. Core modules have no section.
 
 `dashboard/src/pages/registry.tsx` has one entry for each page, with its section and its module.
 
@@ -67,7 +67,7 @@ Each org sets its logo, accent color and website on the Settings page. The sideb
 
 The dashboard uses the same type and colors as `site/`: Geist, Geist Mono and the gray tokens of the fumadocs-ui theme. The tokens are in `dashboard/src/index.css`. Light and dark follow the system; the switch at the bottom of the sidebar sets one. Transitions last 150 to 200 ms. If the system asks for reduced motion, the dashboard does not animate.
 
-The sign-in page, the sign-in return and the org list use `AuthFrame`. It shows the Platform mark, the help links (Docs, GitHub, What is this?) and the org marks. Set `VITE_SITE_URL` to the URL of the `site/` deployment, and the Docs and What is this? links go to that site. Without it, they go to the docs and README on GitHub.
+The sign-in page, the sign-in return and the org list use `AuthFrame`. It shows the Platform mark, the help links (Docs, GitHub, What is this?) and the org marks. The Docs and What is this? links, and the docs link of each page, go to https://platform.ais-asu.com. Set `VITE_SITE_URL` to use another deployment of `site/`.
 
 A resolved notification stays hidden while its problem has the same message. When the message changes, it is open again. A resolved event stays resolved. The resolved ids are in the org config key `dashboard.resolved`. The org keeps its events for 30 days, at most the newest 200, in the `notifications` table.
 

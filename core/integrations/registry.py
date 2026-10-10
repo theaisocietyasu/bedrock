@@ -44,7 +44,7 @@ class Integration:
     title: str
     description: str
     fields: tuple[Field, ...] = ()
-    # The docs page under docs/, without .md
+    # The page of the docs site under /docs, such as modules/calendar
     docs: str | None = None
     # Whether .env gives a default for the whole deployment
     deployment: Callable[[], bool] | None = None
