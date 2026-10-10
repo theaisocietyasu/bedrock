@@ -26,16 +26,16 @@ Each module has a `README.md` in its folder with its files, routes, jobs, tools 
 | --- | --- |
 | [Accounts](./modules/accounts.md) | Canvas, Google and Outlook sign-in for a member |
 | [Agents](./modules/agents.md) | Conversations, memories, profile graph and turns for agents |
-| [Alerts](./modules/alerts.md) | Job and hackathon listings posted to Discord webhooks |
-| [Packs](./modules/packs.md) | Campus pages and live queries that an org adds to knowledge, such as the ASU pack |
 | [Calendar](./modules/calendar.md) | Notion events synced to Google Calendar |
-| [Compute](./modules/compute.md) | RunPod pods, SSH certificates, file manager, sessions |
 | [Discord bot](./modules/discord-bot.md) | The bot process, its setup and its commands |
+| [Feeds](./modules/feeds.md) | The Job alerts webhook and Hackathon webhook modules, and the feeds engine that posts their listings to Discord |
+| [Godfather](./modules/godfather.md) | RunPod pods, SSH certificates, file manager, sessions |
 | [Knowledge](./modules/knowledge.md) | Sources, crawls and hybrid search |
 | [LeetCode](./modules/leetcode.md) | Daily question post, solve checks and slash commands |
 | [Points](./modules/points.md) | Members, points from events and the leaderboard |
 | [RunPod apps](./modules/runpod-apps.md) | App manifests, deploys, health checks and rollback |
 | [Store](./modules/storefront.md) | Merch store paid with points |
+| [Sub-modules](./modules/submodules.md) | Content that a module reads: campus pages and live queries for knowledge, such as the ASU sub-module, and feeds for the webhook modules |
 | [Uptime](./modules/uptime.md) | Checks of sites and Hosting apps, with events when one goes down or up |
 
 ## Notes

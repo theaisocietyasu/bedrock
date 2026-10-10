@@ -6,11 +6,11 @@ Platform has two officer frontends. `dashboard/` is the new one. Officers use it
 
 `dashboard/` is a Vite and React app with Tailwind and TanStack Query. It calls the API and has no server code.
 
-The sidebar puts the pages in sections that follow the categories on Explore: Members (Points, Store), Webhooks (Webhooks, Alerts), Automations (Calendar sync, Uptime, LeetCode), AI and agents (Knowledge, MCP, Agents) and Infrastructure (Hosting, Godfather, Tokens). Activity and Settings are at the bottom.
+The sidebar puts the pages in sections that follow the module categories on Explore: Storage (Knowledge, Points, Store), AI and agents (Agents), Webhooks (Job alerts webhook, Hackathon webhook), Automations (Calendar sync, Uptime), Bots (LeetCode) and Compute (Godfather, Hosting). Tokens, Event webhooks, Activity and Settings are at the bottom. Core modules have no section.
 
 `dashboard/src/pages/registry.tsx` has one entry for each page, with its section and its module.
 
-The sidebar hides the page of an optional module when the module is off for the org. A section with no pages has no header. If you open the page of a module that is off, the page links to Explore. Old paths open the new pages: `ci` opens Activity, CI runs; `notifications` opens Activity; `modules` opens Explore; `integrations` opens the Integrations tab of Explore; `apps` opens Hosting; `compute` and `hosting?tab=pods` open Godfather.
+The sidebar hides the page of an optional module when the module is off for the org. A section with no pages has no header. If you open the page of a module that is off, the page links to Explore. Old paths open the new pages: `ci` opens Activity, CI runs; `notifications` opens Activity; `modules` opens Explore; `integrations` opens the Integrations tab of Explore; `apps` opens Hosting; `compute` and `hosting?tab=pods` open Godfather; `mcp` opens Tokens; `alerts` opens Job alerts webhook.
 
 The sidebar collapses to a 56px rail of icons. To collapse or expand it, use the button at the left of the top bar, Ctrl+B (Cmd+B on a Mac) or `[`. The `[` key does nothing while you type in a field. The rail shows a tooltip with the page name on hover and on keyboard focus. The dashboard keeps the state in `localStorage` as `platform.sidebar`. On a phone, the sidebar is a menu that opens from the top bar.
 
@@ -24,22 +24,21 @@ The dashboard has one React Query client, made in `dashboard/src/lib/query-clien
 
 | Page | Shows |
 | --- | --- |
-| Overview | A link to the open notifications in Activity, the main counts, CI, and the services, alert feeds and sessions of the modules that are on, recent changes and job runs |
-| Explore | Second in the sidebar. Two tabs with one search field. Modules: each module that is not Core, in category sections, with the title, one line on what it does, a need that is not connected (a link to Integrations), and Add or Remove. Add is off until the needs are connected. Remove asks first, turns the module off and keeps its data. Modules that are always on show Included. Each module card lists its sub-modules: the packs of Knowledge (Add or Sync) and the feeds that Alerts offers (Add opens the new feed form on Alerts). Integrations (`?tab=integrations`): the accounts and services the org connects, with state, keys, Test and the modules that use each one. See [integrations.md](./integrations.md) and [Modules and packs](./architecture.md#modules-and-packs) |
+| Overview | A link to the open notifications in Activity, the main counts, CI, and the services, feeds and sessions of the modules that are on, recent changes and job runs |
+| Explore | Second in the sidebar. Two tabs with one search field. Modules: each module that is not Core, in category sections, with the title, one line on what it does, a need that is not connected (a link to Integrations), and Add or Remove. Add is off until the needs are connected. Remove asks first, turns the module off and keeps its data. Modules that are always on show Included. Each module card lists its sub-modules: the sub-modules of Knowledge (Add or Sync) and the sub-module feeds of a webhook module (Add opens the new feed form on the page of the module). Integrations (`?tab=integrations`): the accounts and services the org connects, with state, keys, Test and the modules that use each one. See [integrations.md](./integrations.md) and [Categories, modules and sub-modules](./architecture.md#categories-modules-and-sub-modules) |
 | Points | Members ranked by points, with the entries of each member. Award points to a member by email, username or Discord user ID. Upload an event check-in CSV. Events grouped by name, with delete for all entries of an event |
 | Store | Products: add, edit (name, category, price in points, stock, image URL, description) and delete. Orders: change the status, add a message to the member, delete |
 | Calendar sync | The Notion database and Google calendar settings, sync on or off, sync now, create the Google calendar, and the upcoming events |
 | LeetCode | The daily post settings: channel, role to ping and time. The slash commands are in [leetcode](modules/leetcode.md) |
-| Godfather | Pods that members connect to with the Godfather CLI, with their live status from their hosting provider: create, start, stop, restart, terminate, who can connect, sessions, files and pod settings. `compute` module |
-| Webhooks | The org's outbound webhooks: add, edit, turn on or off, send test, delete. Each has a name, a destination (Discord), the events it sends and the result of its last message. See [webhooks.md](./webhooks.md) |
-| Alerts | Feeds: create, pause, run now, delete, and the history of each feed: its last 50 runs with counts and errors, and its last 50 items. `alerts?new=<pack>/<feed>` opens the new feed form with a feed of a pack |
+| Godfather | Pods that members connect to with the Godfather CLI, with their live status from their hosting provider: create, start, stop, restart, terminate, who can connect, sessions, files and pod settings. `godfather` module |
+| Event webhooks | The org's outbound webhooks: add, edit, turn on or off, send test, delete. Each has a name, a destination (Discord), the events it sends and the result of its last message. See [webhooks.md](./webhooks.md) |
+| Job alerts webhook, Hackathon webhook | The feeds of one webhook module: create, pause, run now, delete, and the history of each feed: its last 50 runs with counts and errors, and its last 50 items. `job-alerts?new=<submodule>/<feed>` and `hackathons?new=<submodule>/<feed>` open the new feed form with a feed of a sub-module. `job_webhook` and `hackathon_webhook` modules. See [feeds](modules/feeds.md) |
 | Hosting | The org's bots, agents, sites and services on its hosting providers, grouped by kind, with the provider of each. RunPod is the only provider. Register app has a Provider select. Templates creates an app from a template in `apps/`, then opens the deploy form. Register a manifest or repo, see the pod and deployments, deploy a tag with a dry-run preview, roll back, delete. `runpod` module |
-| Knowledge | Sources filtered by domain: upload documents one at a time or in a batch, add, edit, pause and run crawls, delete sources, change the passage size and search settings, and test a search. Packs are on Explore. `knowledge` module |
-| MCP | How to connect an agent to the MCP server, and the agent tokens. `mcp` module |
+| Knowledge | Sources filtered by domain: upload documents one at a time or in a batch, add, edit, pause and run crawls, delete sources, change the passage size and search settings, and test a search. Sub-modules are on Explore. `knowledge` module |
 | Agents | Conversation, memory, member and pending action counts, and the accounts members linked. It shows no conversation text. `agents` module |
 | Uptime | Monitors with state, uptime over 24 hours and 7 days, last latency and the last 30 checks. Add, edit, pause, check now and delete. `uptime` module |
-| Tokens | Machine tokens: create in a dialog and revoke |
-| Activity | Five tabs. Notifications: problems that need an officer (failed alert runs, failed deploys, knowledge sources that could not be fetched) and each webhook event of the org (errors, failed jobs, pods, deploys, store orders, new members), with no webhook needed. Errors: the org's errors from the error log, with the request or job, logger line, host, release and the stack trace, where Platform frames show apart from library frames. Changes: the org's audit log with pages. Knowledge runs: the last crawls and uploads with their errors. CI runs: the latest GitHub Actions runs for the repos the org lists. In Notifications and Errors, select rows to resolve, reopen or delete them together. Only events can be deleted; a problem goes away when its cause is fixed. The bell in the top bar shows the open count and the newest notifications. `/notifications` opens Activity |
+| Tokens | Machine tokens: create in a dialog and revoke. The MCP card shows how an agent connects: the server `/mcp` on port 8001 and the header `Authorization: Bearer plat_...`. A token's scopes set the tools the agent can call |
+| Activity | Five tabs. Notifications: problems that need an officer (failed feed runs, failed deploys, knowledge sources that could not be fetched) and each webhook event of the org (errors, failed jobs, pods, deploys, store orders, new members), with no webhook needed. Errors: the org's errors from the error log, with the request or job, logger line, host, release and the stack trace, where Platform frames show apart from library frames. Changes: the org's audit log with pages. Knowledge runs: the last crawls and uploads with their errors. CI runs: the latest GitHub Actions runs for the repos the org lists. In Notifications and Errors, select rows to resolve, reopen or delete them together. Only events can be deleted; a problem goes away when its cause is fixed. The bell in the top bar shows the open count and the newest notifications. `/notifications` opens Activity |
 | Settings | General, branding and org secrets |
 | Superadmin | Orgs, officer roles, Discord servers without an org, the audit log of all orgs, and the errors of every org and of the server. Only the superadmin sees it |
 
@@ -48,7 +47,7 @@ The dashboard uses these officer routes in `modules/dashboard/`:
 | Route | Does |
 | --- | --- |
 | `GET /api/dashboard/<org>/overview` | Every section in one response |
-| `GET /api/dashboard/<org>/modules` | `categories`, and for each module that is not Core: `name`, `title`, `description`, `category`, `switchable`, `enabled`, `ready`, `needs` (each with `key`, `label`, `kind`, `optional` and `connected`) and `packs`. Explore sets a switch with `PUT /api/organizations/<id>/modules` |
+| `GET /api/dashboard/<org>/modules` | `categories`, and for each module that is not Core: `name`, `title`, `description`, `category`, `switchable`, `enabled`, `ready`, `needs` (each with `key`, `label`, `kind`, `optional` and `connected`) and `submodules`. Explore sets a switch with `PUT /api/organizations/<id>/modules` |
 | `GET /api/dashboard/<org>/trends?days=30` | One series per chart, a value per UTC day (7 to 90 days). Modules that are off have no series |
 | `GET /api/dashboard/<org>/ci` | The latest runs for each listed repo, kept in a cache for 120 seconds |
 | `PUT /api/dashboard/<org>/ci/repos` | Sets the repo list: `{"repos": ["owner/name"]}`, 20 or fewer |
@@ -58,7 +57,7 @@ The dashboard uses these officer routes in `modules/dashboard/`:
 | `/api/dashboard/<org>/apps/...` | List, register, delete, deploy and roll back apps, and read the pod. The same operations as `/api/apps` in [runpod-apps](modules/runpod-apps.md), for officers |
 | `/api/dashboard/<org>/knowledge/...` | List and delete sources, upload documents, add and run crawls, read and set the search settings, start a reindex, read the run log, and search. The same operations as `/api/knowledge` in [knowledge](modules/knowledge.md), for officers. The sources list also says if the org may publish public sources |
 
-The other pages use the routes of their modules: `/api/points`, `/api/storefront`, `/api/calendar`, `/api/compute`, `/api/alerts`, `/api/uptime`, `/api/organizations` and `/api/superadmin`.
+The other pages use the routes of their modules: `/api/points`, `/api/storefront`, `/api/calendar`, `/api/compute`, `/api/feeds`, `/api/uptime`, `/api/organizations` and `/api/superadmin`.
 
 For private repos, connect GitHub on the Integrations tab of Explore with a read-only token that can read Actions.
 
@@ -72,7 +71,7 @@ The sign-in page, the sign-in return and the org list use `AuthFrame`. It shows 
 
 A resolved notification stays hidden while its problem has the same message. When the message changes, it is open again. A resolved event stays resolved. The resolved ids are in the org config key `dashboard.resolved`. The org keeps its events for 30 days, at most the newest 200, in the `notifications` table.
 
-The org marks (`OrgMarks` in `src/components/built-by.tsx`) show the orgs that build Platform as a row of round logos, one over the next. They show on the sign-in pages and at the bottom of the sidebar. To add an org:
+The org marks (`OrgMarks` in `src/components/built-by.tsx`) show the orgs that build Platform as a row of round logos, one over the next. They show on the sign-in pages. The landing page of `site/` shows the same marks and, under the built-by line, the GitHub avatars of the repo's contributors (`site/components/contributors.tsx`, refreshed once a day). To add an org:
 
 1. Put a square SVG logo with a transparent background in `dashboard/public/orgs/` and in `site/public/orgs/`.
 2. Add one entry to `BUILT_BY` in `dashboard/src/lib/links.ts` and to `orgs` in `site/lib/orgs.ts`: the name, the short name, the website, the logo path and the fill of the disk. The fill is fixed, so the logo looks the same on light and dark pages.
@@ -151,4 +150,4 @@ These pages use the API session cookie, not the officer token. The order routes 
 
 `web/` is the old officer app (Create React App). SoDA serves it at admin.thesoda.io from the `web` compose service on port 5000. The dashboard runs beside it on port 5001. `web/` signs in with `POST /api/auth/exchange`. Its build reads `REACT_APP_API_URL`.
 
-The dashboard has the pages of `web/`: member details are on Points (Add member, and Edit details in a member's history), and the store, calendar, compute and superadmin pages have dashboard pages. The Jeopardy and bot pages of `web/` call paths that the API does not have, so they are not in the dashboard.
+The dashboard has the pages of `web/`: member details are on Points (Add member, and Edit details in a member's history), and the store, calendar, Godfather and superadmin pages have dashboard pages. The Jeopardy and bot pages of `web/` call paths that the API does not have, so they are not in the dashboard.

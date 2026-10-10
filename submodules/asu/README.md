@@ -1,12 +1,12 @@
 # asu
 
-The Arizona State University pack. It adds public ASU pages to an org's knowledge as crawled sources, and answers live queries against ASU pages and APIs. With an officer's ASU sign-in, agents also search clubs and events on Sun Devil Central. Other pages that need an ASU sign-in (MyASU, Canvas) are not included.
+The Arizona State University sub-module. It adds public ASU pages to an org's knowledge as crawled sources, and answers live queries against ASU pages and APIs. With an officer's ASU sign-in, agents also search clubs and events on Sun Devil Central. Other pages that need an ASU sign-in (MyASU, Canvas) are not included.
 
 ## Files
 
 | File | Holds |
 | --- | --- |
-| `__init__.py` | `PACK`: the pages and the live queries |
+| `__init__.py` | `SUBMODULE`: the pages and the live queries |
 | `sources/` | Crawled ASU pages: one file for each source with its extractor, and the page list in `pages.py` |
 | `queries/` | One file for each live query |
 | `params.py` | ASU term codes, and dates and times in Arizona time |
@@ -18,7 +18,7 @@ Sync adds each page as a crawled source with a key that starts with `asu/`. Some
 
 ## Live queries
 
-Run them with `POST /api/packs/asu/query` or the `packs.query` tool with `pack` set to `asu`. The old routes `/api/asu/queries`, `/api/asu/query` and `/api/asu/sync` give the same answers.
+Run them with `POST /api/submodules/asu/query` or the `submodules.query` tool with `submodule` set to `asu`. The old routes `/api/asu/queries`, `/api/asu/query` and `/api/asu/sync` give the same answers.
 
 | Source | Parameters (required are marked) |
 | --- | --- |
@@ -37,7 +37,7 @@ Run them with `POST /api/packs/asu/query` or the `packs.query` tool with `pack` 
 | dining | campus (required) |
 | web | query (required), time_range. Needs a SearXNG server |
 
-Pages that render with JavaScript (class search, events) need Firecrawl. The `web` query needs SearXNG. See [docs/modules/packs.md](../../docs/modules/packs.md).
+Pages that render with JavaScript (class search, events) need Firecrawl. The `web` query needs SearXNG. See [docs/modules/submodules.md](../../docs/modules/submodules.md).
 
 ## ASU sign-in
 

@@ -7,7 +7,7 @@ This page lists what is left to build and the known faults. The other pages desc
 - [ ] Turn on access enforcement (`ACCESS_ENFORCE=true`) on each deployment when its `access decision=would_deny` lines show no real callers.
 - [ ] Move the SQLite deployments to Postgres with the copy script. Keep the SQLite file for one week of clean operation.
 - [ ] Make `Check` a required status check on `main`.
-- [ ] Check the RunPod request and response field names against the live RunPod API. The compute and runpod modules are tested against a fake only.
+- [ ] Check the RunPod request and response field names against the live RunPod API. The godfather and runpod modules are tested against a fake only.
 - [ ] Tie Jeopardy to an org. It is global because the bot process has no command channel from the API.
 
 ## Core
@@ -18,7 +18,7 @@ This page lists what is left to build and the known faults. The other pages desc
 - [ ] Sync cursors, so that a sync continues from where the last run stopped. `knowledge_runs` and `alert_runs` already log each run and its error.
 - [ ] Webhooks that start jobs, at `/api/webhooks/<module>/<name>`.
 - [ ] Dashboard pages for job history and retry.
-- [ ] A member page for compute, so that members can see their pods and sessions without the CLI.
+- [ ] A member page for Godfather, so that members can see their pods and sessions without the CLI.
 - [ ] Shared tracing for agents on Platform (OpenTelemetry, with a self-hosted viewer).
 
 ## Modules
@@ -35,7 +35,7 @@ This page lists what is left to build and the known faults. The other pages desc
 | `slack` | Slack as a second chat platform |
 | `sponsors`, `hackathon` | Sponsor records and hackathon logistics |
 
-Campus content is a pack in `packs/`, such as `packs/asu`. Another campus adds its own pack the same way.
+Campus content is a sub-module in `submodules/`, such as `submodules/asu`. Another campus adds its own sub-module the same way.
 
 ## Cleanup
 

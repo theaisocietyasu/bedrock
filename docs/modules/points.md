@@ -4,7 +4,7 @@ Keeps the points that an org's members earn at events. Officers add members, giv
 
 ## In the dashboard
 
-The Points page (Members > Points) has two tabs:
+The Points page (Storage > Points) has two tabs:
 
 - **Members**: the leaderboard with each member's total. Search by name or email. Add a member, or give points to one member.
 - **Events**: the points given at each event. Upload an attendance CSV for an event, or delete the points of an event.

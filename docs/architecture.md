@@ -48,18 +48,37 @@ Views get a database session from `officer_route`, `machine_route` or `member_vi
 
 A module is a folder in `modules/` with only the files it needs: `service.py` for the logic, `api.py` for the routes, `models.py`, `jobs.py` and `tools.py`. The REST routes, jobs, tools and the bot call the same `service.py` functions. [Writing a module](./writing-a-module.md) gives the rules and the places to register a module.
 
-Orgs can turn off the optional modules: `points`, `storefront`, `calendar`, `leetcode`, `compute`, `alerts`, `uptime`, `knowledge`, `mcp`, `agents`, `integrations`, `accounts` and `runpod`. The list is `OPTIONAL_MODULES` in `modules/organizations/service.py`. When a module is off for an org, its routes return 404 for the org (`module=` on `officer_route`, `machine_route` or the `Mount`), its tools are not listed, and its jobs skip the org. With `mcp` off, the org has no tools. With `integrations` off, the org has no tools of connected services. The switches are in `Organization.config["modules"]`. A module with no entry is on, so an org made before the switch existed keeps the module. A new org gets an entry for each optional module: on for the modules in `NEW_ORG_MODULES` in `modules/manifest.py`, off for the others. `NEW_ORG_MODULES` is empty, so a new org starts with Core only. Officers add and remove modules on the dashboard Explore page, or with `flask --app main org modules <prefix> --on x --off y`.
+Orgs can turn on and off the optional modules: `points`, `storefront`, `calendar`, `games`, `leetcode`, `godfather`, `job_webhook`, `hackathon_webhook`, `uptime`, `knowledge`, `agents`, `integrations`, `accounts` and `runpod`. The list is `OPTIONAL_MODULES` in `modules/organizations/service.py`. The Core modules, `mcp` and `feeds` among them, are always on. When a module is off for an org, its routes return 404 for the org (`module=` on `officer_route`, `machine_route` or the `Mount`), its tools are not listed, and its jobs skip the org. With `integrations` off, the org has no tools of connected services. If `games` is off for each org of an officer, the `/api/bot` routes return 404 for that officer. The switches are in `Organization.config["modules"]`. A module with no entry is on, so an org made before the switch existed keeps the module. A new org gets an entry for each optional module: on for the modules in `NEW_ORG_MODULES` in `modules/manifest.py`, off for the others. `NEW_ORG_MODULES` is empty, so a new org starts with Core only. Officers add and remove modules on the dashboard Explore page, or with `flask --app main org modules <prefix> --on x --off y`.
 
-### Modules and packs
+### Categories, modules and sub-modules
 
-| | Module | Pack |
+A category groups modules. A module can read sub-modules.
+
+```mermaid
+flowchart LR
+  category["Category: Storage"] --> module["Module: knowledge"] --> submodule["Sub-module: submodules/asu"]
+```
+
+| | Module | Sub-module |
 | --- | --- | --- |
-| Is | A feature with code, in `modules/<name>/` | Content or presets with no code of their own, in `packs/<name>/` |
-| Examples | `knowledge`, `alerts`, `compute` | `packs/asu` (campus pages and live queries), `packs/careers` (alert feeds) |
-| Per org | Optional modules are switched on or off for each org | An org adds a pack's sources or feeds in the module that uses it |
+| Is | A feature with code, in `modules/<name>/` | Content or presets with no code of their own, in `submodules/<name>/` |
+| Examples | `knowledge`, `job_webhook`, `godfather` | `submodules/asu` (campus pages and live queries for `knowledge`), `submodules/careers` (feeds for `job_webhook` and `hackathon_webhook`) |
+| Per org | Optional modules are switched on or off for each org | An org adds a sub-module's sources or feeds in the module that uses it |
 | On the dashboard | A card on Explore | A sub-module on the card of the module that uses it |
 
-`CATALOG` in `modules/manifest.py` gives each module a title, a description, what it needs (integration keys or settings) and the packs it reads. `CATEGORIES` puts each module in one category. The Core category (organizations, auth, dashboard, packs, users, public, superadmin, bot) is always on and is not on Explore. Pack routes and tools need the `knowledge` module. `GET /api/dashboard/<org>/modules` returns the catalog with the org's switches and whether each need is connected.
+`CATALOG` in `modules/manifest.py` gives each module a title, a description, what it needs (integration keys or settings) and the sub-modules it reads. `CATEGORIES` puts each module in one category:
+
+| Category | Modules |
+| --- | --- |
+| Core | `auth`, `bot`, `dashboard`, `feeds`, `mcp`, `organizations`, `public`, `submodules`, `superadmin`, `users`. Always on and not on Explore |
+| Storage | `knowledge`, `points`, `storefront`, `accounts` |
+| AI and agents | `agents`, `integrations` |
+| Webhooks | `job_webhook`, `hackathon_webhook` |
+| Automations | `calendar`, `uptime` |
+| Bots | `leetcode`, `games` |
+| Compute | `godfather`, `runpod` (Hosting) |
+
+The dashboard sidebar has one section for each category except Core. The routes and tools of `submodules` need the `knowledge` module. `GET /api/dashboard/<org>/modules` returns the catalog with the org's switches and whether each need is connected.
 
 ## Jobs
 
@@ -77,7 +96,7 @@ Apps and agents read and change Platform data through tools. A module declares a
 - Over MCP (streamable HTTP) from `mcp_main.py`, at `http://<host>:8001/mcp`.
 - Over HTTP from the API: `GET /api/tools` lists the tools, and `POST /api/tools/<name>` calls one with the arguments as the JSON body.
 
-Both need a machine token: `Authorization: Bearer plat_...`. A caller sees only the tools that its token scopes allow and that its org has turned on. An unknown tool and a refused tool both return 404, so a token cannot find tools it may not use. A tool always acts on the caller's org. It has no org argument.
+Both need a machine token: `Authorization: Bearer plat_...`. The `mcp` module is Core, so it is always on. A caller sees only the tools that its token scopes allow and whose module its org has turned on. The MCP card on the Tokens page of the dashboard shows the server and the header. An unknown tool and a refused tool both return 404, so a token cannot find tools it may not use. A tool always acts on the caller's org. It has no org argument.
 
 | Tools | Scope | Module |
 | --- | --- | --- |
@@ -98,15 +117,15 @@ Both need a machine token: `Authorization: Bearer plat_...`. A caller sees only 
 | `members.add`, `members.update`, `members.discord_sync` (confirm) | `members:write` | users |
 | `store.products`, `store.orders` | `store:read` | storefront |
 | `store.save_product`, `store.update_orders`, `store.delete_products` (confirm), `store.delete_orders` (confirm) | `store:write` | storefront |
-| `knowledge.search`, `knowledge.sources`, `knowledge.read_source`, `knowledge.packs`, `knowledge.settings`, `knowledge.runs` | `knowledge:read` | knowledge |
-| `knowledge.add_document`, `knowledge.delete_source` (confirm), `knowledge.set_crawl`, `knowledge.crawl_now`, `knowledge.sync_pack`, `knowledge.update_settings`, `knowledge.reindex` (confirm) | `knowledge:write` | knowledge |
-| `packs.query` | `knowledge:read` | packs |
+| `knowledge.search`, `knowledge.sources`, `knowledge.read_source`, `knowledge.submodules`, `knowledge.settings`, `knowledge.runs` | `knowledge:read` | knowledge |
+| `knowledge.add_document`, `knowledge.delete_source` (confirm), `knowledge.set_crawl`, `knowledge.crawl_now`, `knowledge.sync_submodule`, `knowledge.update_settings`, `knowledge.reindex` (confirm) | `knowledge:write` | knowledge |
+| `submodules.query` | `knowledge:read` | submodules |
 | `apps.list`, `apps.get`, `apps.pod`, `apps.templates`, `hosting.providers` | `apps:read` | runpod |
 | `apps.register`, `apps.create_from_template`, `apps.delete` (confirm), `apps.rollback` (confirm) | `apps:manage` | runpod |
 | `apps.deploy` (confirm) | `apps:deploy` | runpod |
-| `alerts.list`, `alerts.presets`, `alerts.history`, `alerts.save`, `alerts.run`, `alerts.delete` (confirm) | `alerts:manage` | alerts |
-| `compute.pods`, `compute.pod_members`, `compute.connected`, `compute.settings`, `compute.sessions`, `compute.list_files`, `compute.read_file`, `compute.update_pod`, `compute.update_settings`, `compute.delete_session`, `compute.make_folder`, `compute.move_file` | `compute:manage` | compute |
-| `compute.pod_action`, `compute.create_pod`, `compute.add_session`, `compute.write_file`, `compute.delete_file` (each confirm) | `compute:manage` | compute |
+| `feeds.list`, `feeds.presets`, `feeds.history`, `feeds.save`, `feeds.run`, `feeds.delete` (confirm) | `feeds:manage` | feeds (the feeds of `job_webhook` and `hackathon_webhook`) |
+| `godfather.pods`, `godfather.pod_members`, `godfather.connected`, `godfather.settings`, `godfather.sessions`, `godfather.list_files`, `godfather.read_file`, `godfather.update_pod`, `godfather.update_settings`, `godfather.delete_session`, `godfather.make_folder`, `godfather.move_file` | `godfather:manage` | godfather |
+| `godfather.pod_action`, `godfather.create_pod`, `godfather.add_session`, `godfather.write_file`, `godfather.delete_file` (each confirm) | `godfather:manage` | godfather |
 | `uptime.list`, `uptime.get`, `uptime.targets` | `uptime:read` | uptime |
 | `uptime.save`, `uptime.check`, `uptime.delete` (confirm) | `uptime:manage` | uptime |
 | `github.*`: the read-only tools of GitHub's MCP server | `github:read` | integrations |
@@ -123,14 +142,14 @@ Both need a machine token: `Authorization: Bearer plat_...`. A caller sees only 
 | `notion.search`, `notion.read_page`, `notion.query_database` | `notion:read` | integrations |
 | `notion.create_page` (confirm) | `notion:write` | integrations |
 | `web.search` | `web:read` | integrations |
-| `asu.clubs`, `asu.events`, after an officer signs in to ASU | `asu:read` | `packs/asu/signin` |
+| `asu.clubs`, `asu.events`, after an officer signs in to ASU | `asu:read` | `submodules/asu/signin` |
 | `canvas.courses`, `canvas.assignments`, `canvas.grades`, `canvas.announcements`, `canvas.calendar`, `canvas.assignment_grades`: one member's own Canvas, after the member connects it | `canvas:read` | accounts |
 
 A tool marked confirm changes or deletes something that is hard to undo. It runs only when the call has `confirm=true`. Without it, nothing changes and the result has `confirm_required`, the arguments, and for `apps.deploy` and `apps.rollback` the dry run. An agent shows that to a person, then calls again with `confirm=true`. Over MCP, read tools have `readOnlyHint` and confirm tools have `destructiveHint`.
 
 No tool returns a secret value or a webhook URL. `tokens.create` returns the new token once. It gives only the scopes and limits of the calling token. A write tool that takes `ids` changes up to 100 rows in one commit; if one id is missing, nothing changes. To send many calls in one request, use `batch` with `{"calls": [{"tool", "arguments"}], "stop_on_error"}`. Its result has one entry for each call: `tool`, `ok`, `result` or `error`, and `status`.
 
-The flows that need a browser have no tool: the OAuth sign-in to an integration, the ASU sign-in, file upload and download on a pod, and the compute CLI sign-in. Superadmin routes and member routes have no tool.
+The flows that need a browser have no tool: the OAuth sign-in to an integration, the ASU sign-in, file upload and download on a pod, and the Godfather CLI sign-in. Superadmin routes and member routes have no tool.
 
 Each call, allowed or refused, is a row in `audit_log` with `action=tool <name>`, `source=mcp` or `api`, and the token as the actor. A call that waits for confirm has `details.confirm=pending`. The MCP server keeps no session state, so you can run more than one. Start it with `docker compose --profile mcp up -d mcp`.
 
@@ -141,7 +160,7 @@ Each call, allowed or refused, is a row in `audit_log` with `action=tool <name>`
 | Discord | Sign-in, role and member checks, the bot | `core/integrations/discord.py`, `modules/auth`, `modules/bot` |
 | Clerk | Member sign-in on the public website storefront | `modules/auth/clerk.py` |
 | Notion, Google Calendar | Calendar sync | `modules/calendar/clients/` |
-| RunPod | Compute pods and app deploys, through the hosting provider registry in `core/hosting.py` | `core/integrations/runpod.py` |
+| RunPod | Godfather pods and app deploys, through the hosting provider registry in `core/hosting.py` | `core/integrations/runpod.py` |
 | LeetCode GraphQL | The daily question and solve checks | `modules/leetcode/client.py` |
 | Error log | Errors of each process and the dashboard, grouped in `error_groups`, shown on Activity, Errors | `core/error_log.py`, `modules/dashboard/errors.py` |
 | Webhooks | Org events (errors, failed jobs, pods, deploys, orders, new members, failed crawls) posted to Discord webhooks | `core/webhooks.py`, `modules/dashboard/webhooks.py` |

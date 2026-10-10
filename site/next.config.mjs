@@ -14,6 +14,9 @@ const movedDocs = {
   '/docs/modules/hermes': '/docs/codebase/operations',
   '/docs/modules/tools-and-mcp': '/docs/codebase/architecture',
   '/docs/project/runpod-deploy': '/docs/codebase/getting-started',
+  '/docs/modules/alerts': '/docs/modules/feeds',
+  '/docs/modules/compute': '/docs/modules/godfather',
+  '/docs/modules/packs': '/docs/modules/submodules',
 };
 
 /** @type {import('next').NextConfig} */

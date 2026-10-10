@@ -1,26 +1,26 @@
-# Compute
+# Godfather
 
-GPU and CPU pods on an org's own hosting provider account that members connect to over SSH with a compute CLI. RunPod is the only provider. The reference CLI is `godfather` (`pip install godfather-cli`). Officers create pods and select who can use them. A member gets a certificate for their own SSH key that works on one pod for 12 hours.
+GPU and CPU pods on an org's own hosting provider account that members connect to over SSH with a Godfather CLI. RunPod is the only provider. The reference CLI is `godfather` (`pip install godfather-cli`). Officers create pods and select who can use them. A member gets a certificate for their own SSH key that works on one pod for 12 hours.
 
 ## Setup
 
 1. Connect RunPod on the Integrations tab of the dashboard Explore page. This saves the org secret `runpod_api_key`. The runpod module uses the same key. `SECRETS_KEY` must be set.
-2. Keep the `compute` module on for the org. It is on by default.
+2. Add the `godfather` module on Explore for the org.
 3. Optional: set these in the server's `.env`.
-   - `COMPUTE_CLI_NAME`: the CLI name in sign-in pages and errors. Default `the compute CLI`. The example AIS server sets `godfather`.
-   - `COMPUTE_POD_IMAGE`: the deployment default pod image. Default `ghcr.io/theaisocietyasu/godfather-base:latest`.
-4. Optional: set the org's own default pod image under Compute > Settings on the dashboard (`PUT /api/compute/<org>/settings` with `{"pod_image": "..."}`, null to clear). A pod gets the image of its create body, else the org default, else `COMPUTE_POD_IMAGE`.
+   - `GODFATHER_CLI_NAME`: the CLI name in sign-in pages and errors. Default `godfather`. The old name `COMPUTE_CLI_NAME` still works.
+   - `GODFATHER_POD_IMAGE`: the deployment default pod image. The old name `COMPUTE_POD_IMAGE` still works. Default `ghcr.io/theaisocietyasu/godfather-base:latest`.
+4. Optional: set the org's own default pod image under Godfather > Settings on the dashboard (`PUT /api/compute/<org>/settings` with `{"pod_image": "..."}`, null to clear). A pod gets the image of its create body, else the org default, else `GODFATHER_POD_IMAGE`.
 
 The first pod makes two ed25519 key pairs for the org in `compute_keys`. `SECRETS_KEY` encrypts the private keys.
 
 - `backend`: its public key goes into root's `authorized_keys` on each pod.
 - `user_ca`: pods trust it through `TrustedUserCAKeys`. It signs member and officer certificates.
 
-The pod image must do this setup. It reads `GODFATHER_SSH_PUBLIC_KEY`, `GODFATHER_SSH_CA_PUBLIC_KEY` and `GODFATHER_SETUP` from its env. It accepts certificates with the principal `gf-<pod_id>`. It has `/usr/local/bin/godfather-login`. These names do not change with `COMPUTE_CLI_NAME`.
+The pod image must do this setup. It reads `GODFATHER_SSH_PUBLIC_KEY`, `GODFATHER_SSH_CA_PUBLIC_KEY` and `GODFATHER_SETUP` from its env. It accepts certificates with the principal `gf-<pod_id>`. It has `/usr/local/bin/godfather-login`. These names do not change with `GODFATHER_CLI_NAME`.
 
 ## Officer routes
 
-All routes are under `/api/compute/<org>` and need an officer of the org.
+All routes are under `/api/compute/<org>` and need an officer of the org. The prefix keeps the old module name `compute`, because the Godfather CLI calls it.
 
 | Route | Does |
 | --- | --- |
@@ -84,13 +84,13 @@ The connected route opens SSH to the pod as root with the `backend` key, with a 
 2. Discord returns to `GET /api/compute/cli/callback`. If the member is in the org's server and compute is on, the page shows a token one time.
 3. The member pastes the token into the CLI. The CLI sends it on the member routes.
 
-The token is a machine token of kind `cli` with the scope `compute:connect`, for the member's Discord id and the org. It is valid for 90 days. A new sign-in revokes the member's previous CLI token. The audit log records each token.
+The token is a machine token of kind `cli` with the scope `godfather:connect`, for the member's Discord id and the org. It is valid for 90 days. A new sign-in revokes the member's previous CLI token. The audit log records each token.
 
 The CLI sign-in needs `ACCOUNTS_BASE_URL`, `CLIENT_ID` and `CLIENT_SECRET` on the server, and `<ACCOUNTS_BASE_URL>/api/compute/cli/callback` as a redirect of the Discord app.
 
 ## Sessions
 
-A session is a time when a pod must run, such as a workshop. The `compute.schedule` job runs every 5 minutes. It starts a pod 10 minutes before a session starts, and stops it when the session ends, unless a different session on the pod is still open. A pod that was already running when its session started is also stopped after it. The job does not touch pods with no sessions. A stopped pod costs only its disk, so one pod can serve a series of workshops.
+A session is a time when a pod must run, such as a workshop. The `godfather.schedule` job runs every 5 minutes. It starts a pod 10 minutes before a session starts, and stops it when the session ends, unless a different session on the pod is still open. A pod that was already running when its session started is also stopped after it. The job does not touch pods with no sessions. A stopped pod costs only its disk, so one pod can serve a series of workshops.
 
 | Route | Does |
 | --- | --- |
@@ -119,18 +119,18 @@ Officers manage pods on the dashboard Godfather page, `/<org>/godfather`. From i
 
 ## Adding a hosting provider
 
-A hosting provider is the cloud that compute pods and apps run on. `core/hosting.py` has the interface and the registry. RunPod (`core/integrations/runpod.py`) is the only provider. `GET /api/dashboard/<org>/hosting/providers` lists the providers with `configured` for the org, and the dashboard shows them in its Provider selects.
+A hosting provider is the cloud that Godfather pods and apps run on. `core/hosting.py` has the interface and the registry. RunPod (`core/integrations/runpod.py`) is the only provider. `GET /api/dashboard/<org>/hosting/providers` lists the providers with `configured` for the org, and the dashboard shows them in its Provider selects.
 
 1. Write a client with the `HostingClient` calls: `list_pods`, `get_pod`, `create_pod`, `update_pod`, `start_pod`, `stop_pod` and `delete_pod`. Raise a `HostingError` subclass with the provider's HTTP status when a call fails. A missing pod gives `None` from `get_pod`.
 2. Write a provider class with `name`, `title` and `integration`, and the methods `configured`, `client`, `status`, `machine`, `ssh_address` and `proxy_url`. `status` returns `RUNNING` for a running pod and `GONE` for `None`.
 3. Register an integration for the provider's keys in `core/integrations/registry.py`, so officers connect it on Integrations.
 4. Call `hosting.register()` in the module, and add the module to `PROVIDER_MODULES` in `core/hosting.py`.
-5. The create bodies of compute (`pod_request` in `modules/compute/service.py`) and of app manifests follow the RunPod v2 API. Map them to the new provider's API in its client, or give the provider its own request builder.
-6. Show the provider's own fields in `dashboard/src/pages/compute/new-pod.tsx` when it is selected, as the RunPod hardware fields are.
+5. The create bodies of Godfather pods (`pod_request` in `modules/godfather/service.py`) and of app manifests follow the RunPod v2 API. Map them to the new provider's API in its client, or give the provider its own request builder.
+6. Show the provider's own fields in `dashboard/src/pages/godfather/new-pod.tsx` when it is selected, as the RunPod hardware fields are.
 
-The `provider` column of `compute_pods` and `runpod_apps` keeps the name, so a rename breaks existing rows. The module names `runpod` and `compute` stay. A later change can rename `modules/runpod` to `modules/hosting`.
+The `provider` column of `compute_pods` and `runpod_apps` keeps the name, so a rename breaks existing rows. The module name `runpod` stays, and the tables of `godfather` keep their `compute_` names. A later change can rename `modules/runpod` to `modules/hosting`.
 
 ## Limits
 
-- Members have no web page to connect. They use the compute CLI or the routes above.
+- Members have no web page to connect. They use the Godfather CLI or the routes above.
 - The RunPod field names follow RunPod's REST API and are tested against a fake. Check them with a real key before you use the module in production.
