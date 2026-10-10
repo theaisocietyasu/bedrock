@@ -10,6 +10,17 @@ Inventory taken 2026-10-07 from asusoda/website at 26305fc and this repo's `web/
 - A change a client has to follow ships as a new route next to the old one. The old route goes only after every client has moved.
 - If a contract test fails because the change is intended, regenerate the snapshots with `UPDATE_CONTRACT=1 uv run pytest tests/contract` and name the client change in the PR.
 
+This diagram shows the check of a route change.
+
+```mermaid
+flowchart TD
+  change["Change to a listed route"] --> test["tests/contract compares status and shape with snapshots.json"]
+  test -->|passes| ship["Ship"]
+  test -->|fails| intended{"Change intended?"}
+  intended -->|no| keep["Keep the path, method, status codes and shape"]
+  intended -->|"yes, the client changes too"| update["UPDATE_CONTRACT=1 uv run pytest tests/contract, name the client change in the PR"]
+```
+
 ## SoDA's public website (asusoda/website, thesoda.io)
 
 Calls `https://api.thesoda.io` (`VITE_API_URL`). Storefront and points calls send a Clerk session token as `Authorization: Bearer`.

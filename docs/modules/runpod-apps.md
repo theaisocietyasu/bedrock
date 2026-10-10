@@ -70,7 +70,24 @@ All routes are under `/api/apps`. They need a machine token, and the org is the 
 
 The `apps.list` tool returns the same list as `GET /`.
 
-The first deploy creates the pod, named `<org>-<app>`. A later deploy changes its image, which restarts it: the container disk is erased and volumes stay. A new deploy replaces one that is still in progress. The `runpod.check_deployments` job runs each minute. It marks a deployment healthy when its health path returns a status below 400, or failed after 15 minutes. There is no automatic rollback. After the deploy, the Uptime module checks the app: a new app gets a monitor when Uptime is on, and a deleted app loses its monitors.
+The first deploy creates the pod, named `<org>-<app>`. A later deploy changes its image, which restarts it: the container disk is erased and volumes stay. A new deploy replaces one that is still in progress. The `runpod.check_deployments` job runs each minute. It marks a deployment healthy when its health path returns a status below 400, or failed after 15 minutes. There is no automatic rollback. The Uptime module checks the app: a new app gets a monitor when it is registered and Uptime is on, and a deleted app loses its monitors.
+
+```mermaid
+sequenceDiagram
+  participant CI as App CI
+  participant API as Platform
+  participant RP as RunPod
+  participant Job as runpod.check_deployments
+  CI->>API: POST /api/apps/name/deploy
+  API->>API: Read manifest at ref, if the app has a repo
+  API->>RP: Create pod (first deploy) or update its image
+  API-->>CI: 202, deployment status deploying
+  loop Each minute
+    Job->>RP: GET the health URL of the pod
+  end
+  Job->>Job: healthy if status below 400, failed after 15 minutes
+  Job->>API: Send the app.deployed event
+```
 
 ## Deploy from GitHub Actions
 

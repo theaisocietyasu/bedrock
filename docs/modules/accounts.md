@@ -8,6 +8,26 @@ Members connect their Canvas, Google Calendar and Outlook accounts one time, and
 2. The link signs the browser in to Discord. The sign-in continues only if that Discord account is the member that the link is for. Thus a forwarded link cannot connect a different account.
 3. The browser goes to the provider's consent page, then back to `/api/accounts/<provider>/callback` in the same browser session. Platform gets the grant and keeps it.
 
+```mermaid
+sequenceDiagram
+  participant A as Agent
+  participant API as Platform
+  participant B as Member browser
+  participant D as Discord
+  participant P as Provider
+  A->>API: POST /api/accounts/members/id/provider/login
+  API-->>A: url and expires_at
+  A->>B: Private message with the url
+  B->>API: GET /api/accounts/start/state
+  API->>D: Redirect to Discord sign-in
+  D->>API: GET /api/accounts/discord/callback
+  API->>P: Redirect to the consent page if the member matches
+  P->>API: GET /api/accounts/provider/callback
+  API->>API: Keep the grant, encrypted
+  A->>API: GET .../provider/token
+  API-->>A: access_token, refreshed if needed
+```
+
 ## Routes
 
 Agent routes are under `/api/accounts/members/<discord_id>` and need a machine token. The org is the org of the token.

@@ -2,6 +2,16 @@
 
 Syncs an org's Notion events database to a Google Calendar, and serves the org's upcoming events. Each org can use its own Notion token and Google service account.
 
+```mermaid
+flowchart LR
+  notion["Notion events database"] --> sync["Sync: POST sync, sync-all or calendar.sync_all"]
+  sync --> gcal["Google Calendar"]
+  notion --> events["GET /api/calendar/org/events"]
+  events --> cache["Cache, 5 minutes"]
+  cache --> site["Public site"]
+  cache --> tool["events.list tool"]
+```
+
 ## Setup
 
 1. Set the org's calendar settings: `PUT /api/organizations/<org_id>/calendar` with `notion_database_id`, `calendar_sync_enabled` and, optional, `google_calendar_id`.

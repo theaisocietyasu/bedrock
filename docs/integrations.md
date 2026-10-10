@@ -25,6 +25,20 @@ The description of a card says what the officer connects, not what each module d
 
 The keys are org secrets, encrypted with `SECRETS_KEY`. The API never returns a secret key. It returns the value of a field that is not secret, such as a URL or a model name, so the form can show it. When an org saves its own keys, they replace the deployment default for that org as a whole: Platform never mixes an org URL with a deployment key. An org must set every required field. Discord is set only in `.env`, for every org.
 
+This diagram shows how Platform saves and reads the keys.
+
+```mermaid
+flowchart LR
+  officer["Officer: Integrations tab"] --> put["PUT /api/dashboard/#lt;org#gt;/integrations/#lt;key#gt;"]
+  put --> save["registry.save checks the fields"]
+  save --> set["secrets.set_secret encrypts with SECRETS_KEY"]
+  set --> table[("org_secrets.ciphertext")]
+  module["Module, such as knowledge"] --> values["org_values(db, org_id, key)"]
+  values --> get["secrets.get_secret decrypts"]
+  get --> table
+  module -->|"org_values returns None"| env[".env default"]
+```
+
 A URL that an org saves must be http or https on a host with only public addresses. Platform checks this when the org saves the URL and again before each call, and does not follow redirects. A deployment default in `.env` can be on the private network, such as `http://firecrawl:3002`.
 
 Search compares only vectors of the same embedding model. An org with its own model searches its own vectors, and the vectors of public sources only if the publisher used the same model. Text search still covers every source. On Postgres the vector column holds 1024 numbers, so the model must return 1024. Test says so when it does not.

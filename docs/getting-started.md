@@ -80,6 +80,21 @@ To run one test file: `uv run pytest tests/contract/test_godfather.py -v`. The t
 
 At each start the script gets the head of `PLATFORM_BRANCH`. A pod restart thus deploys the branch.
 
+This diagram shows what the script does at each start.
+
+```mermaid
+flowchart TD
+  start["deploy/runpod/start.sh"] --> fetch["Get the head of PLATFORM_BRANCH"]
+  fetch --> keys["Read /workspace/data/keys.env, or make it"]
+  keys --> build["uv sync and the dashboard build"]
+  build --> migrate["alembic upgrade head"]
+  migrate --> org["Create the org on the first start"]
+  org --> dash["Dashboard on port 5000"]
+  org --> mcp["MCP server on port 8001"]
+  org --> bot["bot_main.py, if BOT_TOKEN is set and RUN_BOT is not false"]
+  org --> api["API on port 8000"]
+```
+
 Caution: keep `/workspace/data/keys.env`. It holds `SECRET_KEY` and `SECRETS_KEY`. If you lose it, the stored org secrets cannot be read.
 
 1. Create a network volume and mount it at `/workspace`.

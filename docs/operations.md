@@ -48,6 +48,21 @@ make health
 
 `cd.yml` updates the checkout before `make backup`. Thus the server uses the `Makefile` of the new commit, also when the old `Makefile` has no `backup` target. If `make deploy` or `make health` fails, `cd.yml` runs `make rollback`.
 
+This diagram shows the deploy.
+
+```mermaid
+flowchart TD
+  push["Push to main"] --> check["check.yml passes"]
+  check --> cd["cd.yml connects to the server over SSH"]
+  cd --> reset["git reset --hard origin/main"]
+  reset --> backup["make backup"]
+  backup --> deploy["make deploy: build changed images, alembic upgrade head, up -d"]
+  deploy -->|fails| rollback["make rollback"]
+  deploy -->|passes| health["make health"]
+  health -->|fails| rollback
+  health -->|passes| done["Deploy done"]
+```
+
 `make deploy` does these steps:
 
 1. Get `origin/main` and find the files changed since `DEPLOY_FROM`. If `DEPLOY_FROM` is empty, it uses the commit that was checked out before the fetch.

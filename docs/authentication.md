@@ -20,6 +20,25 @@ This page tells you how callers sign in and how a route decides who may call it.
 4. If the user is an officer of one or more orgs, the API makes a token pair. It sends the browser to `<CLIENT_URL>/auth/?code=...` with a one-time code that is valid for 60 seconds. If the user is not an officer, the URL has `error=Unauthorized Access`.
 5. The client sends the code to `POST /api/auth/exchange` and gets `access_token` and `refresh_token`.
 
+This diagram shows the same steps.
+
+```mermaid
+sequenceDiagram
+  participant B as Browser
+  participant A as API
+  participant D as Discord
+  B->>A: GET /api/auth/login
+  A-->>B: Redirect to Discord with state
+  B->>D: Sign in and approve
+  D-->>B: Redirect to REDIRECT_URI with code
+  B->>A: GET /api/auth/callback with code and state
+  A->>D: Get the Discord user
+  A->>D: Read roles with BOT_TOKEN
+  A-->>B: Redirect to CLIENT_URL/auth/ with a one-time code
+  B->>A: POST /api/auth/exchange with the code
+  A-->>B: access_token and refresh_token
+```
+
 With `?client=dashboard`, step 4 uses `DASHBOARD_URL` in place of `CLIENT_URL`. If `BOT_TOKEN` is not set or Discord does not answer, the callback returns 503.
 
 The API keeps the one-time codes in process memory. Thus the API runs one gunicorn worker.
@@ -51,6 +70,19 @@ An officer makes a machine token with `POST /api/organizations/<id>/tokens` (`na
 - `GET .../tokens` lists all scopes and, under `uses`, the services each scope calls. Under `integrations` it lists every integration: whether the org connected it, its own scopes, the tools each scope gives (`tools`), whether the tools come from the service's MCP server (`remote`), the Platform scopes that call it (`through`), the modules that use it (`used_by`), and its limits. The Tokens page shows each integration's scopes with their tools, and marks a Platform scope that calls a service with the service icon.
 - Officer routes do not accept a machine token. It is not a JWT, so they return 401.
 - `GET /api/auth/machine/whoami` returns the org, name, kind and scopes of a token.
+
+`machine_scope_required` checks a machine token in this order.
+
+```mermaid
+flowchart TD
+  token["Authorization: Bearer plat_..."] --> known{"SHA-256 hash in machine_tokens, not revoked or expired?"}
+  known -->|no| r401["401"]
+  known -->|yes| scope{"Token has the scope of the route?"}
+  scope -->|no| r403a["403"]
+  scope -->|yes| org{"Org in the URL is the token's org?"}
+  org -->|no| r403b["403"]
+  org -->|yes| view["View runs with g.machine_caller"]
+```
 
 ## Decorators
 

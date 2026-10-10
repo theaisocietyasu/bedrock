@@ -84,6 +84,26 @@ The connected route opens SSH to the pod as root with the `backend` key, with a 
 2. Discord returns to `GET /api/compute/cli/callback`. If the member is in the org's server and compute is on, the page shows a token one time.
 3. The member pastes the token into the CLI. The CLI sends it on the member routes.
 
+The CLI signs in one time, then gets a certificate each time it connects.
+
+```mermaid
+sequenceDiagram
+  participant CLI as Godfather CLI
+  participant API as Platform
+  participant D as Discord
+  participant Pod as Pod
+  CLI->>API: GET /api/compute/org/cli/login
+  API->>D: Send the member to sign in
+  D->>API: GET /api/compute/cli/callback
+  API-->>CLI: Token shown one time, pasted into the CLI
+  CLI->>API: GET /api/compute/org/me/pods
+  API-->>CLI: Running pods the member can use
+  CLI->>API: POST .../me/pods/pod_id/connect with public_key
+  API-->>CLI: Host, port, user_folder, certificate
+  CLI->>Pod: SSH with the certificate
+  Pod->>Pod: godfather-login username
+```
+
 The token is a machine token of kind `cli` with the scope `godfather:connect`, for the member's Discord id and the org. It is valid for 90 days. A new sign-in revokes the member's previous CLI token. The audit log records each token.
 
 The CLI sign-in needs `ACCOUNTS_BASE_URL`, `CLIENT_ID` and `CLIENT_SECRET` on the server, and `<ACCOUNTS_BASE_URL>/api/compute/cli/callback` as a redirect of the Discord app.

@@ -2,6 +2,19 @@
 
 A sub-module is content that a module reads, for one campus or topic. It can hold public pages that Platform crawls into an org's [knowledge](./knowledge.md), live queries that agents run, feeds for the [webhook modules](./feeds.md), and the school's Canvas URL for [accounts](./accounts.md). Sub-modules are folders in [`submodules/`](../../submodules/README.md) of the repo. A sub-module holds content and settings, not new behavior. It adds no tables, routes or dashboard pages, so any org can write one. Features are [modules](../writing-a-module.md).
 
+```mermaid
+flowchart LR
+  folder["submodules/ folder"] --> catalog["catalog.SUBMODULES"]
+  catalog -->|pages| sync["Sync: crawled sources"]
+  sync --> crawl["knowledge.crawl_due"]
+  crawl --> knowledge["knowledge"]
+  catalog -->|queries| query["POST /api/submodules/name/query"]
+  query --> index["submodules.index_result"]
+  index --> knowledge
+  catalog -->|feeds| feeds["job_webhook and hackathon_webhook"]
+  catalog -->|canvas_url| accounts["accounts"]
+```
+
 | Sub-module | Content |
 | --- | --- |
 | [asu](../../submodules/asu/README.md) | Arizona State University: library hours, events, courses, dining, scholarships, news, shuttles, jobs, sports; the ASU Canvas URL; the ASU sign-in for Sun Devil Central ([Sign in to ASU](../integrations.md#sign-in-to-asu)) |

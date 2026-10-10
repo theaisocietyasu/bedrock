@@ -208,7 +208,7 @@ export function WebhooksPage() {
   return (
     <>
       <PageHeader
-        title="Webhooks"
+        title="Events"
         description="Messages to your channels when events happen."
         docs="codebase/webhooks"
         action={
