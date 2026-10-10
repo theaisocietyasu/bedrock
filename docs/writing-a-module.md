@@ -37,6 +37,24 @@ If the module needs more than its README, add `docs/modules/<name>.md`, a row in
 
 `tests/test_module_layout.py` checks the categories, the catalog entries, the manifest lists, `MOUNTS`, the Flask-free contract, the module switches, the docs rows, and that each README and `docs/data-model.md` name the module's jobs, tools and tables. If you forget a place, the test names the file to change.
 
+This diagram shows the places to register a module and the places that the test checks.
+
+```mermaid
+flowchart LR
+  module["modules/#lt;name#gt;/"] --> manifest["modules/manifest.py: CATEGORIES, CATALOG, MODEL_MODULES, JOB_MODULES, TOOL_MODULES"]
+  module --> registry["modules/registry.py: MOUNTS"]
+  module --> optional["modules/organizations/service.py: OPTIONAL_MODULES"]
+  module --> pyproject["pyproject.toml: Flask-free contract"]
+  module --> pages["dashboard/src/pages/registry.tsx: PAGES"]
+  module --> routes["tests/contract/routes.txt"]
+  module --> docs["README files, AGENTS.md, CLAUDE.md, docs/data-model.md"]
+  layout["tests/test_module_layout.py"] -.->|checks| manifest
+  layout -.->|checks| registry
+  layout -.->|checks| optional
+  layout -.->|checks| pyproject
+  layout -.->|checks| docs
+```
+
 ### Org switch
 
 If orgs can turn the module off:

@@ -56,6 +56,18 @@ The `knowledge.crawl_due` job runs every 10 minutes. It crawls up to `KNOWLEDGE_
 5. Removes navigation, headers, footers, forms and scripts. Splits the text into chunks of the org's passage size with the page title on each, makes the embeddings and replaces the source's version. The old version and its chunks are deleted.
 6. Refuses the new text if it is less than half of the last version (when that was 500 characters or more), so a broken page cannot remove a good index. `force` accepts it.
 
+```mermaid
+flowchart LR
+  job["knowledge.crawl_due"] --> check["Check URL and robots.txt"]
+  check --> fetch["Fetch: Firecrawl or GET"]
+  fetch --> same{"Same page hash?"}
+  same -->|"yes, no force"| stop["Stop, keep version"]
+  same -->|no| extract["Extract text"]
+  extract --> chunk["Chunk with page title"]
+  chunk --> embed["Embed if embedder"]
+  embed --> write["New version in knowledge_versions and knowledge_chunks"]
+```
+
 A source's `crawl` field shows its schedule, `last_attempt_at` and `last_error`.
 
 A page that starts to fail keeps its last chunks; the error shows on the source. Delete the source to remove them.
@@ -106,6 +118,16 @@ So when an org adds an embedding service after it has sources, or changes the mo
 - Saving the Embeddings integration starts the job for the org.
 - The search settings on the Knowledge page show how many passages use the current model, and **Embed** starts the job (`POST /api/dashboard/<org>/knowledge/reembed`).
 - The tools `knowledge.embeddings` (counts) and `knowledge.reembed` (confirm) do the same over MCP.
+
+```mermaid
+flowchart LR
+  save["Save Embeddings integration"] --> job["knowledge.reembed"]
+  button["Embed on Knowledge page"] --> job
+  tool["knowledge.reembed tool"] --> job
+  job --> stale["Current versions on another model or none"]
+  stale --> embed["Embed stored passage text"]
+  embed --> commit["Commit one source at a time"]
+```
 
 The job commits one source at a time. A source that fails keeps its old vectors. A change to the deployment default in `.env` starts no job; start it from the Knowledge page. Public sources of other orgs keep the model of the org that wrote them.
 

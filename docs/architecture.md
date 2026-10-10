@@ -15,6 +15,25 @@ Platform is a Flask API with a Discord bot, a job worker and an MCP server. All 
 
 The database is Postgres in production, or SQLite for a small deployment. Alembic makes the schema.
 
+This diagram shows the processes, their clients and the outside services.
+
+```mermaid
+flowchart LR
+  dashboard["dashboard/"] --> api["API: main.py, port 8000"]
+  web["web/"] --> api
+  website["thesoda.io"] --> api
+  agents["Apps and agents"] -->|"Bearer plat_..."| mcp["MCP server: mcp_main.py, port 8001"]
+  agents -->|"/api/tools"| api
+  api --> db[("Postgres or SQLite")]
+  mcp --> db
+  bot["Discord bot: bot_main.py"] --> db
+  worker["Job worker: worker_main.py, Postgres only"] --> db
+  api -->|"REST, BOT_TOKEN"| discord["Discord"]
+  bot --> discord
+  api --> outside["RunPod, Notion, Google, GitHub and other services"]
+  worker --> outside
+```
+
 The API does not need the bot. It reads Discord servers, roles and members over Discord's REST API with `BOT_TOKEN` (`core/integrations/discord.py`). The Jeopardy routes under `/api/bot` are the exception: they call the bot's cogs, so they work only when the bot runs in the API process (`RUN_BOT_IN_API=true`).
 
 ## Layout

@@ -44,6 +44,22 @@ An agent makes two calls for each turn, under `/api/agents/members/<discord_id>/
 | `POST /context` | read | Body: `conversation_id`, `visibility`, and optional `message_limit` (50), `memory_kinds`, `memory_limit` (20), `profile_limit` (100), `profile_query`. A limit of 0 leaves that part out. Returns `member` (display name, role ids, officer, from Discord), `conversation` (`owned`), `messages`, `memories` and `profile`. With `profile_query` and an embedder, `profile.similar` has the nearest nodes |
 | `POST /commit` | write | Body: `conversation_id`, `channel_id`, `visibility`, and one or more of `messages`, `summary`, `memories`, `facts` and `pending`, in the shapes above. One transaction: if a part is invalid, nothing is written. Returns 201 with `seqs`, `summary_seq`, `memory_ids`, `facts` and `pending` |
 
+```mermaid
+sequenceDiagram
+  participant A as Agent
+  participant API as Platform
+  participant D as Discord
+  participant M as Model
+  A->>API: POST .../turn/context
+  API->>D: Is the member in the org's server?
+  API-->>A: member, messages, memories, profile
+  A->>M: Prompt with the context
+  M-->>A: Answer
+  A->>API: POST .../turn/commit
+  API->>API: Write all parts in one transaction
+  API-->>A: 201 with seqs and ids
+```
+
 Agents that write during the turn can use the routes in the first table.
 
 ## Privacy

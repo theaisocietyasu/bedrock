@@ -29,6 +29,21 @@ Posts the LeetCode daily question in a Discord channel of the org. Members link 
 | `leetcode.post_daily` | Every 5 minutes | Posts the question at the org's daily time, once a day |
 | `leetcode.verify` | Every 10 minutes | Checks the recent solves of linked members and records today's solves |
 
+```mermaid
+sequenceDiagram
+  participant Job as Jobs
+  participant DB as Database
+  participant LC as LeetCode
+  participant D as Discord
+  Job->>LC: post_daily: get the daily question
+  Job->>DB: Claim a leetcode_daily row for the day
+  Job->>D: Post the question in the channel
+  Job->>DB: verify: linked members with no solve today
+  Job->>LC: Recent accepted submissions of each
+  Job->>DB: Write a leetcode_solve row
+  Job->>D: Reply under the daily post
+```
+
 ## Routes
 
 `GET` and `PUT /api/organizations/<org_id>/leetcode` read and set `channel_id`, `role_ping` and `daily_time`. Officers of the org only.

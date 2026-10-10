@@ -6,6 +6,15 @@ One Discord bot serves every org on the deployment. Each org is a Discord server
 
 `bot_main.py` runs the bot as its own process. `make up` and `make deploy` start it as the `bot` service. To run it inside the API process, set `RUN_BOT_IN_API=true`.
 
+```mermaid
+flowchart LR
+  proc["bot_main.py, or main.py with RUN_BOT_IN_API"] --> create["create_bot"]
+  create --> helper["HelperCog: bot"]
+  create --> game["GameCog: games"]
+  create --> leet["LeetCodeCog: leetcode"]
+  helper & game & leet --> servers["Discord servers of the orgs"]
+```
+
 Set these in `.env`:
 
 | Setting | Use |

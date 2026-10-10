@@ -16,6 +16,24 @@ The Store page (Storage > Store) has two tabs:
 3. Platform checks that the member has enough points and that each product has stock.
 4. Platform writes the order and lowers the stock.
 
+The member site checkout, `POST /checkout`, does these steps.
+
+```mermaid
+sequenceDiagram
+  participant Site as Member site
+  participant API as Platform
+  participant DB as Database
+  Site->>API: POST /checkout with items and total
+  API->>DB: Sum of the member's points rows
+  API-->>Site: 400 if the balance is too low
+  API->>DB: Check and lower the stock of each product
+  API->>API: Compare prices with the catalog
+  API->>DB: Write orders and order_items
+  API->>API: Send the order.created event
+  API->>DB: Write a negative points row for the order
+  API-->>Site: 201 with points_deducted
+```
+
 ## Routes
 
 All routes are under `/api/storefront/<org>`.

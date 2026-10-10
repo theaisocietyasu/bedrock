@@ -21,6 +21,17 @@ Upload a CSV with an event name and the points for each person. A background job
 
 A person with no member record becomes a member of the org.
 
+```mermaid
+flowchart LR
+  upload["POST /uploadEventCSV"] --> job["points.import_event_csv"]
+  job --> row{"Checked-In Date set?"}
+  row -->|no| skip["Skip row"]
+  row -->|yes| member["Find member by email, else add member"]
+  member --> points["points row"]
+  assign["POST /assign_points"] --> points
+  points --> board["GET /leaderboard"]
+```
+
 ## Routes
 
 All routes are under `/api/points/<org>`.

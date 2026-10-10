@@ -11,6 +11,86 @@ This page lists each table, the module that owns it, and the rules to change the
 
 Rows that belong to an org have an `organization_id` column. Discord roles decide who is an officer, not a table. A role change in Discord thus changes access at the next request (the cache keeps the result for 60 seconds).
 
+This diagram shows the core tables and some module tables, with their main columns.
+
+```mermaid
+erDiagram
+  organizations ||--o{ user_organization_memberships : has
+  users ||--o{ user_organization_memberships : has
+  organizations ||--o{ points : has
+  users ||--o{ points : gets
+  organizations ||--o{ machine_tokens : has
+  organizations ||--o{ org_secrets : has
+  organizations ||--o{ webhooks : has
+  organizations ||--o{ notifications : has
+  organizations ||--o{ products : sells
+  users ||--o{ orders : places
+  orders ||--o{ order_items : has
+  products ||--o{ order_items : in
+  organizations {
+    int id PK
+    string prefix UK
+    string guild_id UK
+    string officer_role_id
+    json config
+  }
+  users {
+    int id PK
+    string discord_id UK
+    string email UK
+    string student_id UK
+  }
+  user_organization_memberships {
+    int user_id FK
+    int organization_id FK
+    bool is_active
+    json profile_fields
+  }
+  points {
+    int user_id FK
+    int organization_id FK
+    float points
+    string event
+  }
+  machine_tokens {
+    int organization_id FK
+    string token_hash UK
+    json scopes
+    json limits
+  }
+  org_secrets {
+    int organization_id FK
+    string name
+    text ciphertext
+  }
+  webhooks {
+    int organization_id FK
+    text url_ciphertext
+    json events
+  }
+  notifications {
+    int organization_id FK
+    string event
+    string title
+  }
+  products {
+    int organization_id FK
+    float price
+    int stock
+  }
+  orders {
+    int organization_id FK
+    int user_id FK
+    float total_amount
+    string status
+  }
+  order_items {
+    int order_id FK
+    int product_id FK
+    float price_at_time
+  }
+```
+
 ## All tables
 
 | Module | Tables |

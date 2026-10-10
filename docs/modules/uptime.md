@@ -34,6 +34,20 @@ An `app` target uses the health URL of the app's pod (`health.port` and `health.
 
 Each event shows in Activity > Notifications and goes to the webhooks that take it. See [Webhooks](../webhooks.md).
 
+The state of a monitor changes as follows.
+
+```mermaid
+stateDiagram-v2
+  state "no state" as none
+  [*] --> none
+  none --> up: check up, no event
+  none --> down: check down, monitor.down
+  up --> down: check down, monitor.down
+  down --> up: check up, monitor.up
+  up --> none: new target or expected status, or resume
+  down --> none: new target or expected status, or resume
+```
+
 ## Routes
 
 All routes are under `/api/uptime/<org>`, for officers of the org. The `uptime` switch turns them off.
