@@ -105,7 +105,7 @@ export function CiRuns() {
           </Card>
         ) : null}
         <Card>
-          <CardHeader title="Repositories" hint="Private repositories need the github_token secret under Settings." />
+          <CardHeader title="Repositories" hint="Private repositories need GitHub on Integrations." />
           <form
             className="space-y-4 p-4"
             onSubmit={(e) => {

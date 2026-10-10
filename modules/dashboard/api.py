@@ -142,7 +142,7 @@ def oauth_callback():
     finally:
         db.close()
     if config.DASHBOARD_URL and prefix:
-        return redirect(f"{config.DASHBOARD_URL}/{prefix}/integrations?connected={key}")
+        return redirect(f"{config.DASHBOARD_URL}/{prefix}/explore?tab=integrations&connected={key}")
     return _oauth_page(f"{oauth.SERVICES[key].title} is connected. You can close this page.", 200)
 
 
@@ -248,17 +248,17 @@ def hosting_providers(db, org):
     return {"providers": hosting.listing(db, _org_id(org))}
 
 
-@_route("/apps", ["GET"])
+@_route("/apps", ["GET"], module="runpod")
 def list_apps(db, org):
     return {"apps": apps.list_apps(db, _org_id(org))}
 
 
-@_route("/apps/templates", ["GET"])
+@_route("/apps/templates", ["GET"], module="runpod")
 def list_app_templates(db, org):
     return {"templates": app_templates.list_templates()}
 
 
-@_route("/apps/templates/<string:template>", ["POST"])
+@_route("/apps/templates/<string:template>", ["POST"], module="runpod")
 def create_app_from_template(db, org, template):
     data = json_body()
     app = app_templates.create(
@@ -274,12 +274,12 @@ def create_app_from_template(db, org, template):
     return app, 201
 
 
-@_route("/apps/<string:name>", ["GET"])
+@_route("/apps/<string:name>", ["GET"], module="runpod")
 def get_app(db, org, name):
     return apps.get_app(db, _org_id(org), name) | {"deployments": apps.deployments(db, _org_id(org), name)}
 
 
-@_route("/apps/<string:name>", ["PUT"])
+@_route("/apps/<string:name>", ["PUT"], module="runpod")
 def put_app(db, org, name):
     data = json_body()
     return apps.put_app(
@@ -287,17 +287,17 @@ def put_app(db, org, name):
     )
 
 
-@_route("/apps/<string:name>", ["DELETE"])
+@_route("/apps/<string:name>", ["DELETE"], module="runpod")
 def delete_app(db, org, name):
     return apps.delete_app(db, _org_id(org), name)
 
 
-@_route("/apps/<string:name>/pod", ["GET"])
+@_route("/apps/<string:name>/pod", ["GET"], module="runpod")
 def get_app_pod(db, org, name):
     return {"pod": apps.pod(db, _org_id(org), name)}
 
 
-@_route("/apps/<string:name>/deploy", ["POST"])
+@_route("/apps/<string:name>/deploy", ["POST"], module="runpod")
 def deploy_app(db, org, name):
     data = json_body()
     dry_run = data.get("dry_run") is True
@@ -307,7 +307,7 @@ def deploy_app(db, org, name):
     return result, 200 if dry_run else 202
 
 
-@_route("/apps/<string:name>/rollback", ["POST"])
+@_route("/apps/<string:name>/rollback", ["POST"], module="runpod")
 def rollback_app(db, org, name):
     dry_run = json_body().get("dry_run") is True
     result = apps.rollback(db, _org_id(org), str(org.prefix), name, _actor(), dry_run=dry_run)
@@ -317,13 +317,13 @@ def rollback_app(db, org, name):
 # Knowledge sources
 
 
-@_route("/knowledge/sources", ["GET"])
+@_route("/knowledge/sources", ["GET"], module="knowledge")
 def list_sources(db, org):
     sources = knowledge.list_sources(db, _org_id(org), request.args.get("category"))
     return {"sources": sources, "can_publish": knowledge.can_publish(db, str(org.prefix))}
 
 
-@_route("/knowledge/sources/<path:key>", ["GET"])
+@_route("/knowledge/sources/<path:key>", ["GET"], module="knowledge")
 def read_source(db, org, key):
     """One page of a source's full text. Query: chunk (a search result's chunk_id), offset."""
     offset = request.args.get("offset")
@@ -336,30 +336,30 @@ def read_source(db, org, key):
     )
 
 
-@_route("/knowledge/sources/<path:key>", ["DELETE"])
+@_route("/knowledge/sources/<path:key>", ["DELETE"], module="knowledge")
 def delete_source(db, org, key):
     knowledge.delete_source(db, _org_id(org), key)
     return {"deleted": True}
 
 
-@_route("/knowledge/crawls/<path:key>", ["PUT"])
+@_route("/knowledge/crawls/<path:key>", ["PUT"], module="knowledge")
 def schedule_crawl(db, org, key):
     return crawl.schedule(db, _org_id(org), str(org.prefix), key, json_body())
 
 
-@_route("/knowledge/crawls/<path:key>/run", ["POST"])
+@_route("/knowledge/crawls/<path:key>/run", ["POST"], module="knowledge")
 def run_crawl(db, org, key):
     """Queue a crawl of one source now."""
     crawl.queue(db, _org_id(org), str(org.prefix), key, force=json_body().get("force") is True)
     return {"queued": True}, 202
 
 
-@_route("/knowledge/packs", ["GET"])
+@_route("/knowledge/packs", ["GET"], module="knowledge")
 def list_packs(db, org):
     return {"packs": packs.list_packs(db, _org_id(org))}
 
 
-@_route("/knowledge/packs/<string:name>/sync", ["POST"])
+@_route("/knowledge/packs/<string:name>/sync", ["POST"], module="knowledge")
 def sync_pack(db, org, name):
     """Add or update the pack's sources, then start the crawl job for the sources that are due."""
     from core.jobs import defer
@@ -369,7 +369,7 @@ def sync_pack(db, org, name):
     return counts
 
 
-@_route("/knowledge/search", ["POST"])
+@_route("/knowledge/search", ["POST"], module="knowledge")
 def search(db, org):
     data = json_body()
     return search_chunks(
@@ -382,7 +382,7 @@ def search(db, org):
     )
 
 
-@_route("/knowledge/documents", ["POST"])
+@_route("/knowledge/documents", ["POST"], module="knowledge")
 def upload_documents(db, org):
     """Index uploaded files. Form fields: files (one or more), category, folder, public."""
     uploads = [documents.Upload(f.filename or "document", f.read()) for f in request.files.getlist("files")]
@@ -391,12 +391,12 @@ def upload_documents(db, org):
     return documents.upload(db, _org_id(org), str(org.prefix), uploads, form, embedder.for_org(db, _org_id(org)))
 
 
-@_route("/knowledge/settings", ["GET"])
+@_route("/knowledge/settings", ["GET"], module="knowledge")
 def get_knowledge_settings(db, org):
     return _settings_body(db, _org_id(org), settings.for_org(db, _org_id(org)))
 
 
-@_route("/knowledge/settings", ["PUT"])
+@_route("/knowledge/settings", ["PUT"], module="knowledge")
 def set_knowledge_settings(db, org):
     return _settings_body(db, _org_id(org), settings.update(db, _org_id(org), json_body()))
 
@@ -411,7 +411,7 @@ def _settings_body(db, org_id: int, values: dict) -> dict:
     }
 
 
-@_route("/knowledge/reindex", ["POST"])
+@_route("/knowledge/reindex", ["POST"], module="knowledge")
 def reindex(db, org):
     """Start a job that crawls every crawled source again, so new chunk settings apply."""
     from core.jobs import defer
@@ -420,13 +420,13 @@ def reindex(db, org):
     return {"queued": True}, 202
 
 
-@_route("/knowledge/reembed", ["POST"])
+@_route("/knowledge/reembed", ["POST"], module="knowledge")
 def reembed_passages(db, org):
     """Start a job that embeds every passage that is not on the org's current embedding model."""
     return reembed.queue(db, _org_id(org)), 202
 
 
-@_route("/knowledge/runs", ["GET"])
+@_route("/knowledge/runs", ["GET"], module="knowledge")
 def knowledge_runs(db, org):
     limit = request.args.get("limit", type=int)
     return {"runs": runs.recent(db, _org_id(org), limit, failed_only=request.args.get("failed") == "1")}

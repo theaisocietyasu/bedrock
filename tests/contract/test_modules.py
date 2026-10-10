@@ -24,6 +24,12 @@ def test_modules_are_on_by_default(client, officer_headers, soda_id):
         "compute": True,
         "alerts": True,
         "uptime": True,
+        "knowledge": True,
+        "mcp": True,
+        "agents": True,
+        "integrations": True,
+        "accounts": True,
+        "runpod": True,
     }
 
 
@@ -77,7 +83,8 @@ def test_module_catalog_lists_every_module_but_core(client, officer_headers, sod
     assert set(found) == set(CATALOG) - set(CATEGORIES[CORE])
     assert found["alerts"]["enabled"] is False and found["alerts"]["switchable"] is True
     assert found["points"]["enabled"] is True
-    assert found["knowledge"]["switchable"] is False and found["knowledge"]["enabled"] is True
+    assert found["knowledge"]["switchable"] is True and found["knowledge"]["enabled"] is True
+    assert found["games"]["switchable"] is False
     assert [p["name"] for p in found["knowledge"]["packs"]] == ["asu"]
     assert [p["name"] for p in found["alerts"]["packs"]] == ["careers"]
     games = found["games"]
@@ -94,7 +101,7 @@ def test_module_catalog_needs_officer(client):
 def test_integrations_list_the_modules_they_unlock(client, officer_headers):
     body = client.get("/api/dashboard/soda/integrations", headers=officer_headers).get_json()
     unlocks = {i["key"]: i["unlocks"] for i in body["integrations"]}
-    assert unlocks["runpod"] == ["Hosting", "Member pods"]
+    assert unlocks["runpod"] == ["Godfather", "Hosting"]
     assert unlocks["notion"] == ["Calendar sync"]
 
 
@@ -118,3 +125,24 @@ def test_catalog_needs_name_real_integrations(app):
         for need in info.needs:
             if need.kind == "integration":
                 assert need.key in INTEGRATIONS, f"{name} needs {need.key}, which no module registers"
+
+
+def test_agent_modules_off_close_their_routes_and_tools(client, officer_headers, soda_id):
+    body = {"name": "test-agent", "kind": "agent", "scopes": ["knowledge:read", "agents:read"]}
+    issued = client.post(f"/api/organizations/{soda_id}/tokens", json=body, headers=officer_headers)
+    headers = {"Authorization": f"Bearer {issued.get_json()['token']}"}
+
+    def tools():
+        return [t["name"] for t in client.get("/api/tools", headers=headers).get_json()["tools"]]
+
+    assert client.get("/api/knowledge/sources", headers=headers).status_code == 200
+    assert "knowledge.search" in tools()
+
+    client.put(f"/api/organizations/{soda_id}/modules", json={"modules": {"knowledge": False}}, headers=officer_headers)
+    assert client.get("/api/knowledge/sources", headers=headers).status_code == 404
+    assert client.get("/api/dashboard/soda/knowledge/sources", headers=officer_headers).status_code == 404
+    assert "knowledge.search" not in tools()
+
+    client.put(f"/api/organizations/{soda_id}/modules", json={"modules": {"mcp": False}}, headers=officer_headers)
+    assert tools() == []
+    assert client.post("/api/tools/org.info", json={}, headers=headers).status_code == 404

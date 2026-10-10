@@ -124,7 +124,7 @@ function Events({ prefix, database }: { prefix: string; database: string | null 
   const list = (events.data?.events ?? []).filter((e) => upcoming(e, now)).sort((a, b) => a.start.localeCompare(b.start));
   return (
     <Card>
-      <CardHeader title="Upcoming events" hint="Read from the Notion database. The public events feed shows the same list." />
+      <CardHeader title="Upcoming events" />
       {!configured ? (
         <EmptyState icon={CalendarDays} title="No Notion database">
           Set the Notion database ID to see events.
@@ -177,7 +177,6 @@ function SettingsCard({ orgId, prefix, saved }: { orgId: number; prefix: string;
     <Card>
       <CardHeader
         title="Settings"
-        hint="Where events come from in Notion and which Google calendar they go to."
         action={<Badge tone={last ? 'ok' : 'muted'}>{last ? `Synced ${timeAgo(last)}` : 'Never synced'}</Badge>}
       />
       {!saved.google_calendar_id ? (
@@ -216,7 +215,7 @@ export function CalendarPage() {
     <>
       <PageHeader
         title="Calendar sync"
-        description="Events from the org's Notion database, copied to a Google calendar and the public feed."
+        description="Notion events copied to Google Calendar."
         action={
           <Button variant="primary" onClick={() => sync.mutate()} disabled={!configured || sync.isPending}>
             <RefreshCw className={cx('size-4', sync.isPending && 'animate-spin')} />

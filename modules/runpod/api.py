@@ -11,7 +11,7 @@ from modules.auth.routes import machine_route
 from . import service, templates
 
 apps_blueprint = Blueprint("apps", __name__)
-_route = partial(machine_route, apps_blueprint)
+_route = partial(machine_route, apps_blueprint, module="runpod")
 
 
 def _actor() -> str:

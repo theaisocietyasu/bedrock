@@ -1,7 +1,12 @@
 """Live pack query tool."""
 
-from core.tools import tool
+from functools import partial
+
+from core.tools import tool as _tool
 from modules.packs import catalog, service
+
+# Every tool here needs the knowledge module on for the caller's org
+tool = partial(_tool, module="knowledge")
 
 _LIST = "\n".join(
     f"- {pack.name}/{q.key}: {q.description} Params: "

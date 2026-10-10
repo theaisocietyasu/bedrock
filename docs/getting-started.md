@@ -28,7 +28,7 @@ This page tells you how to run Platform on your machine, and on one RunPod pod w
    flask --app main org create --name "Robotics Club" --prefix robotics --guild-id <server id> --officer-role-id <role id>
    ```
 
-   The optional modules of a new org start off. Add them on the dashboard Modules page, or with `--on points,storefront`.
+   The optional modules of a new org start off. Add them on the dashboard Explore page, or with `--on points,storefront`.
 
 `make dev` adds `docker-compose.dev.yml`. It runs `python3 main.py` with the Flask reloader and mounts the source, so a Python change does not need a rebuild. The bot runs in the `bot` container.
 

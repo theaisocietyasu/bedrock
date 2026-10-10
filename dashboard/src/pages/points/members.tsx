@@ -37,7 +37,6 @@ export function MembersTab({ members, onOpen }: { members: ReturnType<typeof use
     <Card>
       <CardHeader
         title="Leaderboard"
-        hint="Members by points. Store orders take points away. Select a member to see each entry."
       />
       <div className="border-b border-line p-3">
         <SearchInput value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Find a member" aria-label="Find a member" />

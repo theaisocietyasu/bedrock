@@ -51,7 +51,7 @@ The `knowledge.crawl_due` job runs every 10 minutes. It crawls up to `KNOWLEDGE_
 
 1. Checks that the URL is http or https and resolves only to public addresses. It follows redirects one at a time and checks each one. Thus a source cannot point Platform at its own network.
 2. Reads robots.txt with `KNOWLEDGE_USER_AGENT` and skips pages that it does not allow.
-3. Gets the page through the org's Firecrawl (Integrations page, else `FIRECRAWL_URL`), else with a GET of up to 10 MB.
+3. Gets the page through the org's Firecrawl (Integrations tab of Explore, else `FIRECRAWL_URL`), else with a GET of up to 10 MB.
 4. Stops if the page hash did not change, unless `force` is set.
 5. Removes navigation, headers, footers, forms and scripts. Splits the text into chunks of the org's passage size with the page title on each, makes the embeddings and replaces the source's version. The old version and its chunks are deleted.
 6. Refuses the new text if it is less than half of the last version (when that was 500 characters or more), so a broken page cannot remove a good index. `force` accepts it.
@@ -129,7 +129,7 @@ On Postgres with pgvector, the embedding column is `vector(1024)` with an HNSW i
 
 ## Settings
 
-An org sets its own embeddings service and Firecrawl on the Integrations page of the dashboard ([integrations](../integrations.md)). The variables below are the deployment defaults.
+An org sets its own embeddings service and Firecrawl on the Integrations tab of the dashboard Explore page ([integrations](../integrations.md)). The variables below are the deployment defaults.
 
 | Variable | Default | Does |
 | --- | --- | --- |

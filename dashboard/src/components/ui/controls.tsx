@@ -1,6 +1,6 @@
 // Buttons and form fields.
-import { Search, Trash2 } from 'lucide-react';
-import { type ComponentProps, type ReactNode } from 'react';
+import { Check, Minus, Search, Trash2 } from 'lucide-react';
+import { type ComponentProps, type ReactNode, useEffect, useRef } from 'react';
 import { cx } from './cx';
 
 type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
@@ -133,7 +133,55 @@ export function DeleteButton({
   );
 }
 
-// A checkbox in a bordered box, with a title and a line of description.
+// A checkbox in the style of the app. mixed shows a dash for a partial selection. With reveal, the box shows only
+// on a hover of its row (a group), on focus, when checked, or while its list has a selection (SelectionList).
+export function Checkbox({
+  checked,
+  mixed = false,
+  onChange,
+  label,
+  reveal = false,
+  className,
+}: {
+  checked: boolean;
+  mixed?: boolean;
+  onChange: () => void;
+  label: string;
+  reveal?: boolean;
+  className?: string;
+}) {
+  const box = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (box.current) box.current.indeterminate = mixed;
+  }, [mixed]);
+  return (
+    <span
+      className={cx(
+        'relative inline-flex size-4 shrink-0 items-center justify-center transition-opacity duration-150',
+        reveal &&
+          'opacity-0 group-hover:opacity-100 has-checked:opacity-100 has-focus-visible:opacity-100 [[data-selecting=true]_&]:opacity-100',
+        className,
+      )}
+    >
+      <input
+        ref={box}
+        type="checkbox"
+        aria-label={label}
+        checked={checked}
+        onChange={onChange}
+        className="peer absolute inset-0 m-0 cursor-pointer appearance-none rounded-[5px] border border-line-strong bg-panel shadow-xs transition-colors duration-150 checked:border-fg checked:bg-fg indeterminate:border-fg indeterminate:bg-fg hover:border-fg/60 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+      />
+      <Check strokeWidth={3} className="pointer-events-none relative size-3 text-bg opacity-0 peer-checked:opacity-100" aria-hidden />
+      <Minus
+        strokeWidth={3}
+        className="pointer-events-none absolute size-3 text-bg opacity-0 peer-indeterminate:opacity-100"
+        aria-hidden
+      />
+    </span>
+  );
+}
+
+// A checkbox with a title and a line of description, for forms.
 export function CheckOption({
   checked,
   onChange,
@@ -143,14 +191,14 @@ export function CheckOption({
   checked: boolean;
   onChange: (checked: boolean) => void;
   title: string;
-  children: ReactNode;
+  children?: ReactNode;
 }) {
   return (
-    <label className="flex cursor-pointer items-start gap-2.5 rounded-lg border border-line p-3 text-sm transition-colors hover:bg-panel-2/50 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring">
-      <input type="checkbox" className="mt-0.5 size-4 accent-current" checked={checked} onChange={(e) => onChange(e.target.checked)} />
+    <label className="flex cursor-pointer items-start gap-2.5 rounded-md py-1 text-sm">
+      <Checkbox checked={checked} onChange={() => onChange(!checked)} label={title} className="mt-0.5" />
       <span className="min-w-0">
         <span className="block font-medium">{title}</span>
-        <span className="mt-0.5 block text-xs text-muted">{children}</span>
+        {children ? <span className="mt-0.5 block text-xs text-muted">{children}</span> : null}
       </span>
     </label>
   );

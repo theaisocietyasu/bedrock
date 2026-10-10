@@ -39,7 +39,7 @@ def _agent_route(rule: str, scope: str, methods: list[str]):
             return view(db, cast(int, org.id), service.member(discord_id), **kwargs)
 
         bound.__name__ = view.__name__
-        machine_route(accounts_blueprint, M + rule, scope, methods)(bound)
+        machine_route(accounts_blueprint, M + rule, scope, methods, module="accounts")(bound)
         return view
 
     return decorator

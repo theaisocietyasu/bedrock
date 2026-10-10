@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button, Card, EmptyState, ErrorNote, Field, FormActions, Input, SkeletonRows, Spinner } from '../../components/ui';
 import { api, send } from '../../lib/api';
 import type { AppFromTemplate, AppTemplate } from '../../lib/types';
-import { firstConfigured, ProviderField, useProviders } from '../hosting/providers';
+import { firstConfigured, ProviderField, useProviders } from './providers';
 import { NAME_PATTERN, useInvalidate } from './shared';
 
 export function useTemplates(prefix: string) {

@@ -34,7 +34,7 @@ Platform checks the parameters before it gets a page. An unknown pack or query r
 
 ## Settings
 
-An org sets its own Firecrawl and SearXNG on the Integrations page of the dashboard ([integrations](../integrations.md)). The variables below are the deployment defaults.
+An org sets its own Firecrawl and SearXNG on the Integrations tab of the dashboard Explore page ([integrations](../integrations.md)). The variables below are the deployment defaults.
 
 | Variable | Default | Does |
 | --- | --- | --- |

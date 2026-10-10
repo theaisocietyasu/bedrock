@@ -11,12 +11,12 @@ import { Badge, Button, cx, Mono, Spinner } from './ui';
 
 const MODULE_LABELS: Record<string, string> = {
   alerts: 'Alerts',
-  apps: 'Services',
-  app: 'Services',
+  apps: 'Hosting',
+  app: 'Hosting',
   knowledge: 'Knowledge',
   errors: 'Errors',
   jobs: 'Jobs',
-  compute: 'Member pods',
+  compute: 'Godfather',
   order: 'Store',
   member: 'Members',
 };
@@ -52,7 +52,7 @@ export function NotificationItem({
       )}
     >
       {onSelect ? (
-        <Checkbox checked={selected} onChange={onSelect} label={`Select ${n.subject}`} className="mt-0.5" />
+        <Checkbox checked={selected} onChange={onSelect} label={`Select ${n.subject}`} reveal className="mt-0.5" />
       ) : (
         <span className={cx('mt-1.5 size-1.5 shrink-0 rounded-full', resolved ? 'bg-muted/50' : error ? 'bg-bad' : 'bg-info')} aria-hidden />
       )}

@@ -51,7 +51,7 @@ export function KnowledgeRuns() {
       <Card>
         <CardHeader
           title="Knowledge runs"
-          hint="Each crawl and upload: whether the index changed, the passages it holds, and the error if it failed. The last 500 are kept."
+          hint="The last 500 crawls and uploads."
           action={
             <Select value={failed ? 'failed' : 'all'} onChange={(e) => setFailed(e.target.value === 'failed')} aria-label="Show" className="h-8 w-auto text-xs">
               <option value="all">All runs</option>

@@ -5,9 +5,14 @@ other grant. The tools show only when the deployment has the Canvas provider on.
 results go back to the caller only and are never added to knowledge or written to the logs.
 """
 
-from core.tools import tool
+from functools import partial
+
+from core.tools import tool as _tool
 from modules.accounts import canvas
 from modules.auth import scopes
+
+# Every tool here needs the accounts module on for the caller's org
+tool = partial(_tool, module="accounts")
 
 scopes.declare("canvas:read", "Read a member's own Canvas courses, assignments, grades, announcements and calendar")
 

@@ -4,7 +4,7 @@ GPU and CPU pods on an org's own hosting provider account that members connect t
 
 ## Setup
 
-1. Connect RunPod on the dashboard's Integrations page. This saves the org secret `runpod_api_key`. The runpod module uses the same key. `SECRETS_KEY` must be set.
+1. Connect RunPod on the Integrations tab of the dashboard Explore page. This saves the org secret `runpod_api_key`. The runpod module uses the same key. `SECRETS_KEY` must be set.
 2. Keep the `compute` module on for the org. It is on by default.
 3. Optional: set these in the server's `.env`.
    - `COMPUTE_CLI_NAME`: the CLI name in sign-in pages and errors. Default `the compute CLI`. The example AIS server sets `godfather`.
@@ -67,7 +67,7 @@ A member certificate has the principal `gf-<pod_id>` and forces `/usr/local/bin/
 
 ## Who is on a pod
 
-Officers see who can connect to a pod, who connected and who is connected now. On the dashboard, open a pod's Members from its row on the Member pods tab.
+Officers see who can connect to a pod, who connected and who is connected now. On the dashboard, open a pod's Members from its row on the Godfather page.
 
 | Route | Does |
 | --- | --- |
@@ -115,7 +115,7 @@ These officer routes work on the files of a running pod over SFTP, as root with 
 
 A stopped pod returns 409. A failed SSH connection returns 502. Platform does not check pod host keys, because RunPod does not publish them.
 
-Officers manage pods on the Member pods tab of the dashboard Hosting page, `/<org>/hosting?tab=pods`. From it they create, start, stop, restart and terminate pods, change who can connect, add and remove sessions, and work with the files of a running pod.
+Officers manage pods on the dashboard Godfather page, `/<org>/godfather`. From it they create, start, stop, restart and terminate pods, change who can connect, add and remove sessions, and work with the files of a running pod.
 
 ## Adding a hosting provider
 

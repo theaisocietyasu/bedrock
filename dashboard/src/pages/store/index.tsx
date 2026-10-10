@@ -29,7 +29,7 @@ export function StorePage() {
     <>
       <PageHeader
         title="Store"
-        description="Products members buy with points, and the orders they place."
+        description="Merch that members buy with points."
         action={
           <Button variant="primary" onClick={add}>
             <Plus className="size-4" /> Add product
@@ -68,7 +68,7 @@ export function StorePage() {
         open={editing !== null}
         onClose={() => setEditing(null)}
         title={editing && editing !== 'new' ? `Edit ${editing.name}` : 'Add product'}
-        description="Prices are in points. A product with no stock does not show in the member store."
+        description="Prices are in points."
       >
         {editing !== null ? (
           <ProductForm

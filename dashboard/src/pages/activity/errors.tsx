@@ -21,7 +21,7 @@ export function ErrorsTab() {
     <div className="grid gap-4">
       {list.error ? <ErrorNote error={list.error} /> : null}
       {change.error ? <ErrorNote error={change.error} /> : null}
-      <Card>
+      <Card data-selecting={pick.count > 0}>
         <SelectionBar
           count={pick.count}
           total={errors.length}
@@ -38,16 +38,17 @@ export function ErrorsTab() {
           }
         >
           {status === 'open' ? (
-            <Button disabled={change.isPending} onClick={() => run('resolve', pick.ids)}>
+            <Button variant="ghost" disabled={change.isPending} onClick={() => run('resolve', pick.ids)}>
               <CheckCheck className="size-4" /> Resolve
             </Button>
           ) : (
-            <Button disabled={change.isPending} onClick={() => run('reopen', pick.ids)}>
+            <Button variant="ghost" disabled={change.isPending} onClick={() => run('reopen', pick.ids)}>
               <RotateCcw className="size-4" /> Reopen
             </Button>
           )}
           <Button
-            variant="danger"
+            variant="ghost"
+            className="hover:text-bad"
             disabled={change.isPending}
             onClick={() => {
               if (confirm(`Delete ${pick.count} ${pick.count === 1 ? 'error' : 'errors'}? An error that happens again starts a new row.`)) {

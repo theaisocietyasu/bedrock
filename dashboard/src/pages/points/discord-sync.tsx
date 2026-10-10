@@ -48,7 +48,7 @@ export function DiscordSyncDialog({ prefix, open, onClose }: { prefix: string; o
       open={open}
       onClose={close}
       title="Add members from Discord"
-      description="Adds people in the org's Discord server to its members, with their Discord name. Run it again at any time; members already added are kept as they are."
+      description="Adds new people in your Discord server as members."
     >
       {sync.isSuccess ? (
         <div className="space-y-4">

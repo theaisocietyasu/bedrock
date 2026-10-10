@@ -36,7 +36,7 @@ export function AwardDialog({
   const set = (k: keyof typeof draft) => (e: { target: { value: string } }) => setDraft({ ...draft, [k]: e.target.value });
   const points = Number(draft.points);
   return (
-    <Dialog open={open} onClose={onClose} title="Award points" description="Add points to one member. Use a negative number to take points away.">
+    <Dialog open={open} onClose={onClose} title="Award points" description="A negative number takes points away.">
       <form
         className="space-y-5"
         onSubmit={(e) => {

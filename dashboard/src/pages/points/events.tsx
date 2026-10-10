@@ -43,7 +43,7 @@ export function EventsTab({ prefix, groups, members, loading, error }: {
   });
   return (
     <Card>
-      <CardHeader title="Events" hint="Point entries grouped by event name, newest first." />
+      <CardHeader title="Events" />
       {remove.error ? (
         <div className="border-b border-line p-4">
           <ErrorNote error={remove.error} />

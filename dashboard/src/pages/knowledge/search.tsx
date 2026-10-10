@@ -20,7 +20,7 @@ export function TestSearch({ prefix, categories }: { prefix: string; categories:
   });
   return (
     <Card className="mt-6">
-      <CardHeader title="Test search" hint="The passages an agent of this org gets for a query, from its sources and public ones." />
+      <CardHeader title="Test search" />
       <form
         className="grid gap-2 border-b border-line p-4 sm:grid-cols-[minmax(0,1fr)_11rem_auto]"
         onSubmit={(e) => {

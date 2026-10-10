@@ -1,8 +1,13 @@
 """App tools. Apps run on a hosting provider; RunPod is the only one."""
 
+from functools import partial
+
 from core import hosting
-from core.tools import tool
+from core.tools import tool as _tool
 from modules.runpod import service, templates
+
+# Every tool here needs the runpod module on for the caller's org
+tool = partial(_tool, module="runpod")
 
 
 @tool(

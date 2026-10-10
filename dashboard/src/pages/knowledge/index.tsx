@@ -28,7 +28,6 @@ import { compact, count, keyPath } from '../../lib/format';
 import { useCurrentOrg } from '../../lib/org';
 import type { KnowledgeSource } from '../../lib/types';
 import { crawlBody, CrawlForm, RunCrawl } from './crawl';
-import { SourcePacks } from './packs';
 import { TestSearch } from './search';
 import { KnowledgeSettingsForm } from './settings';
 import { useInvalidate } from './shared';
@@ -143,7 +142,8 @@ export function KnowledgePage() {
     <>
       <PageHeader
         title="Knowledge"
-        description="The sources agents search: packs, pages crawled on a schedule, and uploaded documents."
+        description="Pages and documents that agents search."
+        docs="modules/knowledge"
         action={headerActions}
       />
       <StatGrid className="mb-6">
@@ -161,13 +161,6 @@ export function KnowledgePage() {
           <ErrorNote error={list.error ?? actionError} />
         </div>
       ) : null}
-      <SourcePacks
-        prefix={prefix}
-        onSynced={(message) => {
-          setWatchUntil(Date.now() + WATCH_MS);
-          setNotice(message);
-        }}
-      />
       {domains.length > 1 ? <DomainFilter total={sources.length} domains={domains} value={domain} onChange={setDomain} /> : null}
       <Card>
         <CardHeader
@@ -226,8 +219,7 @@ export function KnowledgePage() {
               </div>
             }
           >
-            Add a pack above, upload documents, add a page to crawl on a schedule, or write sources with a
-            knowledge:write token.
+            Upload documents, add a page to crawl, or add a pack on Explore.
           </EmptyState>
         )}
       </Card>
@@ -238,7 +230,6 @@ export function KnowledgePage() {
         open={editing !== null}
         onClose={() => setEditing(null)}
         title={editing && editing !== 'new' ? `Edit ${editing.key}` : 'Add crawl'}
-        description="A crawl fetches a page on a schedule, splits its text into passages and indexes them for agents."
         wide
       >
         {editing ? (
@@ -256,7 +247,6 @@ export function KnowledgePage() {
         open={uploading}
         onClose={() => setUploading(false)}
         title="Upload documents"
-        description="Each file becomes a source. Its text is split into passages and indexed for agents."
         wide
       >
         {uploading ? (
@@ -274,7 +264,6 @@ export function KnowledgePage() {
         open={tuning}
         onClose={() => setTuning(false)}
         title="Search settings"
-        description="How this org's text is split into passages and how a search ranks them."
         wide
       >
         {tuning ? (

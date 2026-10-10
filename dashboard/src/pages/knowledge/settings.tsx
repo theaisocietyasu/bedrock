@@ -160,13 +160,13 @@ function SettingsDraft({
         {!data.embeddings.configured ? (
           <p className="text-xs text-pretty text-muted">
             Without an embedding service, every mode searches on text only. Connect one in{' '}
-            <Link to={`/${prefix}/integrations`} className="text-accent hover:underline">
+            <Link to={`/${prefix}/explore?tab=integrations`} className="text-accent hover:underline">
               Integrations &gt; Embeddings
             </Link>
             .
           </p>
         ) : null}
-        <Field label="Mode" hint="Hybrid finds both exact words and paraphrases. Agents and the MCP server use the same mode.">
+        <Field label="Mode" hint="Hybrid finds exact words and paraphrases.">
           <Select value={draft.mode} onChange={(e) => setDraft({ ...draft, mode: e.target.value })}>
             {MODES.map((m) => (
               <option key={m.value} value={m.value}>

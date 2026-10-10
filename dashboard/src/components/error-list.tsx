@@ -125,9 +125,9 @@ function ErrorRow({
   const [open, setOpen] = useState(false);
   const resolved = Boolean(error.resolved_at);
   return (
-    <li className={cx('border-b border-line last:border-0', selected && 'bg-panel-2/60')}>
+    <li className={cx('group border-b border-line last:border-0', selected && 'bg-panel-2/60')}>
       <div className="flex min-h-14 items-center gap-3 px-4 py-2.5">
-        {onSelect ? <Checkbox checked={Boolean(selected)} onChange={onSelect} label={`Select ${error.kind}`} /> : null}
+        {onSelect ? <Checkbox checked={Boolean(selected)} onChange={onSelect} label={`Select ${error.kind}`} reveal /> : null}
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}

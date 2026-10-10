@@ -17,6 +17,13 @@ from modules.organizations.models import Organization
 INACTIVE_ORG = "The token's organization is inactive or gone"
 
 
+def module_off(org: Organization, module: str | None):
+    """A 404 response when the optional module is off for the org, else None."""
+    if module and not organizations.module_enabled(org, module):
+        return error(f"The {module} module is turned off for this organization", 404)
+    return None
+
+
 def token_org(db) -> Organization | None:
     """The active organization of the calling machine token."""
     return db.query(Organization).filter_by(id=g.machine_caller.organization_id, is_active=True).first()
@@ -32,8 +39,11 @@ def respond(db, view, *args, **kwargs):
         return error(e.message, e.status)
 
 
-def machine_route(blueprint: Blueprint, rule: str, scope: str, methods: list[str]):
-    """Register a route for machine tokens holding scope. The view gets (db, org, **path args)."""
+def machine_route(blueprint: Blueprint, rule: str, scope: str, methods: list[str], *, module: str | None = None):
+    """Register a route for machine tokens holding scope. The view gets (db, org, **path args).
+
+    With module set, the route returns 404 when that optional module is off for the token's org.
+    """
 
     def decorator(view):
         def wrapper(**kwargs):
@@ -42,7 +52,7 @@ def machine_route(blueprint: Blueprint, rule: str, scope: str, methods: list[str
                 org = token_org(db)
                 if org is None:
                     return error(INACTIVE_ORG, 403)
-                return respond(db, view, org, **kwargs)
+                return module_off(org, module) or respond(db, view, org, **kwargs)
             finally:
                 db.close()
 
@@ -53,8 +63,11 @@ def machine_route(blueprint: Blueprint, rule: str, scope: str, methods: list[str
     return decorator
 
 
-def officer_route(blueprint: Blueprint, rule: str, methods: list[str]):
-    """Register a route under /<org_prefix> for officers of that active org. The view gets (db, org, **path args)."""
+def officer_route(blueprint: Blueprint, rule: str, methods: list[str], *, module: str | None = None):
+    """Register a route under /<org_prefix> for officers of that active org. The view gets (db, org, **path args).
+
+    With module set, the route returns 404 when that optional module is off for the org.
+    """
 
     def decorator(view):
         def wrapper(org_prefix, **kwargs):
@@ -63,7 +76,7 @@ def officer_route(blueprint: Blueprint, rule: str, methods: list[str]):
                 org = organizations.find_by_prefix(db, org_prefix, active_only=True)
                 if org is None:
                     return error("Organization not found", 404)
-                return respond(db, view, org, **kwargs)
+                return module_off(org, module) or respond(db, view, org, **kwargs)
             finally:
                 db.close()
 

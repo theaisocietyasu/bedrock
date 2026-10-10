@@ -1,8 +1,13 @@
 """Knowledge tools."""
 
-from core.tools import tool
+from functools import partial
+
+from core.tools import tool as _tool
 from modules.knowledge import crawl, documents, embedder, reembed, runs, search, service, settings
 from modules.packs import service as packs
+
+# Every tool here needs the knowledge module on for the caller's org
+tool = partial(_tool, module="knowledge")
 
 
 @tool(

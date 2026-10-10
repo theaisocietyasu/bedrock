@@ -2,7 +2,7 @@ import { ChevronRight, ExternalLink } from 'lucide-react';
 import { Badge, cx, Dot, Mono, Table, Td, Th, Tr } from '../../components/ui';
 import { deployTone, timeAgo } from '../../lib/format';
 import type { App, HostingProvider } from '../../lib/types';
-import { providerTitle } from '../hosting/providers';
+import { providerTitle } from './providers';
 import { actorLabel, DEFAULT_MANIFEST_PATH } from './shared';
 
 export function AppTable({ apps, providers, onOpen }: { apps: App[]; providers?: HostingProvider[]; onOpen: (name: string) => void }) {

@@ -9,7 +9,7 @@ import { useBranding, useModules, useSuperadmin } from '../lib/queries';
 import { useSignOut } from '../lib/query-client';
 import { useSidebarCollapsed } from '../lib/sidebar';
 import { type Theme, useTheme } from '../lib/theme';
-import { GROUPS, type PageEntry, PAGES, SECTIONS } from '../pages/registry';
+import { type PageEntry, PAGES, SECTIONS } from '../pages/registry';
 import { NotificationsBell } from './notifications';
 import { OrgMark } from './org-mark';
 import { OrgMarks } from './built-by';
@@ -136,22 +136,6 @@ function SectionSlot({ title, collapsed }: { title?: string; collapsed: boolean 
   );
 }
 
-// The header of a group inside a section. The rail keeps its height and hides the text.
-function GroupSlot({ title, collapsed }: { title: string; collapsed: boolean }) {
-  return (
-    <div className="relative h-6 shrink-0">
-      <h3
-        className={cx(
-          'absolute bottom-0.5 left-3 text-[11px] whitespace-nowrap text-muted/70 transition-opacity duration-150',
-          collapsed && 'opacity-0',
-        )}
-      >
-        {title}
-      </h3>
-    </div>
-  );
-}
-
 function NavItem({
   to,
   end,
@@ -200,23 +184,11 @@ function Nav({ collapsed = false, onNavigate, className = 'w-[248px]' }: { colla
   const off = (name: string) => modules?.some((m) => m.name === name && !m.enabled) ?? false;
   const shown = (page: PageEntry) =>
     !page.hidden && (!page.superadmin || superadmin) && !(page.module && [page.module].flat().every(off));
-  // Each section holds its pages with no group, then each group of the section that has a page to show.
-  const sections = SECTIONS.map((s) => {
-    const items = PAGES.filter((p) => p.section === s.id && shown(p));
-    return {
-      id: s.id,
-      title: 'title' in s ? s.title : undefined,
-      size: items.length,
-      blocks: [
-        { id: '', title: undefined as string | undefined, items: items.filter((p) => !p.group) },
-        ...GROUPS.filter((g) => g.section === s.id).map((g) => ({
-          id: g.id,
-          title: g.title as string | undefined,
-          items: items.filter((p) => p.group === g.id),
-        })),
-      ].filter((b) => b.items.length),
-    };
-  }).filter((s) => s.size);
+  const sections = SECTIONS.map((s) => ({
+    id: s.id,
+    title: 'title' in s ? s.title : undefined,
+    items: PAGES.filter((p) => p.section === s.id && shown(p)),
+  })).filter((s) => s.items.length);
   return (
     <div className={cx('flex h-full flex-col', className)}>
       <div className="p-2">
@@ -227,22 +199,17 @@ function Nav({ collapsed = false, onNavigate, className = 'w-[248px]' }: { colla
           {sections.map((section, i) => (
             <div key={section.id} role="group" aria-label={section.title} className="flex flex-col gap-0.5">
               {i ? <SectionSlot title={section.title} collapsed={collapsed} /> : null}
-              {section.blocks.map((block) => (
-                <div key={block.id} role={block.title ? 'group' : undefined} aria-label={block.title} className="flex flex-col gap-0.5">
-                  {block.title ? <GroupSlot title={block.title} collapsed={collapsed} /> : null}
-                  {block.items.map(({ path, label, icon, prefetch }) => (
-                    <NavItem
-                      key={label}
-                      to={`/${prefix}${path ? `/${path}` : ''}`}
-                      end={!path}
-                      label={label}
-                      icon={icon}
-                      collapsed={collapsed}
-                      onNavigate={onNavigate}
-                      onPrefetch={prefetch && prefix ? () => prefetch(client, prefix) : undefined}
-                    />
-                  ))}
-                </div>
+              {section.items.map(({ path, label, icon, prefetch }) => (
+                <NavItem
+                  key={label}
+                  to={`/${prefix}${path ? `/${path}` : ''}`}
+                  end={!path}
+                  label={label}
+                  icon={icon}
+                  collapsed={collapsed}
+                  onNavigate={onNavigate}
+                  onPrefetch={prefetch && prefix ? () => prefetch(client, prefix) : undefined}
+                />
               ))}
             </div>
           ))}
@@ -294,7 +261,7 @@ function Nav({ collapsed = false, onNavigate, className = 'w-[248px]' }: { colla
   );
 }
 
-// The bar above each page: the sidebar button and where the page is, as Org / Section / Group / Page.
+// The bar above each page: the sidebar button and where the page is, as Org / Section / Page.
 function TopBar({ collapsed, onToggle, onMenu }: { collapsed: boolean; onToggle: () => void; onMenu: () => void }) {
   const { org, prefix } = useCurrentOrg();
   const branding = useBranding(prefix);
@@ -302,7 +269,6 @@ function TopBar({ collapsed, onToggle, onMenu }: { collapsed: boolean; onToggle:
   const name = org?.name ?? prefix;
   const section = SECTIONS.find((s) => s.id === page?.section);
   const sectionTitle = section && 'title' in section ? section.title : undefined;
-  const groupTitle = GROUPS.find((g) => g.id === page?.group)?.title;
   const iconButton =
     'flex size-8 shrink-0 cursor-pointer items-center justify-center rounded-md text-muted transition-colors duration-150 hover:bg-panel-2 hover:text-fg';
   return (
@@ -334,7 +300,6 @@ function TopBar({ collapsed, onToggle, onMenu }: { collapsed: boolean; onToggle:
             </Link>
           </li>
           {sectionTitle ? <Crumb className="hidden sm:flex">{sectionTitle}</Crumb> : null}
-          {groupTitle ? <Crumb className="hidden lg:flex">{groupTitle}</Crumb> : null}
           {page ? <Crumb current>{page.label}</Crumb> : null}
         </ol>
       </nav>

@@ -1,4 +1,4 @@
-import { AlertTriangle, ArrowRight, BellRing, Boxes, Bot, CalendarClock, Coins, Cpu, GitBranch, Users } from 'lucide-react';
+import { AlertTriangle, ArrowRight, BellRing, Boxes, Bot, CalendarClock, Coins, Cpu, Database, GitBranch, ShoppingBag, Users } from 'lucide-react';
 import { Link } from 'react-router';
 import { ActivityList } from '../components/activity-list';
 import { moduleLabel } from '../components/notifications';
@@ -30,14 +30,15 @@ export function OverviewPage() {
   if (error || !data) return <ErrorNote error={error ?? 'No data'} />;
   const s = data.sections;
   const runs = (ci.data?.repos ?? []).flatMap((r) => r.runs.slice(0, 1).map((run) => ({ repo: r.repo, ...run })));
-  const enabled = data.modules.filter((m) => m.enabled).length;
+  // A module missing from the list is always on.
+  const on = (name: string) => data.modules.find((m) => m.name === name)?.enabled ?? true;
   const open = (notes.data?.notifications ?? []).filter((n) => !n.resolved_at);
 
   return (
     <>
       <PageHeader
         title="Overview"
-        description={`What runs for ${data.organization.name} and what needs attention. Updated ${timeAgo(data.generated_at)}.`}
+        description={`Updated ${timeAgo(data.generated_at)}.`}
       />
 
       {open.length ? (
@@ -61,62 +62,52 @@ export function OverviewPage() {
       ) : null}
 
       <StatGrid>
-        <Stat label="Members" value={compact(s.members.total)} icon={<Users className="size-4" />} />
-        <Stat
-          label="Points"
-          value={compact(s.points.total)}
-          sub={`${compact(s.points.last_30_days)} in the last 30 days`}
-          icon={<Coins className="size-4" />}
-        />
-        <Stat
-          label="Pods"
-          value={s.compute.pods.length}
-          sub={`${s.compute.sessions.length} upcoming sessions`}
-          icon={<Cpu className="size-4" />}
-        />
-        <Stat
-          label="Agent conversations"
-          value={compact(s.agents.active_7_days)}
-          sub={`${s.agents.members_7_days} members this week`}
-          icon={<Bot className="size-4" />}
-        />
+        {[
+          <Stat key="members" label="Members" value={compact(s.members.total)} icon={<Users className="size-4" />} />,
+          on('points') ? (
+            <Stat
+              key="points"
+              label="Points"
+              value={compact(s.points.total)}
+              sub={`${compact(s.points.last_30_days)} in the last 30 days`}
+              icon={<Coins className="size-4" />}
+            />
+          ) : null,
+          on('compute') ? (
+            <Stat
+              key="pods"
+              label="Pods"
+              value={s.compute.pods.length}
+              sub={`${s.compute.sessions.length} upcoming sessions`}
+              icon={<Cpu className="size-4" />}
+            />
+          ) : null,
+          on('agents') ? (
+            <Stat
+              key="agents"
+              label="Agent conversations"
+              value={compact(s.agents.active_7_days)}
+              sub={`${s.agents.members_7_days} members this week`}
+              icon={<Bot className="size-4" />}
+            />
+          ) : null,
+          on('knowledge') ? (
+            <Stat key="knowledge" label="Knowledge sources" value={compact(s.knowledge.sources)} icon={<Database className="size-4" />} />
+          ) : null,
+          on('storefront') ? (
+            <Stat key="store" label="Open orders" value={s.storefront.pending_orders} icon={<ShoppingBag className="size-4" />} />
+          ) : null,
+        ]
+          .filter(Boolean)
+          .slice(0, 4)}
       </StatGrid>
 
       <TrendsCard prefix={prefix} />
 
-      <div className="mt-6 grid gap-6 lg:grid-cols-3">
-        <Card className="lg:col-span-2">
-          <CardHeader
-            title="Modules"
-            hint={`${enabled} of ${data.modules.length} on for this org`}
-            action={
-              <Link to="explore" className={quietLink}>
-                Change
-              </Link>
-            }
-          />
-          <div className="grid gap-px bg-line sm:grid-cols-2">
-            {data.modules.map((m) => (
-              <div key={m.name} className="flex items-start gap-3 bg-panel px-4 py-3">
-                <span className="mt-1.5">
-                  <Dot tone={m.enabled ? 'ok' : 'muted'} />
-                </span>
-                <div className="min-w-0 flex-1">
-                  <div className="flex items-center justify-between gap-2">
-                    <span className={m.enabled ? 'text-sm font-medium' : 'text-sm font-medium text-muted'}>{m.name}</span>
-                    <span className="text-xs text-muted">{m.enabled ? 'On' : 'Off'}</span>
-                  </div>
-                  <div className="mt-0.5 text-xs text-muted">{m.description}</div>
-                </div>
-              </div>
-            ))}
-          </div>
-        </Card>
-
+      <div className="mt-6 grid gap-6 md:grid-cols-2 xl:grid-cols-[repeat(auto-fit,minmax(15rem,1fr))]">
         <Card>
           <CardHeader
             title="CI"
-            hint="Latest run per repository"
             action={
               <Link to="activity?tab=ci" className={quietLink}>
                 All runs
@@ -155,10 +146,10 @@ export function OverviewPage() {
           )}
         </Card>
 
+        {on('runpod') ? (
         <Card>
           <CardHeader
             title="Services"
-            hint="App deploys on the org's hosting providers"
             action={
               <Link to="hosting" className={quietLink}>
                 Details
@@ -177,11 +168,12 @@ export function OverviewPage() {
             <EmptyState icon={Boxes}>No apps registered.</EmptyState>
           )}
         </Card>
+        ) : null}
 
+        {on('alerts') ? (
         <Card>
           <CardHeader
             title="Alert feeds"
-            hint="Posts in the last 7 days"
             action={
               <Link to="alerts" className={quietLink}>
                 Manage
@@ -200,14 +192,15 @@ export function OverviewPage() {
             <EmptyState icon={BellRing}>No alert feeds.</EmptyState>
           )}
         </Card>
+        ) : null}
 
+        {on('compute') ? (
         <Card>
           <CardHeader
             title="Upcoming sessions"
-            hint="Pods start before each session"
             action={
-              <Link to="hosting?tab=pods" className={quietLink}>
-                Member pods
+              <Link to="godfather" className={quietLink}>
+                Godfather
               </Link>
             }
           />
@@ -222,7 +215,11 @@ export function OverviewPage() {
             <EmptyState icon={CalendarClock}>No sessions scheduled.</EmptyState>
           )}
         </Card>
+        ) : null}
 
+      </div>
+
+      <div className="mt-6 grid gap-6 lg:grid-cols-3">
         <Card className="lg:col-span-2">
           <CardHeader
             title="Recent changes"
@@ -236,15 +233,11 @@ export function OverviewPage() {
         </Card>
 
         <Card>
-          <CardHeader title="Jobs" hint="Background runs" />
+          <CardHeader title="Jobs" />
           <ActivityList entries={data.jobs.slice(0, 8)} empty="No job runs recorded for this organization." />
         </Card>
       </div>
 
-      <p className="mt-8 border-t border-line pt-4 text-xs text-muted">
-        Store: {s.storefront.products} products, {s.storefront.pending_orders} pending orders. Knowledge:{' '}
-        {s.knowledge.sources} sources. Tokens: {s.tokens.tokens.length} app and agent, {s.tokens.cli_tokens} CLI.
-      </p>
     </>
   );
 }

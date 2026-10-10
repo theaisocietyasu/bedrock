@@ -12,7 +12,7 @@ from . import embedder, service
 from .search import search as search_chunks
 
 knowledge_blueprint = Blueprint("knowledge", __name__)
-_route = partial(machine_route, knowledge_blueprint)
+_route = partial(machine_route, knowledge_blueprint, module="knowledge")
 
 # Searches are reads sent as POST
 audit_hook.SKIPPED_ROUTES.add("/api/knowledge/search")
