@@ -46,9 +46,6 @@ export async function Contributors({ className }: { className?: string }) {
           </li>
         ))}
       </ul>
-      <a href={`${repoUrl}/graphs/contributors`} className="mt-2 inline-block text-xs text-fd-muted-foreground hover:text-fd-foreground">
-        {people.length} contributors
-      </a>
     </div>
   );
 }
