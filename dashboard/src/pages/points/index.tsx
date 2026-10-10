@@ -50,7 +50,7 @@ export function PointsPage() {
     <>
       <PageHeader
         title="Points"
-        description="Members and their points, and the events that gave points."
+        description="Members, their points and the events that gave them."
         action={
           <>
             <Button onClick={() => setSyncing(true)}>

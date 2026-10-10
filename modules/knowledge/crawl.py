@@ -29,6 +29,8 @@ from modules.knowledge.service import (
     _write_version,
     can_publish,
 )
+from modules.organizations import service as organizations
+from modules.organizations.models import Organization
 
 logger = get_logger("knowledge.crawl")
 
@@ -206,7 +208,10 @@ def crawl_due(db, embedder_for: Callable[[int], Embedder | None], now: datetime.
     """Crawl every due source with its org's embedder, one host at a time per KNOWLEDGE_CRAWL_GAP_SECONDS. Commits."""
     pacer = fetch.HostPacer(_setting("KNOWLEDGE_CRAWL_GAP_SECONDS", 2))
     results = []
+    off = {o.id for o in db.query(Organization).all() if not organizations.module_enabled(o, "knowledge")}
     for source in due(db, now, limit=_setting("KNOWLEDGE_CRAWL_BATCH", 20)):
+        if source.organization_id in off:
+            continue
         started = runs.Timer()
         try:
             results.append(crawl(db, source, embedder_for(cast(int, source.organization_id)), pacer=pacer))

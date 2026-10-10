@@ -74,11 +74,23 @@ def _usable(db, spec: ToolSpec, org: Organization, caller: MachineCaller) -> boo
 
 
 def available(db, caller: MachineCaller) -> list[ToolSpec]:
-    """Tools this token may call: its scopes allow them, its org has their module on and their service connected."""
+    """Tools this token may call: its scopes allow them, its org has their module on and their service connected.
+
+    With the mcp module off, the org has no tools.
+    """
     org = _org(db, caller)
+    if not organizations.module_enabled(org, "mcp"):
+        return []
     local = [spec for spec in TOOLS.values() if _usable(db, spec, org, caller)]
-    found = local + remote.tools_for(db, caller.organization_id, caller)
+    found = local + _remote(db, org, caller)
     return sorted(found + [BATCH_SPEC] if found else found, key=lambda s: s.name)
+
+
+def _remote(db, org: Organization, caller: MachineCaller) -> list[ToolSpec]:
+    """The tools of the org's connected MCP servers, when the integrations module is on."""
+    if not organizations.module_enabled(org, "integrations"):
+        return []
+    return remote.tools_for(db, caller.organization_id, caller)
 
 
 def call(db, caller: MachineCaller, name: str, arguments: dict | None, *, source: str) -> Any:
@@ -88,12 +100,14 @@ def call(db, caller: MachineCaller, name: str, arguments: dict | None, *, source
     pending = False
     try:
         org = _org(db, caller)
+        if not organizations.module_enabled(org, "mcp"):
+            raise ToolError("The mcp module is turned off for this organization", 404)
         if name == BATCH:
             return _batch(db, caller, arguments, source)
         spec = TOOLS.get(name)
         if spec is not None and not _usable(db, spec, org, caller):
             spec = None
-        if spec is None and name not in TOOLS:
+        if spec is None and name not in TOOLS and organizations.module_enabled(org, "integrations"):
             spec = remote.find(db, caller.organization_id, caller, name)
         if spec is None:
             # Same answer for unknown and not allowed, so a token cannot probe for tools

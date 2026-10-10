@@ -262,7 +262,7 @@ export function FilesDialog({ prefix, pod, onClose }: { prefix: string; pod: Pod
   const stopped = notRunning(list.error);
 
   return (
-    <Dialog open onClose={onClose} wide title={`Files on ${pod.name}`} description="Files on the running pod, as root. The volume is kept when the pod stops; other folders are not.">
+    <Dialog open onClose={onClose} wide title={`Files on ${pod.name}`} description="Only the volume is kept when the pod stops.">
       {opened ? (
         <Editor prefix={prefix} pod={pod} path={opened} onBack={() => setOpened(null)} />
       ) : stopped ? (

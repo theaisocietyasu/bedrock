@@ -21,7 +21,7 @@ const SCALE = 2;
 // Each screen is a dashboard path and, optionally, a step that runs before the screenshot and its own fixtures.
 const SCREENS = [
   { name: 'overview', path: '' },
-  { name: 'hosting', path: 'hosting?tab=pods' },
+  { name: 'hosting', path: 'godfather' },
   {
     name: 'tokens-scopes',
     path: 'tokens',
@@ -36,7 +36,7 @@ const SCREENS = [
     before: async (page) => {
       await page.getByRole('button', { name: 'New token' }).click();
       await page.getByLabel('google:read').check();
-      await page.locator('legend', { hasText: /^Googleconnected$/ }).scrollIntoViewIfNeeded();
+      await page.locator('legend', { hasText: /^Google$/ }).scrollIntoViewIfNeeded();
       await page.mouse.wheel(0, 260);
     },
   },
@@ -54,7 +54,7 @@ const SCREENS = [
   },
   {
     name: 'integrations-sign-in',
-    path: 'integrations',
+    path: 'explore?tab=integrations',
     before: async (page) => {
       await page.getByRole('button', { name: 'Sign in with Google' }).scrollIntoViewIfNeeded();
       await page.mouse.wheel(0, -200);
@@ -62,7 +62,7 @@ const SCREENS = [
   },
   {
     name: 'asu-signed-out',
-    path: 'integrations',
+    path: 'explore?tab=integrations',
     before: async (page) => {
       await page.getByRole('button', { name: 'Sign in to ASU' }).scrollIntoViewIfNeeded();
       await page.mouse.wheel(0, 200);
@@ -70,7 +70,7 @@ const SCREENS = [
   },
   {
     name: 'asu-duo',
-    path: 'integrations',
+    path: 'explore?tab=integrations',
     fixtures: asuDuoFixtures,
     before: async (page) => {
       await page.getByLabel('Duo code').scrollIntoViewIfNeeded();

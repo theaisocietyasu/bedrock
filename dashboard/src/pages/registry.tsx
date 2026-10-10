@@ -1,6 +1,7 @@
 import {
   Activity,
   BellRing,
+  Bot,
   Cable,
   CalendarDays,
   CodeXml,
@@ -10,7 +11,7 @@ import {
   HeartPulse,
   KeyRound,
   LayoutDashboard,
-  Plug,
+  Cpu,
   Server,
   Settings,
   ShieldCheck,
@@ -25,9 +26,10 @@ import { ActivityPage } from './activity';
 import { AdminPage } from './admin';
 import { AlertsPage } from './alerts';
 import { CalendarPage } from './calendar';
+import { AgentsPage } from './agents';
 import { ExplorePage } from './explore';
+import { GodfatherPage } from './godfather';
 import { HostingPage } from './hosting';
-import { IntegrationsPage } from './integrations';
 import { KnowledgePage } from './knowledge';
 import { KnowledgeSourcePage } from './knowledge/source';
 import { LeetCodePage } from './leetcode';
@@ -42,27 +44,18 @@ import { TokensPage } from './tokens';
 import { UptimePage } from './uptime';
 import { WebhooksPage } from './webhooks';
 
-// The sidebar sections, in order. A section with no title has no header.
+// The sidebar sections, in order. A section with no title has no header. They follow the categories on Explore.
 export const SECTIONS = [
   { id: 'top' },
   { id: 'members', title: 'Members' },
+  { id: 'webhooks', title: 'Webhooks' },
   { id: 'automations', title: 'Automations' },
-  { id: 'knowledge', title: 'Knowledge and MCP' },
+  { id: 'agents', title: 'AI and agents' },
   { id: 'infrastructure', title: 'Infrastructure' },
   { id: 'bottom' },
 ] as const;
 
 export type SectionId = (typeof SECTIONS)[number]['id'];
-
-// The groups inside a section, in order, each under a small header. To add an automation, give its page one of
-// these groups. Pages with no group come first in their section.
-export const GROUPS = [
-  { id: 'webhooks', section: 'automations', title: 'Webhooks' },
-  { id: 'scheduled', section: 'automations', title: 'Scheduled jobs' },
-  { id: 'bots', section: 'automations', title: 'Bots' },
-] as const;
-
-export type GroupId = (typeof GROUPS)[number]['id'];
 
 export type PageEntry = {
   // The URL after /<org>/. An empty path is the org home page.
@@ -71,8 +64,6 @@ export type PageEntry = {
   label: string;
   icon: ComponentType<{ className?: string }>;
   section: SectionId;
-  // The group inside the section. It must be a group of the same section.
-  group?: GroupId;
   // The sidebar hides the page when the API says this module is off. With a list, it hides the page when every
   // module in the list is off.
   module?: string | string[];
@@ -96,18 +87,19 @@ export const PAGES: PageEntry[] = [
   { path: 'explore', label: 'Explore', icon: Compass, section: 'top', page: ExplorePage },
   { path: 'points', label: 'Points', icon: Coins, section: 'members', module: 'points', gate: true, page: PointsPage, prefetch: prefetchPoints },
   { path: 'store', label: 'Store', icon: ShoppingBag, section: 'members', module: 'storefront', gate: true, page: StorePage, prefetch: prefetchStore },
-  { path: 'webhooks', label: 'Webhooks', icon: Webhook, section: 'automations', group: 'webhooks', page: WebhooksPage },
-  { path: 'alerts', label: 'Alerts', icon: BellRing, section: 'automations', group: 'webhooks', module: 'alerts', gate: true, page: AlertsPage },
-  { path: 'calendar', label: 'Calendar sync', icon: CalendarDays, section: 'automations', group: 'scheduled', module: 'calendar', gate: true, page: CalendarPage },
-  { path: 'leetcode', label: 'LeetCode', icon: CodeXml, section: 'automations', group: 'bots', module: 'leetcode', gate: true, page: LeetCodePage },
-  { path: 'knowledge', label: 'Knowledge', icon: Database, section: 'knowledge', page: KnowledgePage },
-  { path: 'knowledge/sources/*', label: 'Knowledge source', icon: Database, section: 'knowledge', hidden: true, page: KnowledgeSourcePage },
-  { path: 'mcp', label: 'MCP', icon: Cable, section: 'knowledge', page: McpPage },
-  { path: 'hosting', label: 'Hosting', icon: Server, section: 'infrastructure', module: ['runpod', 'compute'], page: HostingPage },
-  { path: 'uptime', label: 'Uptime', icon: HeartPulse, section: 'infrastructure', module: 'uptime', gate: true, page: UptimePage },
+  { path: 'webhooks', label: 'Webhooks', icon: Webhook, section: 'webhooks', page: WebhooksPage },
+  { path: 'alerts', label: 'Alerts', icon: BellRing, section: 'webhooks', module: 'alerts', gate: true, page: AlertsPage },
+  { path: 'calendar', label: 'Calendar sync', icon: CalendarDays, section: 'automations', module: 'calendar', gate: true, page: CalendarPage },
+  { path: 'uptime', label: 'Uptime', icon: HeartPulse, section: 'automations', module: 'uptime', gate: true, page: UptimePage },
+  { path: 'leetcode', label: 'LeetCode', icon: CodeXml, section: 'automations', module: 'leetcode', gate: true, page: LeetCodePage },
+  { path: 'knowledge', label: 'Knowledge', icon: Database, section: 'agents', module: 'knowledge', gate: true, page: KnowledgePage },
+  { path: 'knowledge/sources/*', label: 'Knowledge source', icon: Database, section: 'agents', module: 'knowledge', gate: true, hidden: true, page: KnowledgeSourcePage },
+  { path: 'mcp', label: 'MCP', icon: Cable, section: 'agents', module: 'mcp', gate: true, page: McpPage },
+  { path: 'agents', label: 'Agents', icon: Bot, section: 'agents', module: 'agents', gate: true, page: AgentsPage },
+  { path: 'hosting', label: 'Hosting', icon: Server, section: 'infrastructure', module: 'runpod', gate: true, page: HostingPage },
+  { path: 'godfather', label: 'Godfather', icon: Cpu, section: 'infrastructure', module: 'compute', gate: true, page: GodfatherPage },
   { path: 'tokens', label: 'Tokens', icon: KeyRound, section: 'infrastructure', page: TokensPage },
   { path: 'activity', label: 'Activity', icon: Activity, section: 'bottom', page: ActivityPage },
-  { path: 'integrations', label: 'Integrations', icon: Plug, section: 'bottom', page: IntegrationsPage },
   { path: 'settings', label: 'Settings', icon: Settings, section: 'bottom', page: SettingsPage },
   { path: 'admin', label: 'Superadmin', icon: ShieldCheck, section: 'bottom', superadmin: true, page: AdminPage },
 ];
@@ -117,9 +109,9 @@ export const REDIRECTS: { path: string; to: string }[] = [
   { path: 'ci', to: '../activity?tab=ci' },
   { path: 'notifications', to: '../activity' },
   { path: 'modules', to: '../explore' },
-  { path: 'agents', to: '../mcp' },
-  { path: 'apps', to: '../hosting?tab=services' },
-  { path: 'compute', to: '../hosting?tab=pods' },
+  { path: 'integrations', to: '../explore?tab=integrations' },
+  { path: 'apps', to: '../hosting' },
+  { path: 'compute', to: '../godfather' },
 ];
 
 // The element for the route of a page, inside a ModuleGate when the entry asks for one.

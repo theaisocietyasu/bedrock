@@ -7,14 +7,15 @@ import importlib
 from dataclasses import dataclass
 
 # Each module and its category. modules/ stays flat; the categories group modules in modules/README.md and on the
-# Modules page of the dashboard. Core modules are always on and do not show on the Modules page.
+# Explore page of the dashboard. Core modules are always on and do not show on Explore.
 CATEGORIES = {
-    "Core": ["auth", "bot", "dashboard", "organizations", "public", "superadmin", "users"],
-    "Bots": ["games", "leetcode"],
-    "AI and agents": ["agents", "integrations", "knowledge", "mcp", "packs"],
-    "Members": ["accounts", "points", "storefront"],
-    "Automations": ["alerts", "calendar"],
-    "Infrastructure": ["compute", "runpod", "uptime"],
+    "Core": ["auth", "bot", "dashboard", "organizations", "packs", "public", "superadmin", "users"],
+    "AI and agents": ["knowledge", "mcp", "agents", "integrations"],
+    "Members": ["points", "storefront", "accounts"],
+    "Webhooks": ["alerts"],
+    "Automations": ["calendar", "uptime"],
+    "Bots": ["leetcode", "games"],
+    "Infrastructure": ["runpod", "compute"],
 }
 
 CORE = "Core"
@@ -36,7 +37,7 @@ class Need:
 
 @dataclass(frozen=True)
 class ModuleInfo:
-    """How the Modules page of the dashboard shows a module."""
+    """How the Explore page of the dashboard shows a module."""
 
     title: str
     description: str
@@ -67,12 +68,10 @@ CATALOG = {
     "bot": ModuleInfo("Discord bot", "The Discord bot that runs the commands of other modules.", (DISCORD_BOT,)),
     "calendar": ModuleInfo(
         "Calendar sync",
-        "Syncs a Notion events database to Google Calendar and serves the public events feed.",
+        "Copies Notion events to Google Calendar and the public events feed.",
         needs=(Need("notion", "Notion"), Need("google", "Google service account")),
     ),
-    "compute": ModuleInfo(
-        "Member pods", "GPU and CPU pods on the org's RunPod account that members SSH into.", (RUNPOD,)
-    ),
+    "compute": ModuleInfo("Godfather", "GPU and CPU pods that members connect to with the Godfather CLI.", (RUNPOD,)),
     "dashboard": ModuleInfo("Dashboard", "This dashboard: overview, activity, errors, branding and webhooks."),
     "games": ModuleInfo("Games", "Jeopardy games in the org's Discord server.", (DISCORD_BOT,)),
     "integrations": ModuleInfo("Integration tools", "Gives agents the tools of the services that the org connects."),
@@ -100,19 +99,17 @@ CATALOG = {
     "public": ModuleInfo("Public pages", "Open routes for the leaderboard, the member list and stats."),
     "runpod": ModuleInfo(
         "Hosting",
-        "Deploys the org's own apps to a hosting provider, checks their health and rolls them back.",
+        "Deploys the org's apps to a hosting provider and checks their health.",
         needs=(RUNPOD, Need("github", "GitHub", optional=True)),
     ),
     "storefront": ModuleInfo("Store", "A merch store that members pay for with points."),
     "superadmin": ModuleInfo("Superadmin", "Orgs for the whole deployment. Only the superadmin uses it."),
-    "uptime": ModuleInfo(
-        "Uptime", "Checks the org's sites and Hosting apps on a schedule and sends an event when one goes down or up."
-    ),
+    "uptime": ModuleInfo("Uptime", "Checks the org's sites and apps, with an event when one goes down."),
     "users": ModuleInfo("Member list", "The members of the org and their profile fields."),
 }
 
 # The modules that a new org starts with, in addition to Core. Each other module that an org can switch off starts off.
-NEW_ORG_MODULES = ("knowledge", "mcp")
+NEW_ORG_MODULES: tuple[str, ...] = ()
 
 
 # Importing these puts every table in Base.metadata (alembic/env.py, tests/conftest.py)

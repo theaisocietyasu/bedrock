@@ -218,7 +218,7 @@ export function AccessDialog({ prefix, pod, onClose }: { prefix: string; pod: Po
     },
   });
   return (
-    <Dialog open onClose={onClose} title={`Access to ${pod.name}`} description="Who can connect with the compute CLI. Officers can always connect, as root.">
+    <Dialog open onClose={onClose} title={`Access to ${pod.name}`} description="Officers can always connect.">
       <form
         className="space-y-5"
         onSubmit={(e) => {

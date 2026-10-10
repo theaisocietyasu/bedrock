@@ -1,16 +1,47 @@
 // Page frame: headers, cards, rows and stats.
+import { BookOpen } from 'lucide-react';
 import { type ComponentProps, type ReactNode } from 'react';
+import { docsPage } from '../../lib/links';
 import { cx } from './cx';
 
-// The title of a page: the sidebar label of the page, one line of description, and the page actions on the right.
-export function PageHeader({ title, description, action }: { title: ReactNode; description?: ReactNode; action?: ReactNode }) {
+// A link to a page of the docs, for the right side of a header.
+export function DocsLink({ page, className }: { page: string; className?: string }) {
+  return (
+    <a
+      href={docsPage(page)}
+      target="_blank"
+      rel="noreferrer"
+      className={cx('flex h-8 items-center gap-1.5 rounded-md px-2 text-xs text-muted transition-colors hover:bg-panel-2 hover:text-fg', className)}
+    >
+      <BookOpen className="size-3.5" /> Docs
+    </a>
+  );
+}
+
+// The title of a page: the sidebar label, one short line of description, a docs link and the page actions on the right.
+export function PageHeader({
+  title,
+  description,
+  action,
+  docs,
+}: {
+  title: ReactNode;
+  description?: ReactNode;
+  action?: ReactNode;
+  docs?: string;
+}) {
   return (
     <header className="mb-8 flex flex-wrap items-end justify-between gap-x-6 gap-y-4">
       <div className="min-w-0 flex-1 basis-72">
         <h1 className="text-2xl font-semibold tracking-tight text-balance">{title}</h1>
         {description ? <p className="mt-1.5 max-w-2xl text-sm text-pretty text-muted">{description}</p> : null}
       </div>
-      {action ? <div className="flex shrink-0 flex-wrap items-center gap-2">{action}</div> : null}
+      {action || docs ? (
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {docs ? <DocsLink page={docs} /> : null}
+          {action}
+        </div>
+      ) : null}
     </header>
   );
 }

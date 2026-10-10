@@ -1,6 +1,8 @@
 import { X } from 'lucide-react';
-import { type ReactNode, useEffect, useRef, useState } from 'react';
-import { cx } from './ui';
+import { type ReactNode, useState } from 'react';
+import { Checkbox } from './ui';
+
+export { Checkbox };
 
 type Id = string | number;
 
@@ -29,37 +31,8 @@ export function useSelection<T extends Id>(ids: T[]) {
   };
 }
 
-// A checkbox for a list row or a list header. mixed shows a dash for a partial selection.
-export function Checkbox({
-  checked,
-  mixed = false,
-  onChange,
-  label,
-  className,
-}: {
-  checked: boolean;
-  mixed?: boolean;
-  onChange: () => void;
-  label: string;
-  className?: string;
-}) {
-  const box = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (box.current) box.current.indeterminate = mixed;
-  }, [mixed]);
-  return (
-    <input
-      ref={box}
-      type="checkbox"
-      aria-label={label}
-      checked={checked}
-      onChange={onChange}
-      className={cx('size-4 shrink-0 cursor-pointer rounded accent-current', className)}
-    />
-  );
-}
-
-// The bar above a list: select all on the left, and the actions for the selected rows on the right.
+// The header row of a selectable list: select all and the count on the left, filters on the right. While rows are
+// selected, a bar floats at the bottom of the screen with the count, the actions for those rows, and a clear button.
 export function SelectionBar({
   count,
   total,
@@ -82,29 +55,34 @@ export function SelectionBar({
   extra?: ReactNode;
 }) {
   return (
-    <div className="flex min-h-11 flex-wrap items-center gap-3 border-b border-line px-4 py-2">
-      <Checkbox checked={all} mixed={some} onChange={onToggleAll} label={all ? 'Clear the selection' : `Select all ${noun}`} />
+    <>
+      <div className="flex min-h-12 flex-wrap items-center gap-3 border-b border-line px-4 py-2">
+        <Checkbox checked={all} mixed={some} onChange={onToggleAll} label={all ? 'Clear the selection' : `Select all ${noun}`} />
+        <span className="text-xs text-muted tabular-nums">
+          {count ? `${count} of ${total} selected` : `${total} ${noun}`}
+        </span>
+        <div className="ml-auto flex flex-wrap items-center gap-2">{extra}</div>
+      </div>
       {count ? (
-        <>
-          <span className="text-xs font-medium tabular-nums">{count} selected</span>
+        <div
+          role="toolbar"
+          aria-label={`Actions for ${count} selected`}
+          className="fixed inset-x-4 bottom-5 z-30 mx-auto flex w-fit max-w-[calc(100%-2rem)] animate-in flex-wrap items-center gap-2 rounded-xl border border-line bg-panel py-1.5 pr-1.5 pl-3 shadow-lg"
+        >
+          <span className="text-sm font-medium tabular-nums">{count} selected</span>
+          <span aria-hidden className="mx-1 h-4 w-px bg-line" />
+          {children}
           <button
             type="button"
             onClick={onClear}
             aria-label="Clear the selection"
-            className="flex size-6 cursor-pointer items-center justify-center rounded-md text-muted hover:bg-panel-2 hover:text-fg"
+            title="Clear the selection"
+            className="flex size-8 cursor-pointer items-center justify-center rounded-md text-muted hover:bg-panel-2 hover:text-fg"
           >
-            <X className="size-3.5" />
+            <X className="size-4" />
           </button>
-          <div className="ml-auto flex flex-wrap items-center gap-2">{children}</div>
-        </>
-      ) : (
-        <>
-          <span className="text-xs text-muted tabular-nums">
-            {total} {noun}
-          </span>
-          <div className="ml-auto flex flex-wrap items-center gap-2">{extra}</div>
-        </>
-      )}
-    </div>
+        </div>
+      ) : null}
+    </>
   );
 }

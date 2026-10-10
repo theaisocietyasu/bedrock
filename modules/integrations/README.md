@@ -1,6 +1,6 @@
 # integrations
 
-Gives agents the tools of the services an org connects on the Integrations page, through the same token and MCP server as the Platform tools. Platform passes a call to the service's own MCP server, with an API key (GitHub, RunPod) or as an officer who signed in (Notion, Google). It also calls some APIs itself with the org's keys (Google, Notion, web search). The agent never gets the keys.
+Gives agents the tools of the services an org connects on the Integrations tab of Explore, through the same token and MCP server as the Platform tools. Platform passes a call to the service's own MCP server, with an API key (GitHub, RunPod) or as an officer who signed in (Notion, Google). It also calls some APIs itself with the org's keys (Google, Notion, web search). The agent never gets the keys.
 
 ## Files
 

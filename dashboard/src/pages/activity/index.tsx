@@ -22,7 +22,7 @@ export function ActivityPage() {
   const [tab, setTab] = useTabParam(TABS);
   return (
     <>
-      <PageHeader title="Activity" description="Notifications, errors, changes, knowledge runs and CI runs of the org." />
+      <PageHeader title="Activity" description="What happened in your org." />
       <TabBar
         label="Activity"
         tabs={TABS}

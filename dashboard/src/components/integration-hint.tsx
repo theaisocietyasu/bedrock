@@ -11,7 +11,7 @@ export function IntegrationHint({ keys }: { keys: string[] }) {
   if (!missing.length) return null;
   return (
     <Link
-      to={`/${prefix}/integrations`}
+      to={`/${prefix}/explore?tab=integrations`}
       className="mb-4 flex animate-in items-center gap-3 rounded-lg border border-line bg-panel px-4 py-2.5 text-sm shadow-xs transition-colors hover:bg-panel-2/60"
     >
       <Plug className="size-4 shrink-0 text-warn" />

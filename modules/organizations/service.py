@@ -35,6 +35,12 @@ OPTIONAL_MODULES = {
     "compute": "GPU and CPU pods on the org's RunPod account that members SSH into",
     "alerts": "Job and hackathon listings posted to Discord webhooks",
     "uptime": "Checks of sites and Hosting apps, with an event when one goes down or up",
+    "knowledge": "Pages and documents that agents search",
+    "mcp": "The MCP server that gives agents the tools of each module",
+    "agents": "Conversations, memories and pending actions of the org's agents",
+    "integrations": "Tools of the services the org connects, for agents",
+    "accounts": "Accounts that members connect for agents to read",
+    "runpod": "Apps the org deploys to a hosting provider",
 }
 
 

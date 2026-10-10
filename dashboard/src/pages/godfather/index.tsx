@@ -1,5 +1,5 @@
 import { CalendarClock, Cpu, KeyRound, Plus, Settings2 } from 'lucide-react';
-import { type ReactNode, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router';
 import {
   Badge,
@@ -36,12 +36,12 @@ function MissingKey({ prefix }: { prefix: string }) {
       icon={KeyRound}
       title="Connect a hosting provider"
       action={
-        <Link to={`/${prefix}/integrations`} className="inline-flex h-8 items-center rounded-md bg-accent px-3 text-sm font-medium text-accent-fg shadow-xs hover:opacity-85">
-          Open Integrations
+        <Link to={`/${prefix}/explore?tab=integrations`} className="inline-flex h-8 items-center rounded-md bg-accent px-3 text-sm font-medium text-accent-fg shadow-xs hover:opacity-85">
+          Connect
         </Link>
       }
     >
-      Pods run on the org's own account at a hosting provider, such as RunPod. Connect it on the Integrations page.
+      Pods run on the org's own RunPod account.
     </EmptyState>
   );
 }
@@ -52,7 +52,7 @@ function Upcoming({ prefix, pods, open }: { prefix: string; pods: Pod[]; open: (
   const byId = new Map(pods.map((p) => [p.id, p]));
   return (
     <Card>
-      <CardHeader title="Upcoming sessions" hint="Pods start 10 minutes before a session and stop when it ends" />
+      <CardHeader title="Upcoming sessions" hint={sessions.length ? `${sessions.length} sessions` : undefined} />
       {overview.isLoading ? (
         <SkeletonRows rows={3} />
       ) : sessions.length ? (
@@ -99,14 +99,14 @@ function Upcoming({ prefix, pods, open }: { prefix: string; pods: Pod[]; open: (
           </tbody>
         </Table>
       ) : (
-        <EmptyState icon={CalendarClock}>No upcoming sessions. Add one from a pod's Sessions.</EmptyState>
+        <EmptyState icon={CalendarClock}>No upcoming sessions.</EmptyState>
       )}
     </Card>
   );
 }
 
-// The Member pods tab of the Hosting page. tabs is the tab bar, shown under the page header.
-export function MemberPodsTab({ tabs }: { tabs: ReactNode }) {
+// Pods that members connect to with the Godfather CLI.
+export function GodfatherPage() {
   const { prefix } = useCurrentOrg();
   const pods = usePods(prefix);
   const [creating, setCreating] = useState(false);
@@ -125,8 +125,9 @@ export function MemberPodsTab({ tabs }: { tabs: ReactNode }) {
   return (
     <>
       <PageHeader
-        title="Hosting"
-        description="GPU and CPU pods on the org's hosting provider accounts that members connect to with the compute CLI."
+        title="Godfather"
+        description="Pods that members connect to with the Godfather CLI."
+        docs="modules/compute"
         action={
           <div className="flex gap-2">
             <Button onClick={() => setEditing(true)} aria-label="Pod settings">
@@ -138,12 +139,11 @@ export function MemberPodsTab({ tabs }: { tabs: ReactNode }) {
           </div>
         }
       />
-      {tabs}
       {missingKey ? null : (
         <StatGrid className="mb-6">
           <Stat label="Pods" value={pods.data ? list.length : '-'} />
           <Stat label="Running" value={pods.data ? running.length : '-'} sub={pods.data ? `${list.length - running.length} stopped` : undefined} />
-          <Stat label="Spend while running" value={pods.data ? (costLabel(spend) ?? '-') : '-'} sub="Running pods only" />
+          <Stat label="Spend while running" value={pods.data ? (costLabel(spend) ?? '-') : '-'} />
           <Stat label="Upcoming sessions" value={upcoming ?? '-'} />
         </StatGrid>
       )}
@@ -151,7 +151,7 @@ export function MemberPodsTab({ tabs }: { tabs: ReactNode }) {
         <Card>
           <CardHeader
             title="Pods"
-            hint={pods.data ? `${list.length} ${list.length === 1 ? 'pod' : 'pods'} · status from the provider, refreshed every 15 seconds` : undefined}
+            hint={pods.data ? `${list.length} ${list.length === 1 ? 'pod' : 'pods'}` : undefined}
             action={pods.isFetching && pods.data ? <Badge tone="active">Refreshing</Badge> : null}
           />
           {pods.isLoading ? (
@@ -174,7 +174,7 @@ export function MemberPodsTab({ tabs }: { tabs: ReactNode }) {
                 </Button>
               }
             >
-              Create a pod for a workshop or a project team. Members connect to it with the compute CLI.
+              Create a pod for a workshop or a project team.
             </EmptyState>
           )}
         </Card>

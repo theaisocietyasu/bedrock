@@ -16,28 +16,33 @@ export const MODULES = [
   { name: 'compute', description: "GPU and CPU pods on the org's RunPod account that members SSH into", enabled: true },
   { name: 'alerts', description: 'Job and hackathon listings posted to Discord webhooks', enabled: true },
   { name: 'uptime', description: 'Checks of sites and Hosting apps, with an event when one goes down or up', enabled: true },
+  { name: 'knowledge', description: 'Pages and documents that agents search', enabled: true },
+  { name: 'mcp', description: 'The MCP server that gives agents the tools of each module', enabled: true },
+  { name: 'agents', description: "Conversations, memories and pending actions of the org's agents", enabled: true },
+  { name: 'integrations', description: 'Tools of the services the org connects, for agents', enabled: true },
+  { name: 'accounts', description: 'Accounts that members connect for agents to read', enabled: true },
+  { name: 'runpod', description: 'Apps the org deploys to a hosting provider', enabled: true },
 ];
 
-// The modules on the Modules page, as GET /api/dashboard/<org>/modules returns them. enabled comes from MODULES.
+// The modules on the Explore page, as GET /api/dashboard/<org>/modules returns them. enabled comes from MODULES.
 const need = (key, label, connected, extra = {}) => ({ key, label, kind: 'integration', optional: false, connected, ...extra });
 const CATALOG = [
-  { name: 'games', title: 'Games', description: "Jeopardy games in the org's Discord server.", category: 'Bots', switchable: false, needs: [need('discord', 'Discord bot', true)], packs: [] },
-  { name: 'leetcode', title: 'LeetCode', description: "Posts the daily LeetCode question in a Discord channel and checks who solved it.", category: 'Bots', switchable: true, needs: [need('discord', 'Discord bot', true)], packs: [] },
-  { name: 'agents', title: 'Agents', description: "Conversations, memories and pending actions of the org's agents.", category: 'AI and agents', switchable: false, needs: [need('openrouter', 'OpenRouter', false, { optional: true })], packs: [] },
-  { name: 'integrations', title: 'Integration tools', description: "Gives agents the tools of the services that the org connects.", category: 'AI and agents', switchable: false, needs: [], packs: [] },
-  { name: 'knowledge', title: 'Knowledge', description: "Pages and documents that agents search, with crawls on a schedule.", category: 'AI and agents', switchable: false, needs: [need('embeddings', 'Embeddings service', true, { optional: true }), need('firecrawl', 'Firecrawl', false, { optional: true })], packs: ['asu'] },
-  { name: 'mcp', title: 'MCP', description: "The MCP server that gives agents and apps the tools of each module.", category: 'AI and agents', switchable: false, needs: [], packs: [] },
-  { name: 'packs', title: 'Packs', description: "Loads content packs: campus pages and live queries for knowledge, and feeds for alerts.", category: 'AI and agents', switchable: false, needs: [need('searxng', 'Web search (SearXNG)', true, { optional: true })], packs: ['asu', 'careers'] },
-  { name: 'accounts', title: 'Member accounts', description: "Members connect Canvas, Google and Outlook, and agents read them for the member.", category: 'Members', switchable: false, needs: [need('ACCOUNTS_BASE_URL', 'ACCOUNTS_BASE_URL setting', true, { kind: 'setting' })], packs: [] },
+  { name: 'knowledge', title: 'Knowledge', description: "Pages and documents that agents search, with crawls on a schedule.", category: 'AI and agents', switchable: true, needs: [need('embeddings', 'Embeddings service', true, { optional: true }), need('firecrawl', 'Firecrawl', false, { optional: true })], packs: ['asu'] },
+  { name: 'mcp', title: 'MCP', description: "The MCP server that gives agents and apps the tools of each module.", category: 'AI and agents', switchable: true, needs: [], packs: [] },
+  { name: 'agents', title: 'Agents', description: "Conversations, memories and pending actions of the org's agents.", category: 'AI and agents', switchable: true, needs: [need('openrouter', 'OpenRouter', false, { optional: true })], packs: [] },
+  { name: 'integrations', title: 'Integration tools', description: "Gives agents the tools of the services that the org connects.", category: 'AI and agents', switchable: true, needs: [], packs: [] },
   { name: 'points', title: 'Points', description: "Points, leaderboards and event check-ins.", category: 'Members', switchable: true, needs: [], packs: [] },
   { name: 'storefront', title: 'Store', description: "A merch store that members pay for with points.", category: 'Members', switchable: true, needs: [], packs: [] },
-  { name: 'alerts', title: 'Alerts', description: "Job and hackathon listings posted to Discord webhooks.", category: 'Automations', switchable: true, needs: [], packs: ['careers'] },
-  { name: 'calendar', title: 'Calendar sync', description: "Syncs a Notion events database to Google Calendar and serves the public events feed.", category: 'Automations', switchable: true, needs: [need('notion', 'Notion', false), need('google', 'Google service account', true)], packs: [] },
-  { name: 'compute', title: 'Member pods', description: "GPU and CPU pods on the org's RunPod account that members SSH into.", category: 'Infrastructure', switchable: true, needs: [need('runpod', 'RunPod', true)], packs: [] },
-  { name: 'runpod', title: 'Hosting', description: "Deploys the org's own apps to a hosting provider, checks their health and rolls them back.", category: 'Infrastructure', switchable: false, needs: [need('runpod', 'RunPod', true), need('github', 'GitHub', true, { optional: true })], packs: [] },
-  { name: 'uptime', title: 'Uptime', description: "Checks the org's sites and Hosting apps on a schedule and sends an event when one goes down or up.", category: 'Infrastructure', switchable: true, needs: [], packs: [] },
+  { name: 'accounts', title: 'Member accounts', description: "Members connect Canvas, Google and Outlook, and agents read them for the member.", category: 'Members', switchable: true, needs: [need('ACCOUNTS_BASE_URL', 'ACCOUNTS_BASE_URL setting', true, { kind: 'setting' })], packs: [] },
+  { name: 'alerts', title: 'Alerts', description: "Job and hackathon listings posted to Discord webhooks.", category: 'Webhooks', switchable: true, needs: [], packs: ['careers'] },
+  { name: 'calendar', title: 'Calendar sync', description: "Copies Notion events to Google Calendar and the public events feed.", category: 'Automations', switchable: true, needs: [need('notion', 'Notion', false), need('google', 'Google service account', true)], packs: [] },
+  { name: 'uptime', title: 'Uptime', description: "Checks the org's sites and apps, with an event when one goes down.", category: 'Automations', switchable: true, needs: [], packs: [] },
+  { name: 'leetcode', title: 'LeetCode', description: "Posts the daily LeetCode question in a Discord channel and checks who solved it.", category: 'Bots', switchable: true, needs: [need('discord', 'Discord bot', true)], packs: [] },
+  { name: 'games', title: 'Games', description: "Jeopardy games in the org's Discord server.", category: 'Bots', switchable: false, needs: [need('discord', 'Discord bot', true)], packs: [] },
+  { name: 'runpod', title: 'Hosting', description: "Deploys the org's apps to a hosting provider and checks their health.", category: 'Infrastructure', switchable: true, needs: [need('runpod', 'RunPod', true), need('github', 'GitHub', true, { optional: true })], packs: [] },
+  { name: 'compute', title: 'Godfather', description: "GPU and CPU pods that members connect to with the Godfather CLI.", category: 'Infrastructure', switchable: true, needs: [need('runpod', 'RunPod', true)], packs: [] },
 ];
-const CATEGORIES = ['Bots', 'AI and agents', 'Members', 'Automations', 'Infrastructure'];
+const CATEGORIES = ['AI and agents', 'Members', 'Webhooks', 'Automations', 'Bots', 'Infrastructure'];
 const PACKS = {
   asu: { name: 'asu', title: 'Arizona State University', description: 'Public ASU pages and live queries: library hours, events, courses, dining, scholarships, news, shuttles, jobs, sports.' },
   careers: { name: 'careers', title: 'Internships and hackathons', description: 'Alert feeds for software internships, new grad roles and upcoming hackathons.' },

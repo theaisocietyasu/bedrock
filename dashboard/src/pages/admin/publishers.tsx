@@ -19,7 +19,7 @@ export function PublishersCard({ orgs }: { orgs: OrganizationDetail[] }) {
   const byId = new Map((list.data?.publishers ?? []).map((p) => [p.org_id, p]));
   return (
     <Card>
-      <CardHeader title="Knowledge publishers" hint="Publishers write public sources that every org can search, such as a campus pack." />
+      <CardHeader title="Knowledge publishers" />
       {list.error ? (
         <div className="p-4">
           <ErrorNote error={list.error} />

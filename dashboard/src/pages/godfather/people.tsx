@@ -115,7 +115,7 @@ function Access({ data, onEdit }: { data: PodMembers['access']; onEdit: () => vo
 
 function Recent({ data }: { data: PodMembers['recent'] }) {
   return (
-    <Section icon={History} title="Recent connections" hint="Each certificate the CLI got for this pod, last 90 days">
+    <Section icon={History} title="Recent connections" hint="Last 90 days">
       {data.length ? (
         <div className="max-h-72 overflow-y-auto">
           <Table>
@@ -160,7 +160,7 @@ export function PodMembersDialog({ prefix, pod, onClose, onEditAccess }: { prefi
     queryFn: () => api<PodMembers>(`${podPath(prefix, pod.id)}/members`),
   });
   return (
-    <Dialog open onClose={onClose} title={`Members of ${pod.name}`} description="Who can connect with the compute CLI, who is connected now and who connected before." wide>
+    <Dialog open onClose={onClose} title={`Members of ${pod.name}`}  wide>
       <div className="space-y-4">
         <ConnectedNow prefix={prefix} pod={pod} />
         {members.isLoading ? (

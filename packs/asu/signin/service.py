@@ -33,14 +33,14 @@ logger = get_logger("asu.signin")
 SECRET = "asu_session"  # nosec B105 - the name of an org secret, not its value
 MAX_NETID = 64
 MAX_PASSWORD = 256
-EXPIRED = "The ASU sign-in has expired. An officer must sign in to ASU again on the Integrations page"
-NOT_SIGNED_IN = "No ASU sign-in. An officer must sign in to ASU on the Integrations page"
+EXPIRED = "The ASU sign-in has expired. An officer must sign in to ASU again on the Integrations tab of Explore"
+NOT_SIGNED_IN = "No ASU sign-in. An officer must sign in to ASU on the Integrations tab of Explore"
 
 secrets.declare(SECRET, "ASU: the browser cookies of the officer who signed in to ASU")
 webhooks.declare(
     "asu.session_expired",
     "ASU sign-in expired",
-    "The saved ASU sign-in expired. An officer signs in again on the Integrations page.",
+    "The saved ASU sign-in expired. An officer signs in again on the Integrations tab of Explore.",
 )
 
 
@@ -218,7 +218,7 @@ def _expire(db, org_id: int, org_prefix: str) -> None:
     link = f"{config.DASHBOARD_URL}/{org_prefix}/integrations" if config.DASHBOARD_URL and org_prefix else None
     message = webhooks.Message(
         title="ASU sign-in expired",
-        text="Agents cannot read Sun Devil Central. Sign in to ASU again on the Integrations page.",
+        text="Agents cannot read Sun Devil Central. Sign in to ASU again on the Integrations tab of Explore.",
         url=link,
         color=webhooks.AMBER,
         footer="Integrations",

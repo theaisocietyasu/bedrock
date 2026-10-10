@@ -1,12 +1,18 @@
 """Web search tool for agents through the org's SearXNG, or the deployment's. No Flask here."""
 
+from functools import partial
+
 from core.integrations import registry
-from core.tools import ToolError, tool
+from core.tools import ToolError
+from core.tools import tool as _tool
 from modules.auth import scopes
 from modules.knowledge import fetch
 from modules.packs import web
 from modules.packs.search import query_scope
 from modules.packs.types import QueryError
+
+# Every tool here needs the integrations module on for the caller's org
+tool = partial(_tool, module="integrations")
 
 registry.use("searxng", "integrations")
 scopes.declare("web:read", "Search the web through the org's SearXNG", "searxng")

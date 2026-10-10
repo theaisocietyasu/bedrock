@@ -67,7 +67,7 @@ export function GeneralForm({ org }: { org: OrganizationDetail }) {
             className="tabular-nums"
           />
         </Field>
-        <Field label="Points cooldown (seconds)" hint="Time before the same member can earn message points again.">
+        <Field label="Points cooldown (seconds)" hint="Between two messages that earn points.">
           <Input
             type="number"
             inputMode="numeric"

@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { BellRing, History, Play, Plus } from 'lucide-react';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useSearchParams } from 'react-router';
 import {
   Badge,
   Button,
@@ -12,6 +13,7 @@ import {
   EmptyState,
   ErrorNote,
   Field,
+  FormActions,
   Input,
   PageHeader,
   Select,
@@ -30,7 +32,8 @@ import type { AlertFeed, AlertHistory, AlertPreset, AlertRun } from '../lib/type
 type Draft = { key: string; kind: AlertFeed['kind']; repo: string; label: string; webhook: string; every: string };
 const EMPTY: Draft = { key: '', kind: 'github_jobs', repo: '', label: 'Internship', webhook: '', every: '3' };
 
-function NewFeed({ prefix, onDone }: { prefix: string; onDone: () => void }) {
+// The new feed form. initial is the pack/key of a feed to start from, from the Add of a sub-module on Explore.
+function NewFeed({ prefix, initial, onDone }: { prefix: string; initial?: string | null; onDone: () => void }) {
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [preset, setPreset] = useState<AlertPreset | null>(null);
   const client = useQueryClient();
@@ -52,6 +55,13 @@ function NewFeed({ prefix, onDone }: { prefix: string; onDone: () => void }) {
       every: String(chosen.every_hours),
     });
   };
+  // The feed from Explore fills the form once, when the feeds of the packs load.
+  const applied = useRef(false);
+  useEffect(() => {
+    if (!presets.data || !initial || applied.current) return;
+    applied.current = true;
+    pick(initial);
+  });
   const config = () => {
     const base = preset && preset.kind === draft.kind ? preset.config : {};
     return draft.kind === 'github_jobs' ? { ...base, repo: draft.repo, label: draft.label } : base;
@@ -71,10 +81,8 @@ function NewFeed({ prefix, onDone }: { prefix: string; onDone: () => void }) {
   });
   const set = (k: keyof Draft) => (e: { target: { value: string } }) => setDraft({ ...draft, [k]: e.target.value });
   return (
-    <Card className="mb-6">
-      <CardHeader title="New feed" hint="The first run records what is listed now and posts only what comes after." />
-      <form
-        className="grid gap-5 p-4 sm:grid-cols-2"
+    <form
+        className="grid gap-5 sm:grid-cols-2"
         onSubmit={(e) => {
           e.preventDefault();
           create.mutate();
@@ -82,7 +90,7 @@ function NewFeed({ prefix, onDone }: { prefix: string; onDone: () => void }) {
       >
         {choices.length ? (
           <div className="sm:col-span-2">
-            <Field label="Start from" hint="Feeds that packs offer">
+            <Field label="Start from">
               <Select value={preset ? `${preset.pack}/${preset.key}` : ''} onChange={(e) => pick(e.target.value)}>
               <option value="">A blank feed</option>
               {choices.map((p) => (
@@ -113,23 +121,23 @@ function NewFeed({ prefix, onDone }: { prefix: string; onDone: () => void }) {
             </Field>
           </>
         ) : null}
-        <Field label="Discord webhook URL" hint="Stored encrypted and never shown again">
+        <Field label="Discord webhook URL" hint="Never shown again after you save.">
           <Input value={draft.webhook} onChange={set('webhook')} placeholder="https://discord.com/api/webhooks/..." required />
         </Field>
         <Field label="Every (hours)">
           <Input type="number" min={1} max={168} value={draft.every} onChange={set('every')} />
         </Field>
-        <div className="flex flex-wrap items-center gap-2 border-t border-line pt-4 sm:col-span-2">
-          <Button variant="primary" disabled={create.isPending}>
-            Create feed
-          </Button>
-          <Button type="button" variant="ghost" onClick={onDone}>
-            Cancel
-          </Button>
-          {create.error ? <ErrorNote error={create.error} /> : null}
+        <div className="sm:col-span-2">
+          <FormActions error={create.error}>
+            <Button variant="primary" disabled={create.isPending}>
+              Create feed
+            </Button>
+            <Button type="button" variant="ghost" onClick={onDone}>
+              Cancel
+            </Button>
+          </FormActions>
         </div>
       </form>
-    </Card>
   );
 }
 
@@ -153,7 +161,7 @@ function FeedHistory({ prefix, feed, onClose }: { prefix: string; feed: string |
       open={Boolean(feed)}
       onClose={onClose}
       title={`History of ${feed ?? ''}`}
-      description="The last 50 runs, scheduled or started with Run now, and the last 50 items."
+      description="The last 50 runs and items."
       wide
     >
       {history.error ? <ErrorNote error={history.error} /> : null}
@@ -215,7 +223,13 @@ function FeedHistory({ prefix, feed, onClose }: { prefix: string; feed: string |
 export function AlertsPage() {
   const { prefix } = useCurrentOrg();
   const client = useQueryClient();
-  const [adding, setAdding] = useState(false);
+  const [params, setParams] = useSearchParams();
+  const initial = params.get('new');
+  const [adding, setAdding] = useState(Boolean(initial));
+  const closeNew = () => {
+    setAdding(false);
+    if (initial) setParams({}, { replace: true });
+  };
   const [viewing, setViewing] = useState<string | null>(null);
   const feeds = useQuery({
     queryKey: ['alerts', prefix],
@@ -238,10 +252,13 @@ export function AlertsPage() {
     <>
       <PageHeader
         title="Alerts"
-        description="Job listings and hackathons posted to Discord channels through webhooks."
+        description="Job and hackathon listings posted to Discord."
+        docs="modules/alerts"
         action={newFeed}
       />
-      {adding ? <NewFeed prefix={prefix} onDone={() => setAdding(false)} /> : null}
+      <Dialog open={adding} onClose={closeNew} title="New feed" description="The first run posts nothing; later runs post new listings." wide>
+        {adding ? <NewFeed prefix={prefix} initial={initial} onDone={closeNew} /> : null}
+      </Dialog>
       {feeds.error ? (
         <div className="mb-4">
           <ErrorNote error={feeds.error} />

@@ -9,6 +9,7 @@ import base64
 import json
 from datetime import UTC, datetime
 from email.message import EmailMessage
+from functools import partial
 from typing import Any
 from urllib.parse import quote
 
@@ -18,9 +19,13 @@ from google.auth.transport.requests import AuthorizedSession
 from google.oauth2 import service_account
 
 from core.integrations import registry
-from core.tools import ToolError, tool
+from core.tools import ToolError
+from core.tools import tool as _tool
 from modules.auth import scopes
 from modules.calendar.integrations import GOOGLE_SECRET, GOOGLE_SUBJECT
+
+# Every tool here needs the integrations module on for the caller's org
+tool = partial(_tool, module="integrations")
 
 TIMEOUT_SECONDS = 30
 MAX_TEXT_CHARS = 100_000

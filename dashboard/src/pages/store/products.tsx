@@ -39,7 +39,7 @@ export function ProductsTab({
   const list = [...(products.data ?? [])].sort((a, b) => a.name.localeCompare(b.name));
   return (
     <Card>
-      <CardHeader title="Products" hint="Members buy these with points in the member store." />
+      <CardHeader title="Products" />
       {remove.error ? (
         <div className="border-b border-line p-4">
           <ErrorNote error={remove.error} />

@@ -5,7 +5,7 @@ import { Badge, Button, Card, Dot, EmptyState, ErrorNote, Mono, SkeletonRows, Ta
 import { api } from '../../lib/api';
 import { deployTone, duration, podTone, timeAgo } from '../../lib/format';
 import type { App, AppDetail, RunPodPod } from '../../lib/types';
-import { providerTitle, useProviders } from '../hosting/providers';
+import { providerTitle, useProviders } from './providers';
 import { DeletePanel, DeployPanel, RollbackPanel } from './actions';
 import { ManifestSection } from './manifest';
 import { actorLabel, Fact, Label } from './shared';

@@ -60,7 +60,7 @@ export function ProviderField({
           <>
             {' '}
             Connect {missing.map((p) => p.title).join(', ')} on{' '}
-            <Link to={`/${prefix}/integrations`} className="underline hover:text-fg">
+            <Link to={`/${prefix}/explore?tab=integrations`} className="underline hover:text-fg">
               Integrations
             </Link>
             .

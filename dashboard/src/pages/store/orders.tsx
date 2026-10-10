@@ -19,7 +19,7 @@ export function OrdersTab({ orders, onOpen }: { orders: ReturnType<typeof useSto
   const page = useShowMore(list, null);
   return (
     <Card>
-      <CardHeader title="Orders" hint="Newest first. Select an order to change its status or add a message." />
+      <CardHeader title="Orders" />
       {orders.error ? (
         <div className="p-4">
           <ErrorNote error={orders.error} />

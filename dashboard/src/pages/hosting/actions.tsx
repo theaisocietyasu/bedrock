@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Button, Code, cx, Field, FormActions, Input, Mono, Spinner } from '../../components/ui';
 import { send } from '../../lib/api';
 import type { App, DeployPreview } from '../../lib/types';
-import { providerTitle, useProviders } from '../hosting/providers';
+import { providerTitle, useProviders } from './providers';
 import { DEFAULT_MANIFEST_PATH, JsonBlock, Label, TAG_PATTERN, useInvalidate } from './shared';
 
 export function DeployPanel({

@@ -1,6 +1,6 @@
 # Integrations
 
-An integration is an account or a service outside Platform, such as Notion or RunPod. An officer connects it one time on the dashboard's Integrations page. Then each module that needs it uses it. Each card shows whether the integration is connected, the modules that use it, a Test button and a link to its docs.
+An integration is an account or a service outside Platform, such as Notion or RunPod. An officer connects it one time on the Integrations tab of the dashboard Explore page. Then each module that needs it uses it. Each card shows whether the integration is connected, the modules that use it, a Test button and a link to its docs.
 
 The page shows the cards in two groups:
 
@@ -71,7 +71,7 @@ Platform gives tools in two ways:
 
 ### Sign in with a service
 
-Some MCP servers take no API key. The officer signs in with the service, and the agent acts as that person. On the Integrations page, click **Sign in with Notion** or **Sign in with Google**. **Sign out** removes the saved sign-in. Platform keeps the sign-in as the org secret `oauth_<key>` and refreshes it before it expires.
+Some MCP servers take no API key. The officer signs in with the service, and the agent acts as that person. On the Integrations tab of Explore, click **Sign in with Notion** or **Sign in with Google**. **Sign out** removes the saved sign-in. Platform keeps the sign-in as the org secret `oauth_<key>` and refreshes it before it expires.
 
 - The API must have a public URL in `ACCOUNTS_BASE_URL`. The service sends the browser back to `<ACCOUNTS_BASE_URL>/api/dashboard/integrations/oauth/callback`.
 - Notion: nothing to set up. Platform finds the sign-in URLs from the MCP server and registers itself as a client.
@@ -82,7 +82,7 @@ Some MCP servers take no API key. The officer signs in with the service, and the
 
 Sun Devil Central, the ASU club system, needs an ASU sign-in. An officer signs in one time, and agents then search its clubs and events. The code is in `packs/asu/signin/`.
 
-1. On the Integrations page, click **Sign in to ASU** on the ASU card.
+1. On the Integrations tab of Explore, click **Sign in to ASU** on the ASU card.
 2. Type your NetID and password, and click **Sign in**.
 3. Approve the Duo push on your phone. If Duo shows a code, the card shows the same code. Type it in the Duo app.
 4. When the card shows **Signed in**, give a token the `asu:read` scope.
@@ -90,7 +90,7 @@ Sun Devil Central, the ASU club system, needs an ASU sign-in. An officer signs i
 - Platform keeps only the browser cookies, as the org secret `asu_session`, encrypted with `SECRETS_KEY`. It does not keep, log or audit the NetID or the password.
 - The tools `asu.clubs` and `asu.events` show only when the org has a saved sign-in. They are read-only. Their results go only to the caller. Platform never adds them to knowledge.
 - `asu.events` also reads the public ASU events calendar. If the sign-in expired, it returns the calendar and says that it did not read Sun Devil Central.
-- When a page load ends on a sign-in page, the sign-in has expired. The tools return an error, the card shows **Sign-in expired**, and Platform sends the event `asu.session_expired` one time. The notification links to the Integrations page. Sign in again to clear it.
+- When a page load ends on a sign-in page, the sign-in has expired. The tools return an error, the card shows **Sign-in expired**, and Platform sends the event `asu.session_expired` one time. The notification links to the Integrations tab of Explore. Sign in again to clear it.
 - **Sign out** removes the saved cookies.
 - The sign-in runs in a browser on the API. The API process keeps the state of each attempt in memory, so run one API worker (the default).
 
@@ -122,7 +122,7 @@ All routes are under `/api/dashboard/<org>`, for officers of the org.
 
 An `attempt` has a `state`: `running`, `duo_code` (`code` has the number to type in Duo), `done` or `failed` (`reason` says why, such as a NetID or password that ASU did not accept).
 
-`GET /api/dashboard/integrations/oauth/callback` takes no login. The service calls it with `state` and `code`; a `state` works one time. It sends the browser back to the Integrations page.
+`GET /api/dashboard/integrations/oauth/callback` takes no login. The service calls it with `state` and `code`; a `state` works one time. It sends the browser back to the Integrations tab of Explore.
 
 The older routes `/api/organizations/<id>/secrets/<name>` still work and write the same secrets.
 
@@ -153,5 +153,5 @@ These settings moved to the dashboard, and the `.env` value is now the default f
 2. Call `register(Integration(...))` from `core/integrations/registry.py` in the file that owns the client: a file in `core/integrations/` for a service that core uses, or a module file. Give the key, title, description, fields, docs page and test. The description says what the officer connects, such as "Connect the org's Notion workspace." `register` declares each field as an org secret. Give a field `secret=False` when the dashboard may show its value, `optional=True` when the org may leave it empty, and `kind="url"` for a URL that must be public.
 3. Read the org's values with `org_values(db, org_id, key)`. It returns None when the org did not set every required field; then use the `.env` default.
 4. In each module that reads the service, call `use("<key>", "<module>")` at the top of the file.
-5. Add the module name to `MODULES` in `dashboard/src/pages/integrations.tsx` if it has a dashboard page, and an icon to `ICONS`. If it is an account, add its key to the Accounts group in `GROUPS`. A key in no group shows under Services.
+5. Add the module name to `MODULES` in `dashboard/src/pages/explore/integrations.tsx` if it has a dashboard page, and an icon to `ICONS`. If it is an account, add its key to the Accounts group in `GROUPS`. A key in no group shows under Services.
 6. Add a row to the table on this page.

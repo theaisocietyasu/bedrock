@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { type ReactNode, useEffect, useState } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router';
-import { Card, CardHeader, cx, ErrorNote, PageHeader, PageSkeleton, quietLink, Row, SkeletonRows } from '../../components/ui';
+import { Card, CardHeader, cx, ErrorNote, PageHeader, PageSkeleton, SkeletonRows } from '../../components/ui';
 import { api } from '../../lib/api';
 import { useCurrentOrg } from '../../lib/org';
-import { useBranding, useIntegrations, useModules, useOrganization } from '../../lib/queries';
+import { useBranding, useIntegrations, useOrganization } from '../../lib/queries';
 import type { Organization, SecretState } from '../../lib/types';
 import { BrandingForm } from './branding';
 import { GeneralForm } from './general';
@@ -13,7 +13,12 @@ import { SecretRow } from './secrets';
 type Section = { id: string; label: string };
 
 // Sections that moved to their own pages, for links made before the move.
-const MOVED: Record<string, string> = { '#calendar': 'calendar', '#leetcode': 'leetcode', '#modules': 'explore' };
+const MOVED: Record<string, string> = {
+  '#calendar': 'calendar',
+  '#leetcode': 'leetcode',
+  '#modules': 'explore',
+  '#modules-link': 'explore',
+};
 
 // The id of the section nearest the top of the viewport.
 function useActiveSection(ids: string[]): string | undefined {
@@ -85,7 +90,7 @@ function GeneralSection({ org }: { org: Organization }) {
   const detail = useOrganization(org.id);
   return (
     <Card>
-      <CardHeader title="General" hint="How the org is described and how members earn message points." />
+      <CardHeader title="General" />
       {detail.data ? <GeneralForm key={org.id} org={detail.data} /> : <Pending error={detail.error} loading={detail.isLoading} />}
     </Card>
   );
@@ -95,38 +100,12 @@ function BrandingSection({ org, prefix }: { org: Organization; prefix: string })
   const branding = useBranding(prefix);
   return (
     <Card>
-      <CardHeader title="Branding" hint="The logo, website and accent color officers see in this dashboard." />
+      <CardHeader title="Branding" />
       {branding.data ? (
         <BrandingForm key={JSON.stringify(branding.data)} prefix={prefix} name={org.name} saved={branding.data} />
       ) : (
         <Pending error={branding.error} loading={branding.isLoading} />
       )}
-    </Card>
-  );
-}
-
-function ModulesSection({ prefix, modules }: { prefix: string; modules: ReturnType<typeof useModules> }) {
-  const states = modules.data?.modules ?? [];
-  const on = states.filter((m) => m.enabled).length;
-  return (
-    <Card>
-      <CardHeader
-        title="Modules"
-        hint="Add or remove modules for this org on Explore."
-        action={
-          <Link to={`/${prefix}/explore`} className={quietLink}>
-            Open Explore
-          </Link>
-        }
-      />
-      <Pending error={modules.error} loading={modules.isLoading} />
-      {modules.data ? (
-        <Row>
-          <div className="min-w-0 flex-1 text-sm text-muted">
-            {on} of {states.length} modules that you can add are on.
-          </div>
-        </Row>
-      ) : null}
     </Card>
   );
 }
@@ -144,9 +123,8 @@ function SecretsSection({ orgId, prefix }: { orgId: number; prefix: string }) {
         title="Secrets"
         hint={
           <>
-            Webhook URLs and app values, encrypted with the server's SECRETS_KEY. Values are never shown. Keys for Notion, Google,
-            GitHub and hosting providers such as RunPod are on{' '}
-            <Link to={`/${prefix}/integrations`} className="underline underline-offset-2 hover:text-fg">
+            Webhook URLs and app values. Service keys are on{' '}
+            <Link to={`/${prefix}/explore?tab=integrations`} className="underline underline-offset-2 hover:text-fg">
               Integrations
             </Link>
             .
@@ -183,18 +161,16 @@ function useHashSection(prefix: string, ready: boolean) {
 
 export function SettingsPage() {
   const { org, prefix } = useCurrentOrg();
-  const modules = useModules(org?.id);
   useHashSection(prefix, Boolean(org));
   if (!org) return <PageSkeleton />;
   const sections: (Section & { body: ReactNode })[] = [
     { id: 'general', label: 'General', body: <GeneralSection org={org} /> },
     { id: 'branding', label: 'Branding', body: <BrandingSection org={org} prefix={prefix} /> },
-    { id: 'modules-link', label: 'Modules', body: <ModulesSection prefix={prefix} modules={modules} /> },
     { id: 'secrets', label: 'Secrets', body: <SecretsSection orgId={org.id} prefix={prefix} /> },
   ];
   return (
     <>
-      <PageHeader title="Settings" description="General settings, branding and secrets of the org, and a link to its modules." />
+      <PageHeader title="Settings" />
       <div className="grid grid-cols-[minmax(0,1fr)] gap-6 lg:grid-cols-[160px_minmax(0,1fr)] lg:gap-10">
         <SectionNav sections={sections} />
         <div className="min-w-0 space-y-6">

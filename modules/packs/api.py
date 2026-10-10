@@ -14,9 +14,9 @@ from modules.auth.routes import machine_route
 from . import service
 
 packs_blueprint = Blueprint("packs", __name__)
-_route = partial(machine_route, packs_blueprint)
+_route = partial(machine_route, packs_blueprint, module="knowledge")
 asu_blueprint = Blueprint("asu", __name__)
-_asu_route = partial(machine_route, asu_blueprint)
+_asu_route = partial(machine_route, asu_blueprint, module="knowledge")
 
 # Live queries are reads sent as POST
 audit_hook.SKIPPED_ROUTES.add("/api/packs/<string:name>/query")

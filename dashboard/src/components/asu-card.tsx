@@ -148,7 +148,7 @@ export function AsuCard({ prefix, initial }: { prefix: string; initial: AsuState
         open={open}
         onClose={() => setOpen(false)}
         title="Sign in to ASU"
-        description="Approve the Duo push on your phone after you sign in. This card shows the Duo code when Duo asks for one."
+        description="Approve the Duo push on your phone."
       >
         <SignInForm
           prefix={prefix}

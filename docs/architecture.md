@@ -48,7 +48,7 @@ Views get a database session from `officer_route`, `machine_route` or `member_vi
 
 A module is a folder in `modules/` with only the files it needs: `service.py` for the logic, `api.py` for the routes, `models.py`, `jobs.py` and `tools.py`. The REST routes, jobs, tools and the bot call the same `service.py` functions. [Writing a module](./writing-a-module.md) gives the rules and the places to register a module.
 
-Orgs can turn off the optional modules: `points`, `storefront`, `calendar`, `leetcode`, `compute` and `alerts`. The list is `OPTIONAL_MODULES` in `modules/organizations/service.py`. The switches are in `Organization.config["modules"]`. A module with no entry is on, so an org made before the switch existed keeps the module. A new org gets an entry for each optional module: on for the modules in `NEW_ORG_MODULES` in `modules/manifest.py`, off for the others. Officers add and remove modules on the dashboard Modules page, or with `flask --app main org modules <prefix> --on x --off y`.
+Orgs can turn off the optional modules: `points`, `storefront`, `calendar`, `leetcode`, `compute`, `alerts`, `uptime`, `knowledge`, `mcp`, `agents`, `integrations`, `accounts` and `runpod`. The list is `OPTIONAL_MODULES` in `modules/organizations/service.py`. When a module is off for an org, its routes return 404 for the org (`module=` on `officer_route`, `machine_route` or the `Mount`), its tools are not listed, and its jobs skip the org. With `mcp` off, the org has no tools. With `integrations` off, the org has no tools of connected services. The switches are in `Organization.config["modules"]`. A module with no entry is on, so an org made before the switch existed keeps the module. A new org gets an entry for each optional module: on for the modules in `NEW_ORG_MODULES` in `modules/manifest.py`, off for the others. `NEW_ORG_MODULES` is empty, so a new org starts with Core only. Officers add and remove modules on the dashboard Explore page, or with `flask --app main org modules <prefix> --on x --off y`.
 
 ### Modules and packs
 
@@ -57,9 +57,9 @@ Orgs can turn off the optional modules: `points`, `storefront`, `calendar`, `lee
 | Is | A feature with code, in `modules/<name>/` | Content or presets with no code of their own, in `packs/<name>/` |
 | Examples | `knowledge`, `alerts`, `compute` | `packs/asu` (campus pages and live queries), `packs/careers` (alert feeds) |
 | Per org | Optional modules are switched on or off for each org | An org adds a pack's sources or feeds in the module that uses it |
-| On the dashboard | A card on the Modules page | Shown on the card of the module that uses it, and on that module's page |
+| On the dashboard | A card on Explore | A sub-module on the card of the module that uses it |
 
-`CATALOG` in `modules/manifest.py` gives each module a title, a description, what it needs (integration keys or settings) and the packs it reads. `CATEGORIES` puts each module in one category. The Core category (organizations, auth, dashboard, users, public, superadmin, bot) is always on and is not on the Modules page. `GET /api/dashboard/<org>/modules` returns the catalog with the org's switches and whether each need is connected.
+`CATALOG` in `modules/manifest.py` gives each module a title, a description, what it needs (integration keys or settings) and the packs it reads. `CATEGORIES` puts each module in one category. The Core category (organizations, auth, dashboard, packs, users, public, superadmin, bot) is always on and is not on Explore. Pack routes and tools need the `knowledge` module. `GET /api/dashboard/<org>/modules` returns the catalog with the org's switches and whether each need is connected.
 
 ## Jobs
 

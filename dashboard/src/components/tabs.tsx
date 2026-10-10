@@ -13,19 +13,22 @@ export function useTabParam<T extends string>(tabs: readonly Tab<T>[]): [T, (id:
 }
 
 // A row of tabs with an underline under the open one. The underline slides to the tab that opens.
-// Arrow keys move between tabs. extra adds content after a label, such as a count.
+// Arrow keys move between tabs. extra adds content after a label, such as a count. action sits at the right end of
+// the row, such as a search field or a filter.
 export function TabBar<T extends string>({
   label,
   tabs,
   value,
   onChange,
   extra,
+  action,
 }: {
   label: string;
   tabs: readonly Tab<T>[];
   value: T;
   onChange: (id: T) => void;
   extra?: (id: T) => ReactNode;
+  action?: ReactNode;
 }) {
   const list = useRef<HTMLDivElement>(null);
   const [bar, setBar] = useState<{ left: number; width: number } | null>(null);
@@ -60,7 +63,8 @@ export function TabBar<T extends string>({
   };
 
   return (
-    <div ref={list} role="tablist" aria-label={label} onKeyDown={move} className="relative mb-6 flex gap-1 overflow-x-auto border-b border-line">
+    <div className="mb-6 flex flex-wrap items-center justify-between gap-x-4 border-b border-line">
+    <div ref={list} role="tablist" aria-label={label} onKeyDown={move} className="relative flex min-w-0 gap-1 overflow-x-auto">
       {tabs.map((t) => (
         <button
           key={t.id}
@@ -88,6 +92,8 @@ export function TabBar<T extends string>({
         )}
         style={bar ? { width: bar.width, translate: `${bar.left}px 0` } : undefined}
       />
+    </div>
+    {action ? <div className="flex w-full items-center gap-2 py-1.5 sm:w-auto">{action}</div> : null}
     </div>
   );
 }

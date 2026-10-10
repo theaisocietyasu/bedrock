@@ -22,7 +22,7 @@ export function ModuleGate({ module, title, children }: { module: string; title:
 }
 
 // A page header and a note that the module is off, with a link to Explore.
-export function ModuleOff({ module, title }: { module: string; title: string }) {
+export function ModuleOff({ title }: { module?: string; title: string }) {
   const { prefix } = useCurrentOrg();
   return (
     <>
@@ -30,18 +30,17 @@ export function ModuleOff({ module, title }: { module: string; title: string }) 
       <Card>
         <EmptyState
           icon={PowerOff}
-          title={`The ${module} module is off`}
+          title={`${title} is off`}
           action={
             <Link
               to={`/${prefix}/explore`}
               className="inline-flex h-8 items-center rounded-md bg-accent px-3 text-sm font-medium text-accent-fg shadow-xs hover:opacity-85"
             >
-              Open Modules
+              Open Explore
             </Link>
           }
         >
-          Add the module in Explore to use this page. While it is off, its routes return 404 for this
-          org.
+          Add it on Explore.
         </EmptyState>
       </Card>
     </>

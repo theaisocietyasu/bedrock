@@ -28,7 +28,7 @@ function Superadmin() {
   const close = () => setOpen(null);
   return (
     <>
-      <PageHeader title="Superadmin" description="All orgs, the Discord servers the bot is in, knowledge publishers, the errors of all orgs and the server, and the audit log of all orgs." />
+      <PageHeader title="Superadmin" description="Every org on this deployment." />
 
       {dashboard.error ? (
         <Card className="mb-6">
@@ -64,7 +64,7 @@ function Superadmin() {
       {!dashboard.error ? (
         <div className="mb-6 space-y-6">
           <Card>
-            <CardHeader title="Organizations" hint="Set who counts as an officer, or remove an organization." />
+            <CardHeader title="Organizations" />
             {dashboard.isLoading ? (
               <SkeletonRows />
             ) : (
@@ -72,7 +72,7 @@ function Superadmin() {
             )}
           </Card>
           <Card>
-            <CardHeader title="Discord servers without an org" hint="Servers the bot is in that have no org yet." />
+            <CardHeader title="Discord servers without an org" />
             {dashboard.isLoading ? <SkeletonRows rows={2} /> : <GuildsCard guilds={guilds} onAdd={(guild) => setOpen({ kind: 'add', guild })} />}
           </Card>
           {dashboard.data ? <PublishersCard orgs={orgs} /> : null}

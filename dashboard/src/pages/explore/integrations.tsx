@@ -1,49 +1,50 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { BookOpen, LogIn, PlugZap } from 'lucide-react';
+import { BookOpen, LogIn, PlugZap, SearchX } from 'lucide-react';
 import { useState } from 'react';
 import { Link } from 'react-router';
-import { AsuCard } from '../components/asu-card';
-import { IntegrationIcon } from '../components/integration-icons';
+import { AsuCard } from '../../components/asu-card';
+import { IntegrationIcon } from '../../components/integration-icons';
 import {
   Badge,
   Button,
   Card,
   cx,
   Dialog,
+  EmptyState,
   ErrorNote,
   Field,
   FormActions,
   Input,
-  PageHeader,
   PageSkeleton,
   Spinner,
   Textarea,
-} from '../components/ui';
-import { send } from '../lib/api';
-import { timeAgo } from '../lib/format';
-import { docsPage } from '../lib/links';
-import { useCurrentOrg } from '../lib/org';
-import { useIntegrations } from '../lib/queries';
-import type { Integration, IntegrationList, IntegrationTest, OAuthState } from '../lib/types';
+} from '../../components/ui';
+import { send } from '../../lib/api';
+import { timeAgo } from '../../lib/format';
+import { docsPage } from '../../lib/links';
+import { useCurrentOrg } from '../../lib/org';
+import { useIntegrations } from '../../lib/queries';
+import type { Integration, IntegrationList, IntegrationTest, OAuthState } from '../../lib/types';
 
 // The module names the API sends, with their label and dashboard page.
 const MODULES: Record<string, { label: string; path?: string }> = {
-  agents: { label: 'MCP', path: 'mcp' },
+  agents: { label: 'Agents', path: 'agents' },
+  mcp: { label: 'MCP', path: 'mcp' },
   auth: { label: 'Sign-in' },
   calendar: { label: 'Calendar sync', path: 'calendar' },
-  compute: { label: 'Member pods', path: 'hosting?tab=pods' },
+  compute: { label: 'Godfather', path: 'godfather' },
   dashboard: { label: 'Activity', path: 'activity' },
   games: { label: 'Games' },
   knowledge: { label: 'Knowledge', path: 'knowledge' },
   leetcode: { label: 'LeetCode', path: 'leetcode' },
-  packs: { label: 'Packs', path: 'knowledge' },
-  runpod: { label: 'Services', path: 'hosting' },
+  packs: { label: 'Knowledge', path: 'knowledge' },
+  runpod: { label: 'Hosting', path: 'hosting' },
 };
 
 // The groups of cards, in order. An integration with a key in no group goes in the last group.
-const GROUPS: { title: string; hint: string; keys: string[] }[] = [
-  { title: 'Accounts', hint: "The org's accounts at other services.", keys: ['discord', 'github', 'google', 'notion', 'runpod'] },
-  { title: 'Services', hint: 'Servers that Platform calls for search and page reads.', keys: [] },
+const GROUPS: { title: string; keys: string[] }[] = [
+  { title: 'Accounts', keys: ['discord', 'github', 'google', 'notion', 'runpod'] },
+  { title: 'Services', keys: [] },
 ];
 
 function StateBadge({ i }: { i: Integration }) {
@@ -273,7 +274,7 @@ function IntegrationCard({ prefix, i, canSave, oauth }: { prefix: string; i: Int
         open={editing}
         onClose={() => setEditing(false)}
         title={`Connect ${i.title}`}
-        description="Values are encrypted on the API. Secret keys are never shown again."
+        description="Secret keys are never shown again."
       >
         <KeysForm prefix={prefix} i={i} onDone={() => setEditing(false)} />
       </Dialog>
@@ -281,39 +282,40 @@ function IntegrationCard({ prefix, i, canSave, oauth }: { prefix: string; i: Int
   );
 }
 
-// The outside services the org connects: their keys, where the keys come from, and the modules that use them.
-export function IntegrationsPage() {
+// The outside services the org connects, filtered by the search text: their keys and the modules that use them.
+export function IntegrationsTab({ query }: { query: string }) {
   const { prefix } = useCurrentOrg();
   const { data, isLoading, error } = useIntegrations(prefix);
   if (isLoading) return <PageSkeleton />;
   if (error || !data) return <ErrorNote error={error ?? 'No data'} />;
-  const connected = data.integrations.filter((i) => i.source).length;
+  const q = query.trim().toLowerCase();
+  const found = data.integrations.filter((i) => !q || `${i.key} ${i.title} ${i.description}`.toLowerCase().includes(q));
+  const asu = data.asu && (!q || 'asu sun devil'.includes(q) || q.includes('asu'));
   return (
     <>
-      <PageHeader
-        title="Integrations"
-        description={`Connect an account or a service one time. Modules across the dashboard then use it. ${connected} of ${data.integrations.length} connected.`}
-      />
       {!data.secrets_key ? (
         <div className="mb-4">
           <ErrorNote error="SECRETS_KEY is not set on the API, so keys cannot be saved." />
         </div>
       ) : null}
+      {!found.length && !asu ? (
+        <Card>
+          <EmptyState icon={SearchX} title="No integration matches" />
+        </Card>
+      ) : null}
       <div className="space-y-8">
         {GROUPS.map((g, n) => {
           const last = n === GROUPS.length - 1;
-          const items = data.integrations.filter((i) => g.keys.includes(i.key) || (last && !GROUPS.some((o) => o.keys.includes(i.key))));
-          return items.length ? (
+          const items = found.filter((i) => g.keys.includes(i.key) || (last && !GROUPS.some((o) => o.keys.includes(i.key))));
+          const extra = n === 0 && asu && data.asu ? <AsuCard prefix={prefix} initial={data.asu} /> : null;
+          return items.length || extra ? (
             <section key={g.title} aria-label={g.title}>
-              <div className="mb-3">
-                <h2 className="text-sm font-semibold">{g.title}</h2>
-                <p className="mt-0.5 text-xs text-muted">{g.hint}</p>
-              </div>
-              <div className="grid gap-4 md:grid-cols-2">
+              <h2 className="mb-3 text-xs font-medium tracking-wide text-muted uppercase">{g.title}</h2>
+              <div className="grid items-start gap-4 md:grid-cols-2">
                 {items.map((i) => (
                   <IntegrationCard key={i.key} prefix={prefix} i={i} canSave={data.secrets_key} oauth={data.oauth?.[i.key]} />
                 ))}
-                {n === 0 && data.asu ? <AsuCard prefix={prefix} initial={data.asu} /> : null}
+                {extra}
               </div>
             </section>
           ) : null;

@@ -15,7 +15,7 @@ export function TrendsCard({ prefix }: { prefix: string }) {
     <Card className="mt-6">
       <CardHeader
         title="Activity over time"
-        hint="One bar per day, in UTC"
+        hint="Per day, UTC"
         action={
           <div role="group" aria-label="Range" className="flex rounded-md border border-line p-0.5">
             {RANGES.map((n) => (

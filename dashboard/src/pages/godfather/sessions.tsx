@@ -117,7 +117,7 @@ export function SessionsDialog({ prefix, pod, onClose }: { prefix: string; pod: 
       open
       onClose={onClose}
       title={`Sessions on ${pod.name}`}
-      description="The schedule starts the pod 10 minutes before a session and stops it when the session ends, unless another session is still open."
+      description="The pod starts 10 minutes before a session and stops after it."
     >
       <div className="space-y-6">
         <form

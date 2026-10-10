@@ -31,7 +31,6 @@ export function ErrorsCard({ prefixes }: { prefixes: string[] }) {
     <Card>
       <CardHeader
         title="Errors"
-        hint="Open errors of every organization, and of the server itself, such as failed jobs."
         action={
           <Select value={org} onChange={(e) => setOrg(e.target.value)} aria-label="Filter by org" className="h-8 w-40 text-xs sm:w-48">
             <option value="">All</option>

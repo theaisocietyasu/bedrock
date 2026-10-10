@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { Button, cx, Field, FormActions, Input, Spinner } from '../../components/ui';
 import { send } from '../../lib/api';
 import type { App } from '../../lib/types';
-import { firstConfigured, ProviderField, useProviders } from '../hosting/providers';
+import { firstConfigured, ProviderField, useProviders } from './providers';
 import { ManifestInput, readManifest } from './manifest';
 import { DEFAULT_MANIFEST_PATH, NAME_PATTERN, REPO_PATTERN, useInvalidate } from './shared';
 
@@ -92,7 +92,7 @@ export function RegisterApp({ prefix, onDone }: { prefix: string; onDone: (name:
         providers={providers.data}
         value={provider}
         onChange={setChosen}
-        hint="The cloud account the app's pod runs on. The manifest follows the RunPod pod API."
+        hint=""
       />
       <SourceChoice value={source} onChange={setSource} />
       {source === 'repo' ? (
@@ -100,7 +100,7 @@ export function RegisterApp({ prefix, onDone }: { prefix: string; onDone: (name:
           <Field label="Repository" hint={repoOk ? 'owner/name. Private repos need GitHub on Integrations.' : 'Use the form owner/name.'}>
             <Input value={repo} onChange={(e) => setRepo(e.target.value.trim())} placeholder="example-club/club-bot" aria-invalid={!repoOk} required />
           </Field>
-          <Field label="Manifest path" hint="Read from the default branch now, and at the git ref of each deploy.">
+          <Field label="Manifest path">
             <Input value={path} onChange={(e) => setPath(e.target.value)} className="font-mono" required />
           </Field>
         </div>

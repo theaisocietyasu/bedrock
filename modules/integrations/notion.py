@@ -4,15 +4,20 @@ The tools use only the org's own token, never the deployment default, so an agen
 workspace. Notion shows the integration only the pages and databases shared with it.
 """
 
+from functools import partial
 from typing import Any
 from urllib.parse import quote
 
 import requests
 
 from core.integrations import registry
-from core.tools import ToolError, tool
+from core.tools import ToolError
+from core.tools import tool as _tool
 from modules.auth import scopes
 from modules.calendar.integrations import NOTION_SECRET
+
+# Every tool here needs the integrations module on for the caller's org
+tool = partial(_tool, module="integrations")
 
 API = "https://api.notion.com/v1"
 VERSION = "2022-06-28"

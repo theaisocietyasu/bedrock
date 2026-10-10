@@ -133,7 +133,7 @@ export function NewPodDialog({ prefix, onClose }: { prefix: string; onClose: () 
   });
   const editEnv = (key: number, patch: Partial<EnvRow>) => setEnv(env.map((r) => (r.key === key ? { ...r, ...patch } : r)));
   return (
-    <Dialog open onClose={onClose} wide title="New pod" description="Creates a pod on the org's account at the selected hosting provider. It starts right away.">
+    <Dialog open onClose={onClose} wide title="New pod" description="The pod starts right away.">
       <form
         className="space-y-6"
         onSubmit={(e) => {
@@ -146,13 +146,13 @@ export function NewPodDialog({ prefix, onClose }: { prefix: string; onClose: () 
           providers={providers.data}
           value={provider}
           onChange={setChosen}
-          hint="The cloud account the pod runs on and bills."
+          hint=""
         />
         <div className="grid gap-5 sm:grid-cols-2">
           <Field label="Name" hint="Leave empty for a random name">
             <Input value={draft.name} onChange={set('name')} placeholder="workshop" maxLength={100} />
           </Field>
-          <Field label="Image" hint="Leave empty for the org's default pod image, set in Pod settings">
+          <Field label="Image" hint="Empty uses the default in Pod settings">
             <Input
               value={draft.image}
               onChange={set('image')}

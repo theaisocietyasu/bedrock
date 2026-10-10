@@ -1,7 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { ArrowRight, Pencil, Plus, Send, Webhook as WebhookIcon } from 'lucide-react';
+import { Pencil, Plus, Send, Webhook as WebhookIcon } from 'lucide-react';
 import { useState } from 'react';
-import { Link } from 'react-router';
 import {
   Badge,
   Button,
@@ -89,7 +88,7 @@ function WebhookForm({ prefix, list, hook, onDone }: { prefix: string; list: Web
       </div>
       <Field
         label={`${kind?.label ?? 'Webhook'} webhook URL`}
-        hint="Channel settings > Integrations > Webhooks. The URL is stored encrypted and never shown again."
+        hint="Never shown again after you save."
       >
         <Input
           type="url"
@@ -169,8 +168,8 @@ function WebhookRow({ prefix, hook, labels, onEdit }: { prefix: string; hook: We
         </div>
         <div className="flex items-center gap-1">
           <Switch checked={hook.enabled} onChange={() => toggle.mutate()} label={`Webhook ${hook.name} on`} disabled={toggle.isPending} />
-          <Button variant="ghost" disabled={test.isPending} onClick={() => test.mutate()}>
-            {test.isPending ? <Spinner className="size-3.5" /> : <Send className="size-4" />} Send test
+          <Button variant="ghost" size="icon" title="Send test" aria-label={`Send a test to ${hook.name}`} disabled={test.isPending} onClick={() => test.mutate()}>
+            {test.isPending ? <Spinner className="size-3.5" /> : <Send className="size-4" />}
           </Button>
           <Button variant="ghost" size="icon" title="Edit" aria-label={`Edit ${hook.name}`} onClick={onEdit}>
             <Pencil className="size-4" />
@@ -195,36 +194,6 @@ function WebhookRow({ prefix, hook, labels, onEdit }: { prefix: string; hook: We
   );
 }
 
-function FeedsCard({ prefix, list }: { prefix: string; list: WebhookList }) {
-  return (
-    <Card>
-      <CardHeader
-        title="Alert feeds"
-        hint="Job and hackathon feeds post to their own webhooks on a schedule."
-        action={
-          <Link to={`/${prefix}/alerts`} className="inline-flex items-center gap-1 text-xs text-muted transition-colors hover:text-fg">
-            Open Alerts <ArrowRight className="size-3.5" />
-          </Link>
-        }
-      />
-      {list.feeds.length ? (
-        list.feeds.map((f) => (
-          <div key={f.key} className="flex items-center gap-3 border-b border-line px-4 py-2.5 text-sm last:border-0">
-            <Dot tone={!f.enabled ? 'muted' : f.last_error ? 'bad' : 'ok'} />
-            <span className="min-w-0 flex-1 truncate font-medium">{f.key}</span>
-            <Badge>{f.kind === 'github_jobs' ? 'job list' : 'hackathons'}</Badge>
-            <span className="hidden w-32 text-right text-xs text-muted sm:block">
-              {f.enabled ? `ran ${timeAgo(f.last_run_at)}` : 'off'}
-            </span>
-          </div>
-        ))
-      ) : (
-        <p className="px-4 py-3 text-sm text-muted">No alert feeds. Add one on the Alerts page.</p>
-      )}
-    </Card>
-  );
-}
-
 export function WebhooksPage() {
   const { prefix } = useCurrentOrg();
   const [editing, setEditing] = useState<Webhook | 'new' | null>(null);
@@ -240,7 +209,8 @@ export function WebhooksPage() {
     <>
       <PageHeader
         title="Webhooks"
-        description="Messages that Platform sends to your channels when events happen: errors, failed jobs, pods, deploys, orders and new members."
+        description="Messages to your channels when events happen."
+        docs="webhooks"
         action={
           <Button variant="primary" disabled={!data?.secrets_key} onClick={() => setEditing('new')}>
             <Plus className="size-4" /> New webhook
@@ -266,17 +236,14 @@ export function WebhooksPage() {
             hooks.map((h) => <WebhookRow key={h.id} prefix={prefix} hook={h} labels={labels} onEdit={() => setEditing(h)} />)
           ) : (
             <EmptyState icon={WebhookIcon} title="No webhooks">
-              Add a webhook to get a message in a channel when an event happens.
             </EmptyState>
           )}
         </Card>
-        {data?.alerts ? <FeedsCard prefix={prefix} list={data} /> : null}
       </div>
       <Dialog
         open={editing !== null}
         onClose={() => setEditing(null)}
         title={editing === 'new' ? 'New webhook' : `Edit ${editing?.name ?? ''}`}
-        description="Pick the events this webhook sends. Each event sends one message."
         wide
       >
         {data && editing !== null ? (

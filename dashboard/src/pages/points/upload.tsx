@@ -32,7 +32,7 @@ export function UploadDialog({ prefix, open, onClose }: { prefix: string; open: 
       open={open}
       onClose={close}
       title="Upload event check-ins"
-      description="Gives the points to each row with a check-in date, one time for each email. A member that is not found is added."
+      description="Gives points to each checked-in row, once per email."
     >
       {upload.isSuccess ? (
         <div className="space-y-4">

@@ -19,8 +19,8 @@ If `service.py` has more than one concern, split it into more Flask-free files. 
 
 | What | Where |
 | --- | --- |
-| Category | `CATEGORIES` in `modules/manifest.py`. Put the module in one category. Core modules are always on and are not on the Modules page |
-| Catalog entry | `CATALOG` in `modules/manifest.py`: the title and one-line description that the Modules page shows, each integration key or setting the module needs (`Need`), and the packs it reads |
+| Category | `CATEGORIES` in `modules/manifest.py`. Put the module in one category. Core modules are always on and are not on Explore |
+| Catalog entry | `CATALOG` in `modules/manifest.py`: the title and one-line description that Explore shows, each integration key or setting the module needs (`Need`), and the packs it reads |
 | Blueprint and URL prefix | `MOUNTS` in `modules/registry.py`, and the import at the top of that file |
 | Tables | `MODEL_MODULES` in `modules/manifest.py`, then `uv run alembic revision --autogenerate -m "..."` |
 | Jobs | `JOB_MODULES` in `modules/manifest.py` |
