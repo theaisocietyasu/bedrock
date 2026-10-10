@@ -157,8 +157,8 @@ const HomePage = () => {
     },
     {
       id: "compute",
-      module: "compute",
-      title: "Compute",
+      module: "godfather",
+      title: "Godfather",
       icon: FaServer,
       color: "from-cyan-500 to-cyan-600",
       description: "GPU and CPU pods members SSH into",

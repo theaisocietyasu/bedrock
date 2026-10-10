@@ -24,7 +24,7 @@ make up | down | logs | status | shell | build
 make check                       # fix lint and format, then ty, pytest, alembic check
 make ci                          # the same checks with no changes to files; CI runs this
 uv run bandit -q -c pyproject.toml -r .
-uv run pytest tests/contract/test_compute.py -v
+uv run pytest tests/contract/test_godfather.py -v
 uv run alembic upgrade head      # make migrate
 make deploy | health | rollback  # on the server
 flask --app main org|jobs|config ...
@@ -46,7 +46,7 @@ flask --app main org|jobs|config ...
 | `web/` | Old officer app, kept for SoDA at admin.thesoda.io |
 | `docs/` | Guides, indexed in `docs/README.md` |
 
-Modules: accounts, agents, alerts, auth, bot, calendar, compute, dashboard, games, integrations, knowledge, leetcode, mcp, organizations, packs, points, public, runpod, storefront, superadmin, uptime, users.
+Modules: accounts, agents, auth, bot, calendar, dashboard, feeds, games, godfather, hackathon_webhook, integrations, job_webhook, knowledge, leetcode, mcp, organizations, points, public, runpod, storefront, submodules, superadmin, uptime, users.
 
 ## Rules
 

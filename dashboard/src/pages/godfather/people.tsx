@@ -36,7 +36,7 @@ function Section({ icon: Icon, title, hint, action, children }: { icon: typeof W
 
 function ConnectedNow({ prefix, pod }: { prefix: string; pod: Pod }) {
   const live = useQuery({
-    queryKey: ['compute', prefix, 'connected', pod.id],
+    queryKey: ['godfather', prefix, 'connected', pod.id],
     queryFn: () => api<PodConnected>(`${podPath(prefix, pod.id)}/members/connected`),
     enabled: pod.status === 'RUNNING',
     retry: false,
@@ -156,7 +156,7 @@ function Recent({ data }: { data: PodMembers['recent'] }) {
 // Who can connect to a pod, who is connected now and who connected recently.
 export function PodMembersDialog({ prefix, pod, onClose, onEditAccess }: { prefix: string; pod: Pod; onClose: () => void; onEditAccess: () => void }) {
   const members = useQuery({
-    queryKey: ['compute', prefix, 'pod-members', pod.id],
+    queryKey: ['godfather', prefix, 'pod-members', pod.id],
     queryFn: () => api<PodMembers>(`${podPath(prefix, pod.id)}/members`),
   });
   return (

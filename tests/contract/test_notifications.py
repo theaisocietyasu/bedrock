@@ -79,7 +79,7 @@ def test_webhook_events_are_notifications(client, officer_headers, sent, monkeyp
         assert [n["subject"] for n in events] == ["KeyError", "pod third"]
         error, pod = events
         assert error["level"] == "error" and error["link"] == "activity?tab=errors" and error["at"]
-        assert pod["level"] == "info" and pod["module"] == "compute" and pod["message"] == "Pod: abc"
+        assert pod["level"] == "info" and pod["module"] == "godfather" and pod["message"] == "Pod: abc"
         resolved = client.post(f"{BASE}/resolve", json={"ids": [error["id"]]}, headers=officer_headers).get_json()
         assert next(n for n in resolved["notifications"] if n["id"] == error["id"])["resolved_by"]
         assert resolved["open"] == body["open"] - 1

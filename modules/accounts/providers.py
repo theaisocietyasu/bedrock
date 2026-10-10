@@ -4,7 +4,7 @@ A provider is on when ACCOUNTS_<NAME>_CLIENT_ID and ACCOUNTS_<NAME>_CLIENT_SECRE
 with ACCOUNTS_BASE_URL (the public URL of this API, which the provider redirects back to).
 ACCOUNTS_<NAME>_SCOPES, _AUTHORIZE_URL and _TOKEN_URL override the defaults below. The Canvas URLs
 come from ACCOUNTS_CANVAS_URL (the school's Canvas, like https://canvas.example.edu), else from the
-canvas_url of the one pack that sets it.
+canvas_url of the one submodule that sets it.
 """
 
 import datetime
@@ -139,13 +139,13 @@ class Provider:
 
 
 def canvas_url() -> str | None:
-    """The school's Canvas: ACCOUNTS_CANVAS_URL, else the canvas_url of the one pack that sets it."""
+    """The school's Canvas: ACCOUNTS_CANVAS_URL, else the canvas_url of the one submodule that sets it."""
     url = os.environ.get("ACCOUNTS_CANVAS_URL", "").strip().rstrip("/")
     if url:
         return url
-    from modules.packs import catalog
+    from modules.submodules import catalog
 
-    found = {pack.canvas_url.rstrip("/") for pack in catalog.PACKS.values() if pack.canvas_url}
+    found = {submodule.canvas_url.rstrip("/") for submodule in catalog.SUBMODULES.values() if submodule.canvas_url}
     return found.pop() if len(found) == 1 else None
 
 

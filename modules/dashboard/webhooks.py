@@ -1,7 +1,7 @@
 """Outbound webhooks for officers: add, change, remove and test the org's webhooks. No Flask here.
 
 core/webhooks.py has the table, the events and the delivery. A URL must match its kind and name a public
-host. It is encrypted with SECRETS_KEY and no route returns it. The alert feeds of the alerts module post to
+host. It is encrypted with SECRETS_KEY and no route returns it. The feeds of the webhook modules post to
 their own webhooks; the listing names them so officers see every place that Platform sends to.
 """
 
@@ -11,7 +11,7 @@ from typing import cast
 from core import net, secrets, webhooks
 from core.errors import ServiceError
 from core.time import utcnow
-from modules.alerts import service as alerts
+from modules.feeds import service as feeds
 from modules.organizations import service as organizations
 from modules.organizations.models import Organization
 
@@ -52,8 +52,6 @@ def events(org: Organization) -> list[dict]:
 
 
 def _feeds(db, org: Organization) -> list[dict]:
-    if not organizations.module_enabled(org, "alerts"):
-        return []
     return [
         {
             "key": f["key"],
@@ -63,18 +61,17 @@ def _feeds(db, org: Organization) -> list[dict]:
             "last_run_at": f["last_run_at"],
             "last_error": f["last_error"],
         }
-        for f in alerts.list_feeds(db, cast(int, org.id))
+        for f in feeds.list_feeds(db, cast(int, org.id))
     ]
 
 
 def listing(db, org: Organization) -> dict:
-    """The org's webhooks, the events and kinds to pick from, and the alert feeds."""
+    """The org's webhooks, the events and kinds to pick from, and the feeds of the webhook modules."""
     rows = db.query(webhooks.Webhook).filter_by(organization_id=org.id).order_by(webhooks.Webhook.name).all()
     return {
         "webhooks": [_dict(row) for row in rows],
         "events": events(org),
         "kinds": [{"key": k.key, "label": k.label, "example": k.example} for k in webhooks.KINDS.values()],
-        "alerts": organizations.module_enabled(org, "alerts"),
         "feeds": _feeds(db, org),
         "secrets_key": secrets.configured(),
     }

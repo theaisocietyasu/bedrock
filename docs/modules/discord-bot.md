@@ -33,7 +33,7 @@ In the Discord Developer Portal, turn on the **Server Members** intent for the a
 | Helper | `bot` | Makes and removes channels and roles for other parts; `/clear` removes game channels |
 | Jeopardy | `games` | Team roles and channels, questions and the scoreboard |
 
-The alerts module posts through Discord webhooks, not through the bot.
+The [feeds](./feeds.md) of the webhook modules post through Discord webhooks, not through the bot. The `games` switch turns Jeopardy on and off.
 
 ## Jeopardy limits
 

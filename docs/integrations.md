@@ -20,7 +20,7 @@ The description of a card says what the officer connects, not what each module d
 | Google | `google_service_account` (JSON key) | `google-secret.json` | Calendar sync |
 | Notion | `notion_api_key` | `NOTION_API_KEY` | Calendar sync |
 | OpenRouter | `openrouter_api_key` | `OPENROUTER_API_KEY` | Knowledge, MCP (through Embeddings) |
-| RunPod | `runpod_api_key` | none | Compute, Apps |
+| RunPod | `runpod_api_key` | none | Godfather, Hosting |
 | Web search (SearXNG) | `searxng_url`, [`searxng_engines`] | `SEARXNG_URL`, `SEARXNG_ENGINES` | ASU |
 
 The keys are org secrets, encrypted with `SECRETS_KEY`. The API never returns a secret key. It returns the value of a field that is not secret, such as a URL or a model name, so the form can show it. When an org saves its own keys, they replace the deployment default for that org as a whole: Platform never mixes an org URL with a deployment key. An org must set every required field. Discord is set only in `.env`, for every org.
@@ -80,7 +80,7 @@ Some MCP servers take no API key. The officer signs in with the service, and the
 
 ### Sign in to ASU
 
-Sun Devil Central, the ASU club system, needs an ASU sign-in. An officer signs in one time, and agents then search its clubs and events. The code is in `packs/asu/signin/`.
+Sun Devil Central, the ASU club system, needs an ASU sign-in. An officer signs in one time, and agents then search its clubs and events. The code is in `submodules/asu/signin/`.
 
 1. On the Integrations tab of Explore, click **Sign in to ASU** on the ASU card.
 2. Type your NetID and password, and click **Sign in**.
@@ -135,14 +135,14 @@ A setting stays in `.env` when it is the same for every org or when it is about 
 - The OAuth apps of connected accounts (`ACCOUNTS_*`). Their callback URLs are on the API, so one app serves every org.
 - URLs of the frontends and CORS: `CLIENT_URL`, `DASHBOARD_URL`, `CORS_EXTRA_ORIGINS`.
 - Limits and schedules of jobs: `CALENDAR_SYNC_CRON`, `AUDIT_RETENTION_DAYS`, `ERROR_RETENTION_DAYS`, `ERROR_WEBHOOK_URL`, `AGENT_RETENTION_DAYS`, `UPTIME_RETENTION_DAYS`, `KNOWLEDGE_CRAWL_*`, `PACK_QUERY_MAX_CHARS`.
-- `COMPUTE_CLI_NAME`: the name of the one CLI that talks to this API.
+- `GODFATHER_CLI_NAME`: the name of the one CLI that talks to this API.
 
 These settings moved to the dashboard, and the `.env` value is now the default for orgs that set none:
 
 | `.env` | Dashboard |
 | --- | --- |
 | `EMBEDDINGS_*`, `FIRECRAWL_*`, `SEARXNG_*`, `NOTION_API_KEY`, `OPENROUTER_API_KEY` | Integrations |
-| `COMPUTE_POD_IMAGE` | Compute > Settings |
+| `GODFATHER_POD_IMAGE` | Godfather > Settings |
 | `KNOWLEDGE_PUBLISHERS` | Superadmin > Knowledge publishers. Orgs in `.env` stay publishers |
 | `KNOWLEDGE_CHUNK_CHARS`, `KNOWLEDGE_MAX_DISTANCE` | Knowledge > Search settings |
 | `LEETCODE_*` | LeetCode. The `.env` post is the older post for one server |

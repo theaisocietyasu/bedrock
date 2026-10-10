@@ -7,7 +7,7 @@ from cryptography.fernet import Fernet
 
 from core import hosting
 
-from .test_compute import FakeRunPod
+from .test_godfather import FakeRunPod
 from .test_runpod_apps import MANIFEST
 
 
@@ -43,7 +43,7 @@ class FakeProvider:
 @pytest.fixture
 def fakecloud(app, monkeypatch):
     from core.db import db_connect
-    from modules.compute.models import ComputeKey, ComputePod
+    from modules.godfather.models import ComputeKey, ComputePod
 
     monkeypatch.setenv("SECRETS_KEY", Fernet.generate_key().decode())
     provider = FakeProvider()

@@ -7,7 +7,7 @@ from typing import cast
 from core.audit import AuditEntry
 from core.time import utcnow
 from modules.agents.models import AgentConversation, AgentMessage
-from modules.alerts.models import AlertFeed, AlertRun
+from modules.feeds.models import AlertFeed, AlertRun
 from modules.knowledge.models import KnowledgeRun
 from modules.organizations import service as organizations
 from modules.organizations.models import Organization
@@ -106,13 +106,13 @@ def trends(db, org: Organization, days: int = DEFAULT_DAYS) -> dict:
         KnowledgeRun.organization_id == org_id, KnowledgeRun.started_at >= since
     )
     series.append(_series("knowledge", "Knowledge runs", "runs", dates, ((t, 1, bool(err)) for t, err in rows)))
-    if on("alerts"):
+    if on("job_webhook") or on("hackathon_webhook"):
         rows = (
             db.query(AlertRun.started_at, AlertRun.posted, AlertRun.error)
             .join(AlertFeed, AlertFeed.id == AlertRun.feed_id)
             .filter(AlertFeed.organization_id == org_id, AlertRun.started_at >= since)
         )
-        series.append(_series("alert_posts", "Alerts posted", "posts", dates, ((t, p or 0, False) for t, p, _ in rows)))
+        series.append(_series("feed_posts", "Webhook posts", "posts", dates, ((t, p or 0, False) for t, p, _ in rows)))
     always_on = {"questions", "knowledge"}
     series = [item for item in series if item["key"] not in always_on or item["total"]]
     return {"days": days, "series": series, "generated_at": utcnow().isoformat()}

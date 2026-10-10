@@ -2,7 +2,7 @@
 
 One folder for each module. Each folder has a `README.md` with its files and its surface: routes, jobs, tools and tables. [docs/writing-a-module.md](../docs/writing-a-module.md) gives the rules and the places to register a new module.
 
-The folders are not nested. `CATEGORIES` in `manifest.py` groups the modules below in the same sections as the Explore page of the dashboard. `CATALOG` in `manifest.py` gives the title, description, needs and packs that the page shows for each module. A new org starts with every module in the Org switch column off.
+The folders are not nested. `CATEGORIES` in `manifest.py` groups the modules below in the same sections as the Explore page of the dashboard. Each module is in one category, and a module can have sub-modules: content in `submodules/` that the module reads. `CATALOG` in `manifest.py` gives the title, description, needs and sub-modules that the page shows for each module. A new org starts with every module in the Org switch column off.
 
 ## Core
 
@@ -13,34 +13,36 @@ Core modules are always on. The Explore page of the dashboard does not show them
 | [auth](auth/README.md) | Discord sign-in, tokens, access checks, machine tokens and scopes | |
 | [bot](bot/README.md) | The Discord bot and its helper cog | |
 | [dashboard](dashboard/README.md) | Overview, branding, CI runs and the module catalog for the officer dashboard | |
+| [feeds](feeds/README.md) | Runs the feeds of the webhook modules | |
+| [mcp](mcp/README.md) | The MCP server and `/api/tools`. A token's scopes decide what an agent can call | |
 | [organizations](organizations/README.md) | Orgs, config, module switches, secrets and machine tokens | |
-| [packs](packs/README.md) | Loads the packs in `packs/`. Explore shows each pack as a sub-module of the module that reads it | |
 | [public](public/README.md) | Open reads | |
+| [submodules](submodules/README.md) | Loads the sub-modules in `submodules/`. Explore shows each sub-module under the module that reads it | |
 | [superadmin](superadmin/README.md) | Orgs for the whole deployment | |
 | [users](users/README.md) | Members and memberships | |
+
+## Storage
+
+| Module | Does | Org switch |
+| --- | --- | --- |
+| [knowledge](knowledge/README.md) | Sources, crawls and hybrid search | `knowledge` |
+| [points](points/README.md) | Points, leaderboards and CSV imports | `points` |
+| [storefront](storefront/README.md) | Merch store paid in points | `storefront` |
+| [accounts](accounts/README.md) | Canvas, Google and Outlook sign-in for a member | `accounts` |
 
 ## AI and agents
 
 | Module | Does | Org switch |
 | --- | --- | --- |
-| [knowledge](knowledge/README.md) | Sources, crawls and hybrid search | `knowledge` |
-| [mcp](mcp/README.md) | The MCP server and `/api/tools` | `mcp` |
 | [agents](agents/README.md) | Conversations, memories, profile graph and pending actions for agents | `agents` |
 | [integrations](integrations/README.md) | Tools of connected services (GitHub) passed through to their MCP servers | `integrations` |
-
-## Members
-
-| Module | Does | Org switch |
-| --- | --- | --- |
-| [points](points/README.md) | Points, leaderboards and CSV imports | `points` |
-| [storefront](storefront/README.md) | Merch store paid in points | `storefront` |
-| [accounts](accounts/README.md) | Canvas, Google and Outlook sign-in for a member | `accounts` |
 
 ## Webhooks
 
 | Module | Does | Org switch |
 | --- | --- | --- |
-| [alerts](alerts/README.md) | Job and hackathon listings posted to Discord webhooks | `alerts` |
+| [job_webhook](job_webhook/README.md) | New internship and new grad roles posted to a Discord webhook | `job_webhook` |
+| [hackathon_webhook](hackathon_webhook/README.md) | Upcoming hackathons posted to a Discord webhook | `hackathon_webhook` |
 
 ## Automations
 
@@ -54,14 +56,14 @@ Core modules are always on. The Explore page of the dashboard does not show them
 | Module | Does | Org switch |
 | --- | --- | --- |
 | [leetcode](leetcode/README.md) | The daily LeetCode post and solve checks | `leetcode` |
-| [games](games/README.md) | Jeopardy in Discord | |
+| [games](games/README.md) | Jeopardy in Discord | `games` |
 
-## Infrastructure
+## Compute
 
 | Module | Does | Org switch |
 | --- | --- | --- |
+| [godfather](godfather/README.md) | Pods on a hosting provider (RunPod) that members connect to with the Godfather CLI | `godfather` |
 | [runpod](runpod/README.md) | App deploys to a hosting provider (RunPod). The dashboard calls it Hosting | `runpod` |
-| [compute](compute/README.md) | Pods on a hosting provider (RunPod) that members connect to with the Godfather CLI. The dashboard calls it Godfather | `compute` |
 
 ## Shared files
 

@@ -9,7 +9,7 @@ This page tells you how callers sign in and how a route decides who may call it.
 | Platform access token and refresh token | Officers in `dashboard/` | Discord sign-in at `/api/auth/login` |
 | Session cookie | The same officers, and members who signed in with Discord | Flask, signed with `SECRET_KEY` |
 | Clerk session token | Members on the public website storefront | Clerk |
-| Machine token (`plat_...`) | Apps, agents and CLIs | An officer, or the compute CLI sign-in |
+| Machine token (`plat_...`) | Apps, agents and CLIs | An officer, or the Godfather CLI sign-in |
 | App token | Older integrations | `GET /api/auth/appToken`. Use a machine token for new work |
 
 ## Officer sign-in

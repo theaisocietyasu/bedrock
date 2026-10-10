@@ -9,15 +9,15 @@ An organization is one Discord server. Almost every route is under the organizat
 
 ## Modules
 
-Each feature is a module under `modules/`. A module has its routes in `api.py`, its tables in `models.py`, and its logic in a Flask-free `service.py` that the REST API, the MCP server, jobs and the bot all reuse. `modules/registry.py` mounts them.
+Each feature is a module under `modules/`. Each module is in one category: Core, Storage, AI and agents, Webhooks, Automations, Bots or Compute. A module can read sub-modules: content in `submodules/`, such as the ASU campus pages for knowledge. A module has its routes in `api.py`, its tables in `models.py`, and its logic in a Flask-free `service.py` that the REST API, the MCP server, jobs and the bot all reuse. `modules/registry.py` mounts them.
 
-Optional modules (points, storefront, calendar, LeetCode, compute and alerts) switch on or off per organization. A module that is off returns 404 for that organization, and the dashboard hides it. The agent, knowledge and account modules are reached through tokens the organization issues, so an organization that issues none never uses them.
+Core modules, such as auth, feeds and the MCP server, are always on. The other modules, such as points, storefront, calendar, LeetCode, Godfather and the job and hackathon webhooks, switch on or off per organization. A new organization starts with each of them off. A module that is off returns 404 for that organization, and the dashboard hides it. The agent, knowledge and account modules are reached through tokens the organization issues, so an organization that issues none never uses them.
 
 ## Access
 
 People sign in with Discord. Every organization route checks whether the caller is a member, an officer or a superadmin before it runs. Changes made by officers and tokens are written to the audit log.
 
-Programs use machine tokens instead of a login. A token starts with `plat_`, is stored only as a hash, belongs to one organization, and carries scopes such as `knowledge:read` or `compute:connect`. Agents, deploy pipelines and the godfather CLI each hold one.
+Programs use machine tokens instead of a login. A token starts with `plat_`, is stored only as a hash, belongs to one organization, and carries scopes such as `knowledge:read` or `godfather:connect`. Agents, deploy pipelines and the godfather CLI each hold one.
 
 ## Secrets
 

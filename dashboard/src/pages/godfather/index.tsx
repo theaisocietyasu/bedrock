@@ -27,7 +27,7 @@ import { NewPodDialog } from './new-pod';
 import { PodMembersDialog } from './people';
 import { AccessDialog, type PodDialog, PodsTable, TerminateDialog } from './pods';
 import { SessionsDialog } from './sessions';
-import { ComputeSettingsDialog } from './settings';
+import { GodfatherSettingsDialog } from './settings';
 import { costLabel, isMissingKey, usePods } from './shared';
 
 function MissingKey({ prefix }: { prefix: string }) {
@@ -48,7 +48,7 @@ function MissingKey({ prefix }: { prefix: string }) {
 
 function Upcoming({ prefix, pods, open }: { prefix: string; pods: Pod[]; open: (d: PodDialog) => void }) {
   const overview = useOverview(prefix);
-  const sessions = [...(overview.data?.sections.compute.sessions ?? [])].sort((a, b) => a.start_at.localeCompare(b.start_at));
+  const sessions = [...(overview.data?.sections.godfather.sessions ?? [])].sort((a, b) => a.start_at.localeCompare(b.start_at));
   const byId = new Map(pods.map((p) => [p.id, p]));
   return (
     <Card>
@@ -117,7 +117,7 @@ export function GodfatherPage() {
   const list = pods.data ?? [];
   const running = list.filter((p) => p.status === 'RUNNING');
   const spend = running.reduce((sum, p) => sum + (Number(p.cost_per_hour) || 0), 0);
-  const upcoming = overview.data?.sections.compute.sessions.length;
+  const upcoming = overview.data?.sections.godfather.sessions.length;
   // The dialog follows the latest copy of its pod from the list.
   const current = dialog ? { ...dialog, pod: list.find((p) => p.id === dialog.pod.id) ?? dialog.pod } : null;
   const close = () => setDialog(null);
@@ -127,7 +127,7 @@ export function GodfatherPage() {
       <PageHeader
         title="Godfather"
         description="Pods that members connect to with the Godfather CLI."
-        docs="modules/compute"
+        docs="modules/godfather"
         action={
           <div className="flex gap-2">
             <Button onClick={() => setEditing(true)} aria-label="Pod settings">
@@ -182,7 +182,7 @@ export function GodfatherPage() {
       </div>
 
       {creating ? <NewPodDialog prefix={prefix} onClose={() => setCreating(false)} /> : null}
-      {editing ? <ComputeSettingsDialog prefix={prefix} onClose={() => setEditing(false)} /> : null}
+      {editing ? <GodfatherSettingsDialog prefix={prefix} onClose={() => setEditing(false)} /> : null}
       {current?.kind === 'access' ? <AccessDialog key={current.pod.id} prefix={prefix} pod={current.pod} onClose={close} /> : null}
       {current?.kind === 'members' ? (
         <PodMembersDialog prefix={prefix} pod={current.pod} onClose={close} onEditAccess={() => setDialog({ kind: 'access', pod: current.pod })} />

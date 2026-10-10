@@ -1,6 +1,6 @@
 # Writing a module
 
-This page lists the files a module can have, the places to register it, and the rules that `make ci` checks. The `new-module` skill in `.agents/skills/` has the full procedure. Content for one campus or topic, such as pages to crawl and live queries, is a pack: see [packs/README.md](../packs/README.md).
+This page lists the files a module can have, the places to register it, and the rules that `make ci` checks. The `new-module` skill in `.agents/skills/` has the full procedure. Content for one campus or topic, such as pages to crawl and live queries, is a sub-module: see [submodules/README.md](../submodules/README.md).
 
 ## Files
 
@@ -13,14 +13,14 @@ This page lists the files a module can have, the places to register it, and the 
 | `jobs.py` | Background work with `@job` from `core/jobs.py` | the module runs on a schedule or in the background |
 | `tools.py` | Tools for agents with `@tool` from `core/tools.py` | agents call the module |
 
-If `service.py` has more than one concern, split it into more Flask-free files. For example, `compute/` has `ssh.py`, `files.py` and `schedule.py`.
+If `service.py` has more than one concern, split it into more Flask-free files. For example, `godfather/` has `ssh.py`, `files.py` and `schedule.py`.
 
 ## Register it
 
 | What | Where |
 | --- | --- |
 | Category | `CATEGORIES` in `modules/manifest.py`. Put the module in one category. Core modules are always on and are not on Explore |
-| Catalog entry | `CATALOG` in `modules/manifest.py`: the title and one-line description that Explore shows, each integration key or setting the module needs (`Need`), and the packs it reads |
+| Catalog entry | `CATALOG` in `modules/manifest.py`: the title and one-line description that Explore shows, each integration key or setting the module needs (`Need`), and the sub-modules it reads |
 | Blueprint and URL prefix | `MOUNTS` in `modules/registry.py`, and the import at the top of that file |
 | Tables | `MODEL_MODULES` in `modules/manifest.py`, then `uv run alembic revision --autogenerate -m "..."` |
 | Jobs | `JOB_MODULES` in `modules/manifest.py` |
@@ -29,6 +29,7 @@ If `service.py` has more than one concern, split it into more Flask-free files. 
 | Org secrets | `secrets.declare(...)` or `secrets.declare_prefix(...)` from `core/secrets.py`, at the top of `service.py` |
 | Outside services | `register(...)` and `use(...)` from `core/integrations/registry.py`. See [integrations.md](./integrations.md) |
 | Flask-free files | `service.py`, `models.py`, `jobs.py` and `tools.py` are in the "service modules do not import Flask" contract in `pyproject.toml` by wildcard. Add each other Flask-free file, such as `crawl.py`, to that list |
+| Dashboard page | An entry in `PAGES` in `dashboard/src/pages/registry.tsx`, with `module` and the sidebar section of the module's category |
 | Routes | `tests/contract/routes.txt`: run `UPDATE_ROUTES=1 uv run pytest tests/contract/test_routes.py` |
 | Docs | The module `README.md`, a row under its category in `modules/README.md` and in the module table of `README.md`, the `Modules:` line in `AGENTS.md` and `CLAUDE.md`, and each table in `docs/data-model.md` |
 
@@ -104,4 +105,4 @@ The route helpers and the tool runner return its message and status. A tool func
 
 ## Example
 
-`modules/runpod/` is a small module with every file: `service.py`, `api.py` on `machine_route`, `models.py`, `jobs.py` and `tools.py`. `modules/alerts/` is the example for `officer_route`.
+`modules/runpod/` is a small module with every file: `service.py`, `api.py` on `machine_route`, `models.py`, `jobs.py` and `tools.py`. `modules/feeds/` is the example for `officer_route`.

@@ -34,7 +34,6 @@ def test_listing_names_events_kinds_and_feeds(client, officer_headers, sent):
     assert expected | {"member.joined", "knowledge.crawl_failed", "monitor.down", "monitor.up"} <= keys
     assert body["kinds"] == [{"key": "discord", "label": "Discord", "example": "https://discord.com/api/webhooks/..."}]
     assert body["webhooks"] == []
-    assert body["alerts"] is True
     assert body["feeds"] == []
     assert body["secrets_key"] is True
 
@@ -199,13 +198,13 @@ def test_new_member_sends_member_joined(client, officer_headers, sent):
 
 
 def test_pod_and_deploy_messages(client, officer_headers, sent):
-    from modules.compute import service as compute
+    from modules.godfather import service as godfather
     from modules.runpod import service as apps
     from modules.runpod.models import App, AppDeployment
 
     _create(client, officer_headers, events=["pod.started", "pod.stopped", "app.deployed"])
-    compute.announce(_ais_id(), "gpu-1", "pod123", "start", "the session schedule")
-    compute.announce(_ais_id(), "gpu-1", "pod123", "terminate", "an officer or a tool")
+    godfather.announce(_ais_id(), "gpu-1", "pod123", "start", "the session schedule")
+    godfather.announce(_ais_id(), "gpu-1", "pod123", "terminate", "an officer or a tool")
     app = App(organization_id=_ais_id(), name="site")
     apps._announce(app, AppDeployment(tag="v2", status="failed", error="The health path did not answer in time"))
     titles = [payload["embeds"][0]["title"] for _, payload in sent]
@@ -214,7 +213,7 @@ def test_pod_and_deploy_messages(client, officer_headers, sent):
 
 def test_listing_names_alert_feeds(client, officer_headers, sent):
     from core.db import db_connect
-    from modules.alerts.models import AlertFeed
+    from modules.feeds.models import AlertFeed
 
     db = db_connect.SessionLocal()
     db.add(AlertFeed(organization_id=_ais_id(), key="webhook-test-feed", kind="hackathons", config={}))

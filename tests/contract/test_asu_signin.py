@@ -12,10 +12,10 @@ from pathlib import Path
 import pytest
 from cryptography.fernet import Fernet
 
-from modules.packs.types import Fetched
-from packs.asu.signin import browser as browsers
-from packs.asu.signin import service, sso, sundevil_central
-from packs.asu.signin.browser import Loaded
+from modules.submodules.types import Fetched
+from submodules.asu.signin import browser as browsers
+from submodules.asu.signin import service, sso, sundevil_central
+from submodules.asu.signin.browser import Loaded
 
 BASE = "/api/dashboard/soda/integrations/asu/signin"
 NETID = "sparky1"
@@ -189,7 +189,7 @@ def test_tools_need_the_asu_scope(client, officer_headers, soda, fake):
 
 
 def test_clubs_and_events_read_sun_devil_central(client, officer_headers, soda, fake, monkeypatch):
-    from packs.asu.queries import events as public_events
+    from submodules.asu.queries import events as public_events
 
     _sign_in(client, officer_headers)
     fake.pages[sundevil_central.CLUBS_URL] = _page("sundevil_clubs.html", sundevil_central.clubs_url("robotics"))
@@ -257,7 +257,7 @@ def test_an_expired_session_gives_an_error_and_one_notification(client, officer_
 def test_events_keep_the_calendar_when_the_session_expired(client, officer_headers, soda, fake, sent, monkeypatch):
     from core import webhooks
     from core.db import db_connect
-    from packs.asu.queries import events as public_events
+    from submodules.asu.queries import events as public_events
 
     _sign_in(client, officer_headers)
     fake.pages[sundevil_central.BASE] = Loaded(url=LOGIN_PAGE, status=200, html="")

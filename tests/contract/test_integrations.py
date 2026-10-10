@@ -45,7 +45,7 @@ def test_lists_every_integration(client, officer_headers):
     found = _by_key(body)
     assert {"discord", "embeddings", "github", "google", "notion", "runpod"} <= set(found)
     assert found["notion"]["used_by"] == ["calendar", "integrations"]
-    assert set(found["runpod"]["used_by"]) == {"compute", "integrations", "runpod"}
+    assert set(found["runpod"]["used_by"]) == {"godfather", "integrations", "runpod"}
     assert found["discord"]["editable"] is False and found["discord"]["fields"] == []
     assert found["embeddings"]["source"] is None
 
@@ -129,7 +129,7 @@ def test_org_embeddings_replace_the_deployment_default(client, officer_headers, 
 def test_org_firecrawl_and_searxng(client, officer_headers, cleared, public_dns, monkeypatch):
     from core.db import db_connect
     from modules.knowledge import fetch
-    from modules.packs import search as settings
+    from modules.submodules import search as settings
 
     monkeypatch.delenv("FIRECRAWL_URL", raising=False)
     monkeypatch.setenv("SEARXNG_URL", "http://searxng:8080")

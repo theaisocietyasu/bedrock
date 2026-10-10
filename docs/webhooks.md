@@ -1,6 +1,6 @@
 # Webhooks
 
-Platform sends a message to a channel when an event happens in an org. Officers add webhooks on the dashboard page Automations, Webhooks. Each webhook has a name, a destination and the events it sends.
+Platform sends a message to a channel when an event happens in an org. Officers add webhooks on the dashboard page Event webhooks, at the bottom of the sidebar. Each webhook has a name, a destination and the events it sends.
 
 Each event also shows on the dashboard page Notifications, with or without a webhook. The hourly limit applies only to webhook messages.
 
@@ -10,17 +10,17 @@ Each event also shows on the dashboard page Notifications, with or without a web
 | --- | --- | --- | --- |
 | `errors` | Errors | `modules/dashboard/errors.py` | A new error group, or a resolved group that comes back. See [Health, logs and errors](./operations.md#health-logs-and-errors) |
 | `job.failed` | Failed job runs | `core/jobs.py` | A job with an `org_id` or `org_prefix` argument fails. Jobs for the whole server do not send it |
-| `pod.started` | Pods started | `modules/compute/service.py`, `schedule.py` | An officer or a tool starts or restarts a pod, or the session schedule starts it |
-| `pod.stopped` | Pods stopped | `modules/compute/service.py`, `schedule.py` | An officer or a tool stops or terminates a pod, or the session schedule stops it |
+| `pod.started` | Pods started | `modules/godfather/service.py`, `schedule.py` | An officer or a tool starts or restarts a pod, or the session schedule starts it |
+| `pod.stopped` | Pods stopped | `modules/godfather/service.py`, `schedule.py` | An officer or a tool stops or terminates a pod, or the session schedule stops it |
 | `app.deployed` | App deploys | `modules/runpod/service.py` | A deploy becomes healthy, or fails |
 | `order.created` | Store orders | `modules/storefront/service.py` | A member places an order |
 | `member.joined` | New members | `modules/users/service.py` | A person joins the org at sign-in, through a form or a CSV import. A Discord member sync does not send it |
 | `knowledge.crawl_failed` | Knowledge crawl failures | `modules/knowledge/runs.py` | A crawl of a knowledge source fails |
 | `monitor.down` | Monitors down | `modules/uptime/service.py` | A monitor's first check is down, or a check is down after an up check. See [Uptime](./modules/uptime.md) |
 | `monitor.up` | Monitors up | `modules/uptime/service.py` | A check is up after a down check |
-| `asu.session_expired` | ASU sign-in expired | `packs/asu/signin/service.py` | An `asu.*` tool finds that the saved ASU sign-in expired. Sent one time for each sign-in |
+| `asu.session_expired` | ASU sign-in expired | `submodules/asu/signin/service.py` | An `asu.*` tool finds that the saved ASU sign-in expired. Sent one time for each sign-in |
 
-The page lists an event only when its module is on for the org. Pods need `compute`, orders need `storefront` and monitors need `uptime`.
+The page lists an event only when its module is on for the org. Pods need `godfather`, orders need `storefront` and monitors need `uptime`.
 
 ## Delivery
 
@@ -63,15 +63,15 @@ All routes are under `/api/dashboard/<org>/webhooks`, for officers of the org.
 
 | Route | Does |
 | --- | --- |
-| `GET /` | The webhooks, the events and kinds to pick from, the alert feeds when `alerts` is on, and `secrets_key` |
+| `GET /` | The webhooks, the events and kinds to pick from, the feeds of the webhook modules that are on, and `secrets_key` |
 | `POST /` | Adds a webhook: `{"name", "kind": "discord", "url", "events": [...]}`. Returns 201 |
 | `PUT /<id>` | Changes `name`, `url`, `events` or `enabled`. A missing key keeps its value |
 | `DELETE /<id>` | Removes the webhook |
 | `POST /<id>/test` | Posts a test message. Returns `{"ok", "message"}` |
 
-## Alert feeds and the server webhook
+## Feeds and the server webhook
 
-- Alert feeds post job and hackathon listings to their own webhooks. Set them on the Alerts page. See [Alerts](./modules/alerts.md). The Webhooks page lists the feeds and links to Alerts.
+- The feeds of the Job alerts webhook and Hackathon webhook modules post listings to their own webhooks. Set them on the page of each module. See [Feeds and the webhook modules](./modules/feeds.md).
 - `ERROR_WEBHOOK_URL` in `.env` gets every new error of every org and of the server. It is not an org webhook and does not show on the page.
 
 The `webhooks` table is in [Data model](./data-model.md). Migration `a1358e0da9ef` moved each org secret `error_webhook_url` to a webhook named Errors that sends `errors`.

@@ -253,7 +253,7 @@ register(
     )
 )
 use("firecrawl", "knowledge")
-use("firecrawl", "packs")
+use("firecrawl", "submodules")
 
 
 class HostPacer:

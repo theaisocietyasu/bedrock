@@ -4,7 +4,7 @@ A merch store that members pay for with points. Officers add products and manage
 
 ## In the dashboard
 
-The Store page (Members > Store) has two tabs:
+The Store page (Storage > Store) has two tabs:
 
 - **Products**: name, price in points, stock, category and image. Add, edit and delete products.
 - **Orders**: each order with the member, the items and the total. Change the status: pending, processing, shipped, delivered or cancelled.

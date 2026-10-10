@@ -2,12 +2,12 @@
 
 export type * from './org';
 export type * from './overview';
-export type * from './alerts';
+export type * from './feeds';
 export type * from './apps';
 export type * from './knowledge';
 export type * from './calendar';
 export type * from './superadmin';
-export type * from './compute';
+export type * from './godfather';
 export type * from './hosting';
 export type * from './points';
 export type * from './store';

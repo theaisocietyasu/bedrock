@@ -9,7 +9,7 @@ def test_default_pod_image(client, officer_headers):
     from core.config import config
 
     got = client.get(SETTINGS, headers=officer_headers).get_json()["settings"]
-    assert got == {"pod_image": None, "deployment_pod_image": config.COMPUTE_POD_IMAGE}
+    assert got == {"pod_image": None, "deployment_pod_image": config.GODFATHER_POD_IMAGE}
     saved = client.put(SETTINGS, json={"pod_image": "org/image:1"}, headers=officer_headers)
     assert saved.get_json()["settings"]["pod_image"] == "org/image:1"
     for bad in ({"pod_image": "a b"}, {"pod_image": 3}, {"other": 1}, ["x"]):

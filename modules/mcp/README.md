@@ -1,6 +1,6 @@
 # mcp
 
-Serves the tools of other modules to apps and agents with a machine token: over MCP streamable HTTP at `/mcp`, and over HTTP at `/api/tools`. A caller sees only the tools that its token scopes and its org's module switches allow.
+Serves the tools of other modules to apps and agents with a machine token: over MCP streamable HTTP at `/mcp`, and over HTTP at `/api/tools`. The module is Core and always on. A caller sees only the tools that its token scopes and its org's module switches allow. The Tokens page of the dashboard shows how to connect.
 
 ## Files
 

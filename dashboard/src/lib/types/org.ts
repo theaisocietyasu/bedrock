@@ -37,7 +37,7 @@ export type CatalogModule = {
   enabled: boolean;
   ready: boolean;
   needs: ModuleNeed[];
-  packs: ModulePack[];
+  submodules: ModulePack[];
 };
 
 export type ModuleCatalog = { categories: string[]; modules: CatalogModule[] };

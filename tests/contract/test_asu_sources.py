@@ -7,25 +7,25 @@ from pathlib import Path
 import pytest
 
 from modules.knowledge.extract import chunk_text
-from modules.packs.queries import check, url_for
-from modules.packs.text import extract_text, form_page_text
-from modules.packs.types import Fetched, QueryError, QuerySource
-from packs.asu import PACK
-from packs.asu.params import term_code
-from packs.asu.sources import SOURCES
-from packs.asu.sources.courses import extract_courses
-from packs.asu.sources.dining_hours import extract_dining_hours
-from packs.asu.sources.events import extract_events
-from packs.asu.sources.jobs import extract_jobs
-from packs.asu.sources.library_hours import extract_hours
-from packs.asu.sources.news import extract_news
-from packs.asu.sources.pages import PAGES
-from packs.asu.sources.scholarships import extract_scholarships
-from packs.asu.sources.shuttles import extract_shuttles
-from packs.asu.sources.sports import extract_sports
+from modules.submodules.queries import check, url_for
+from modules.submodules.text import extract_text, form_page_text
+from modules.submodules.types import Fetched, QueryError, QuerySource
+from submodules.asu import SUBMODULE
+from submodules.asu.params import term_code
+from submodules.asu.sources import SOURCES
+from submodules.asu.sources.courses import extract_courses
+from submodules.asu.sources.dining_hours import extract_dining_hours
+from submodules.asu.sources.events import extract_events
+from submodules.asu.sources.jobs import extract_jobs
+from submodules.asu.sources.library_hours import extract_hours
+from submodules.asu.sources.news import extract_news
+from submodules.asu.sources.pages import PAGES
+from submodules.asu.sources.scholarships import extract_scholarships
+from submodules.asu.sources.shuttles import extract_shuttles
+from submodules.asu.sources.sports import extract_sports
 
 FIXTURES = Path(__file__).parent / "asu_fixtures"
-QUERY_SOURCES = {q.key: q for q in PACK.queries}
+QUERY_SOURCES = {q.key: q for q in SUBMODULE.queries}
 
 
 def page(name: str) -> Fetched:
@@ -217,8 +217,8 @@ def test_a_form_page_keeps_its_results():
 
 
 def test_shuttle_times_in_arizona_time():
-    from packs.asu.params import ARIZONA
-    from packs.asu.queries.shuttles import render
+    from submodules.asu.params import ARIZONA
+    from submodules.asu.queries.shuttles import render
 
     now = datetime.datetime(2026, 9, 12, 16, 0, tzinfo=ARIZONA)
 
@@ -237,7 +237,7 @@ def test_shuttle_times_in_arizona_time():
 
 
 def test_campus_places_are_plain_and_linked():
-    from packs.asu.queries.campus_map import render
+    from submodules.asu.queries.campus_map import render
 
     hayden = {
         "attributes": {"Name": "Hayden Library", "Type": "Library", "Description": "<p>Books &amp; more</p>"},
@@ -249,8 +249,8 @@ def test_campus_places_are_plain_and_linked():
 
 
 def test_feeds_are_narrowed():
-    from packs.asu.queries.social_media import posts_of
-    from packs.asu.queries.sports_news import official_lines
+    from submodules.asu.queries.social_media import posts_of
+    from submodules.asu.queries.sports_news import official_lines
 
     rss = ET.fromstring(  # nosec B314 - literal test input
         "<rss><channel>"
@@ -269,7 +269,7 @@ def test_feeds_are_narrowed():
 
 
 def test_web_results():
-    from modules.packs.web import render
+    from modules.submodules.web import render
 
     found = {
         "answers": [{"answer": "ASU beat Morgan State 70-7."}],

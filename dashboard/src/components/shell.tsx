@@ -3,7 +3,6 @@ import { ChevronsUpDown, Globe, LogOut, Menu, Monitor, Moon, PanelLeftClose, Pan
 import { type ComponentType, type ReactNode, useEffect, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation, useNavigate } from 'react-router';
 import { useAccentColor } from '../lib/branding';
-import { builtByLabel } from '../lib/links';
 import { useCurrentOrg, useOrganizations } from '../lib/org';
 import { useBranding, useModules, useSuperadmin } from '../lib/queries';
 import { useSignOut } from '../lib/query-client';
@@ -12,7 +11,6 @@ import { type Theme, useTheme } from '../lib/theme';
 import { type PageEntry, PAGES, SECTIONS } from '../pages/registry';
 import { NotificationsBell } from './notifications';
 import { OrgMark } from './org-mark';
-import { OrgMarks } from './built-by';
 import { MOD_KEY, Tooltip } from './tooltip';
 import { cx } from './ui';
 
@@ -242,18 +240,12 @@ function Nav({ collapsed = false, onNavigate, className = 'w-[248px]' }: { colla
             </Tooltip>
           </div>
         ) : (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center justify-between gap-2">
-              <button type="button" onClick={signOut} className={cx(itemClass, quietItem, 'cursor-pointer')}>
-                <LogOut className="size-4 shrink-0" />
-                Sign out
-              </button>
-              <ThemeSwitch />
-            </div>
-            <div className="flex items-center gap-2.5 px-3 pt-1 pb-0.5">
-              <OrgMarks size={20} />
-              <span className="truncate text-[11px] text-muted">{builtByLabel(undefined, true)}</span>
-            </div>
+          <div className="flex items-center justify-between gap-2">
+            <button type="button" onClick={signOut} className={cx(itemClass, quietItem, 'cursor-pointer')}>
+              <LogOut className="size-4 shrink-0" />
+              Sign out
+            </button>
+            <ThemeSwitch />
           </div>
         )}
       </div>

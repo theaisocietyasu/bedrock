@@ -7,6 +7,7 @@ import {
   Badge,
   Button,
   Card,
+  CardHeader,
   Checkbox,
   Code,
   DeleteButton,
@@ -392,6 +393,30 @@ export function TokensPage() {
           <EmptyState icon={KeyRound} title="No active tokens" />
         )}
       </Card>
+      <McpCard />
     </>
+  );
+}
+
+// How an agent reaches the tools of the org's modules: the MCP server and the header with a token from this page.
+function McpCard() {
+  const rows: [string, string][] = [
+    ['Server', '/mcp on port 8001'],
+    ['Header', 'Authorization: Bearer plat_...'],
+  ];
+  return (
+    <Card className="mt-6">
+      <CardHeader title="MCP" />
+      <dl className="divide-y divide-line text-sm">
+        {rows.map(([label, value]) => (
+          <div key={label} className="flex items-center gap-3 px-4 py-2.5">
+            <dt className="w-16 shrink-0 text-xs text-muted">{label}</dt>
+            <dd className="min-w-0 truncate">
+              <Code>{value}</Code>
+            </dd>
+          </div>
+        ))}
+      </dl>
+    </Card>
   );
 }

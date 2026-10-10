@@ -20,7 +20,7 @@ KEY = {"type": "string", "minLength": 1, "maxLength": 64}
 
 @tool(
     "org.overview",
-    description="The org at a glance: members, points, store, compute, alerts, apps, knowledge, agents and tokens.",
+    description="The org at a glance: members, points, store, Godfather, webhook feeds, apps, knowledge, agents and tokens.",
     scope="activity:read",
 )
 def org_overview(db, org, caller):
@@ -29,7 +29,7 @@ def org_overview(db, org, caller):
 
 @tool(
     "org.trends",
-    description="Daily counts for the last days days: actions, job runs, points, orders, questions, alerts posted.",
+    description="Daily counts for the last days days: actions, job runs, points, orders, questions, webhook posts.",
     scope="activity:read",
     input_schema={
         "type": "object",
@@ -242,7 +242,7 @@ WEBHOOK_ID = {"type": "integer", "minimum": 1}
 
 @tool(
     "webhooks.list",
-    description="The org's webhooks, the events and kinds to pick from, and the alert feeds. URLs are never returned.",
+    description="The org's webhooks, the events and kinds to pick from, and the feeds of the webhook modules. URLs are never returned.",
     scope="webhooks:manage",
 )
 def webhooks_list(db, org, caller):

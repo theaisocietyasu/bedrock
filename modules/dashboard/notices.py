@@ -1,6 +1,6 @@
 """Notifications for officers: the problems an org has now, the events it had, and which ones an officer resolved.
 
-A problem is a current state: an enabled alert feed whose last run failed, an app whose latest deploy failed,
+A problem is a current state: an enabled feed whose last run failed, an app whose latest deploy failed,
 or a crawled knowledge source whose last fetch failed. Its id is a hash of the module, the subject and the
 message, so a new error on the same subject is a new notification. An event is one webhook event of the org
 (core/webhooks.py saves each one): an error, a failed job, a pod started or stopped, a deploy, a store order,
@@ -17,7 +17,8 @@ from sqlalchemy.orm.attributes import flag_modified
 from core import webhooks
 from core.errors import ServiceError
 from core.time import iso, utcnow
-from modules.alerts.models import AlertFeed
+from modules.feeds import service as feeds
+from modules.feeds.models import AlertFeed
 from modules.knowledge.models import KnowledgeSource
 from modules.organizations.models import Organization
 from modules.runpod.models import App, AppDeployment
@@ -42,11 +43,13 @@ EVENT_LINKS = {
 EVENT_MODULES = {
     "errors": "errors",
     "job.failed": "jobs",
-    "pod.started": "compute",
-    "pod.stopped": "compute",
+    "pod.started": "godfather",
+    "pod.stopped": "godfather",
     "monitor.down": "uptime",
     "monitor.up": "uptime",
 }
+# The dashboard page of each webhook module
+FEED_PAGES = {"job_webhook": "job-alerts", "hackathon_webhook": "hackathons"}
 ERROR_COLORS = (webhooks.RED, webhooks.AMBER)
 MAX_IDS = 500
 
@@ -105,15 +108,19 @@ def current(db, org_id: int) -> list[dict]:
 
 
 def problems(db, org_id: int) -> list[dict]:
-    """Every current problem of the org, alerts first, then apps, then knowledge."""
+    """Every current problem of the org, feeds first, then apps, then knowledge."""
     found = []
-    feeds = (
+    on = feeds.kinds_on(db, org_id)
+    rows = (
         db.query(AlertFeed)
         .filter_by(organization_id=org_id, enabled=True)
         .filter(AlertFeed.last_error.isnot(None))
         .order_by(AlertFeed.key)
     )
-    found += [_notice("alerts", cast(str, f.key), cast(str, f.last_error), "alerts") for f in feeds]
+    for f in rows:
+        if f.kind in on:
+            module = feeds.KIND_MODULES[str(f.kind)]
+            found.append(_notice(module, cast(str, f.key), cast(str, f.last_error), FEED_PAGES[module]))
     for app in db.query(App).filter_by(organization_id=org_id).order_by(App.name):
         latest = db.query(AppDeployment).filter_by(app_id=app.id).order_by(AppDeployment.started_at.desc()).first()
         if latest and latest.status == "failed":

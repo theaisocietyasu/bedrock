@@ -17,7 +17,7 @@ organizations_blueprint = Blueprint("organizations", __name__)
 
 
 # Org config keys that their own routes write
-OWN_ROUTE_KEYS = ("modules", "leetcode", "knowledge", "branding", "dashboard", "compute", "access")
+OWN_ROUTE_KEYS = ("modules", "leetcode", "knowledge", "branding", "dashboard", "godfather", "access")
 
 
 @organizations_blueprint.route("/", methods=["GET"])

@@ -6,9 +6,9 @@ import { send } from '../../lib/api';
 import type { NewPod } from '../../lib/types';
 import { firstConfigured, ProviderField, providerTitle, useProviders } from '../hosting/providers';
 import { UsersEditor } from './members';
-import { computePath, useComputeSettings, useRefreshCompute } from './shared';
+import { godfatherPath, useGodfatherSettings, useRefreshGodfather } from './shared';
 
-// Defaults and limits match pod_request in modules/compute/service.py.
+// Defaults and limits match pod_request in modules/godfather/service.py.
 const DEFAULT_GPU = 'NVIDIA RTX A4000';
 const DEFAULT_CPU = 'cpu3c';
 const RESERVED_PREFIX = 'GODFATHER_';
@@ -91,8 +91,8 @@ export function NewPodDialog({ prefix, onClose }: { prefix: string; onClose: () 
   const [draft, setDraft] = useState<Draft>(EMPTY);
   const [env, setEnv] = useState<EnvRow[]>([]);
   const [nextKey, setNextKey] = useState(1);
-  const refresh = useRefreshCompute(prefix);
-  const defaults = useComputeSettings(prefix);
+  const refresh = useRefreshGodfather(prefix);
+  const defaults = useGodfatherSettings(prefix);
   const providers = useProviders(prefix);
   const [chosen, setChosen] = useState<string | null>(null);
   const provider = chosen ?? firstConfigured(providers.data);
@@ -119,12 +119,12 @@ export function NewPodDialog({ prefix, onClose }: { prefix: string; onClose: () 
       }
       if (draft.name.trim()) body.name = draft.name.trim();
       if (draft.image.trim()) body.image_name = draft.image.trim();
-      if (!runpod) return send(`${computePath(prefix)}/pods`, 'POST', body);
+      if (!runpod) return send(`${godfatherPath(prefix)}/pods`, 'POST', body);
       if (draft.cpu) {
         body.cpu_flavor = draft.flavor.trim() || DEFAULT_CPU;
         body.vcpu_count = Number(draft.vcpus);
       } else body.gpu_type_id = draft.gpu.trim() || DEFAULT_GPU;
-      return send(`${computePath(prefix)}/pods`, 'POST', body);
+      return send(`${godfatherPath(prefix)}/pods`, 'POST', body);
     },
     onSuccess: () => {
       refresh();

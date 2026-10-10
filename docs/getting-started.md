@@ -72,7 +72,7 @@ make check     # fix lint and format, then type check, tests, migrations
 make ci        # the same checks with no changes to files; CI runs this
 ```
 
-To run one test file: `uv run pytest tests/contract/test_compute.py -v`. The tests use an in-process app and a temporary database. They need no running server.
+To run one test file: `uv run pytest tests/contract/test_godfather.py -v`. The tests use an in-process app and a temporary database. They need no running server.
 
 ## Run it on one RunPod pod
 
@@ -91,7 +91,7 @@ Caution: keep `/workspace/data/keys.env`. It holds `SECRET_KEY` and `SECRETS_KEY
    ```
 
 4. Set the pod environment from the table below.
-5. Add `<API_URL>/api/auth/callback` as a redirect in the Discord app. For compute CLI sign-in, also add `<API_URL>/api/compute/cli/callback`.
+5. Add `<API_URL>/api/auth/callback` as a redirect in the Discord app. For Godfather CLI sign-in, also add `<API_URL>/api/compute/cli/callback`.
 
 | Variable | Value |
 | --- | --- |

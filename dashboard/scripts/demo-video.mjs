@@ -95,7 +95,7 @@ function demoApi() {
   ];
   data['/api/superadmin/check'] = { is_superadmin: false };
 
-  data[`/api/alerts/${P}/feeds/internships/history`] = {
+  data[`/api/feeds/${P}/feeds/internships/history`] = {
     runs: [
       { started_at: at(-4 * 60_000), duration_ms: 1800, found: 412, new: 3, posted: 3, recorded: false, error: null },
       { started_at: at(-3 * 3_600_000), duration_ms: 1600, found: 409, new: 2, posted: 2, recorded: false, error: null },
@@ -213,10 +213,10 @@ function demoApi() {
     ],
     [
       'POST',
-      new RegExp(`^/api/dashboard/${P}/knowledge/packs/asu/sync$`),
+      new RegExp(`^/api/dashboard/${P}/knowledge/submodules/asu/sync$`),
       () => {
-        data[`/api/dashboard/${P}/knowledge/packs`].packs[0].sources = 46;
-        record('POST /api/dashboard/<prefix>/knowledge/packs/<name>/sync');
+        data[`/api/dashboard/${P}/knowledge/submodules`].submodules[0].sources = 46;
+        record('POST /api/dashboard/<prefix>/knowledge/submodules/<name>/sync');
         return { json: { added: 46, updated: 0, retired: 0 } };
       },
     ],
@@ -271,7 +271,7 @@ function demoApi() {
         };
         list.push(session);
         list.sort((a, b) => a.start_at.localeCompare(b.start_at));
-        overview.sections.compute.sessions.push({ pod_id: match[1], title: session.title, start_at: session.start_at, stop_at: session.stop_at });
+        overview.sections.godfather.sessions.push({ pod_id: match[1], title: session.title, start_at: session.start_at, stop_at: session.stop_at });
         record('POST /api/compute/<prefix>/pods/<pod_id>/sessions', 201);
         return { status: 201, json: { session } };
       },
@@ -667,8 +667,8 @@ async function story(d) {
   d.hold(0.7);
   d.zoomOut();
 
-  // Automations: alerts, calendar and LeetCode.
-  await d.click(nav('Alerts'), { after: 0.1 });
+  // Webhooks and bots: job alerts and LeetCode.
+  await d.click(nav('Job alerts webhook'), { after: 0.1 });
   d.caption('Post job and hackathon alerts to Discord');
   await d.click(page.getByRole('button', { name: 'History of internships' }), { animate: 180, after: 0.05 });
   await d.zoomTo(dialog(), { max: 1.4 });
@@ -680,7 +680,7 @@ async function story(d) {
   d.caption('Post the daily LeetCode problem');
   d.hold(0.9);
 
-  // Knowledge: upload, a source pack, test search, search settings.
+  // Knowledge: upload, a source submodule, test search, search settings.
   await d.click(nav('Knowledge'), { after: 0.1 });
   d.caption('Upload documents for your agents');
   await d.click(page.getByRole('button', { name: 'Upload', exact: true }), { animate: 180, after: 0.05 });
@@ -707,8 +707,8 @@ async function story(d) {
   await d.click(dialog().getByRole('button', { name: 'Done' }), { animate: 180, after: 0.05 });
 
   d.caption('Add public pages in one step');
-  await d.zoomTo(card('Source packs'), { max: 1.5 });
-  await d.click(card('Source packs').getByRole('button', { name: 'Add' }), { after: 0.8 });
+  await d.zoomTo(card('Source submodules'), { max: 1.5 });
+  await d.click(card('Source submodules').getByRole('button', { name: 'Add' }), { after: 0.8 });
 
   d.caption('Test what your agents will find');
   d.zoomOut(0.7);
@@ -731,15 +731,8 @@ async function story(d) {
   d.zoomOut();
   await d.press('Escape', { animate: 180, after: 0.05 });
 
-  // MCP.
-  await d.click(nav('MCP'), { after: 0.1 });
-  d.caption('See how members use your agents');
-  await d.zoomTo(page.locator('main').first(), { max: 1.25, dy: -150 });
-  d.hold(0.9);
-  d.zoomOut();
-
-  // Infrastructure: compute, apps and tokens.
-  await d.click(nav('Compute'), { after: 0.1 });
+  // Compute and tokens: Godfather, hosting and tokens.
+  await d.click(nav('Godfather'), { after: 0.1 });
   d.caption('Schedule GPU pods for workshops');
   await d.click(page.getByRole('button', { name: 'Sessions of Workshop GPU (A40)' }), { animate: 180, after: 0.05 });
   await d.zoomTo(dialog(), { max: 1.45 });

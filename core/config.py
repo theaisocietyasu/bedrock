@@ -78,10 +78,15 @@ class Config:
             # Access checks (modules/auth/access.py): false logs refusals, true enforces them
             self.ACCESS_ENFORCE = os.environ.get("ACCESS_ENFORCE", "false").lower() == "true"
 
-            # Compute (modules/compute): the CLI name members see in messages, and the default pod image
-            self.COMPUTE_CLI_NAME = os.environ.get("COMPUTE_CLI_NAME", "the compute CLI")
-            self.COMPUTE_POD_IMAGE = os.environ.get(
-                "COMPUTE_POD_IMAGE", "ghcr.io/theaisocietyasu/godfather-base:latest"
+            # Godfather (modules/godfather): the CLI name members see in messages, and the default pod image.
+            # The COMPUTE_ names are the names before the rename.
+            self.GODFATHER_CLI_NAME = os.environ.get("GODFATHER_CLI_NAME") or os.environ.get(
+                "COMPUTE_CLI_NAME", "godfather"
+            )
+            self.GODFATHER_POD_IMAGE = (
+                os.environ.get("GODFATHER_POD_IMAGE")
+                or os.environ.get("COMPUTE_POD_IMAGE")
+                or "ghcr.io/theaisocietyasu/godfather-base:latest"
             )
 
             # LeetCode Daily Bot

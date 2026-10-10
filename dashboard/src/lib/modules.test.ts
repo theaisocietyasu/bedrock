@@ -11,7 +11,7 @@ const hosting: CatalogModule = {
   enabled: true,
   ready: false,
   needs: [{ key: 'runpod', label: 'RunPod', kind: 'integration', optional: false, connected: false }],
-  packs: [{ name: 'asu', title: 'ASU', description: 'Campus pages' }],
+  submodules: [{ name: 'asu', title: 'ASU', description: 'Campus pages' }],
 };
 
 describe('matches', () => {
@@ -19,7 +19,7 @@ describe('matches', () => {
     expect(matches(hosting, '  ')).toBe(true);
   });
 
-  it('matches the title, the category, a need and a pack, with no case', () => {
+  it('matches the title, the category, a need and a submodule, with no case', () => {
     expect(matches(hosting, 'host')).toBe(true);
     expect(matches(hosting, 'INFRA')).toBe(true);
     expect(matches(hosting, 'runpod')).toBe(true);

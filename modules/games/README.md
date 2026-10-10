@@ -15,7 +15,7 @@ Runs Jeopardy games in an org's Discord server. Officers upload games, select th
 
 ## Surface
 
-- Routes: `/api/bot`. Each route needs an officer of any org. The routes that run a game need the bot in the API process (`current_app.auth_bot`), so they fail under gunicorn.
+- Routes: `/api/bot`. Each route needs an officer of an org that has the `games` switch on. For another officer, each route returns 404. The superadmin always passes. The routes that run a game need the bot in the API process (`current_app.auth_bot`), so they fail under gunicorn.
 - Jobs: none.
 - Tools: none.
 - Tables: `jeopardy_game`, `active_game`. One game runs at a time for the deployment, in the first server of the bot.

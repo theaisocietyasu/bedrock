@@ -124,13 +124,15 @@ def test_module_has_a_catalog_entry(name):
     assert info.title and info.description, f"Give {name} a title and a description in CATALOG in modules/manifest.py"
 
 
-def test_catalog_names_real_packs_and_new_org_modules():
+def test_catalog_names_real_submodules_and_new_org_modules():
     from modules.manifest import CATALOG, CATEGORIES, CORE, NEW_ORG_MODULES
 
     for name, info in CATALOG.items():
         assert name in NAMES, f"{name} in CATALOG has no folder in modules/"
-        for pack in info.packs:
-            assert (ROOT / "packs" / pack / "__init__.py").exists(), f"{name} in CATALOG names {pack}, not in packs/"
+        for submodule in info.submodules:
+            assert (ROOT / "submodules" / submodule / "__init__.py").exists(), (
+                f"{name} in CATALOG names {submodule}, not in submodules/"
+            )
     for name in NEW_ORG_MODULES:
         assert name in CATALOG and name not in CATEGORIES[CORE], f"{name} in NEW_ORG_MODULES is not an optional module"
 

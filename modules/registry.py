@@ -11,21 +11,21 @@ from flask import Blueprint, Flask, jsonify, request
 from core.db import db_connect
 from modules.accounts.api import accounts_blueprint
 from modules.agents.api import agents_blueprint
-from modules.alerts.api import alerts_blueprint
 from modules.auth.api import auth_blueprint
 from modules.calendar.api import calendar_blueprint
-from modules.compute.api import compute_blueprint
 from modules.dashboard.api import dashboard_blueprint
+from modules.feeds.api import feeds_blueprint
 from modules.games.api import game_blueprint
+from modules.godfather.api import godfather_blueprint
 from modules.knowledge.api import knowledge_blueprint
 from modules.mcp.api import tools_blueprint
 from modules.organizations import service as organizations
 from modules.organizations.api import organizations_blueprint
-from modules.packs.api import asu_blueprint, packs_blueprint
 from modules.points.api import points_blueprint
 from modules.public.api import public_blueprint
 from modules.runpod.api import apps_blueprint
 from modules.storefront.member_api import storefront_blueprint
+from modules.submodules.api import asu_blueprint, submodules_blueprint
 from modules.superadmin.api import superadmin_blueprint
 from modules.uptime.api import uptime_blueprint
 from modules.users.api import users_blueprint
@@ -56,10 +56,10 @@ MOUNTS = [
     Mount(knowledge_blueprint, "/api/knowledge"),
     Mount(accounts_blueprint, "/api/accounts", module="accounts"),
     Mount(apps_blueprint, "/api/apps"),
-    Mount(packs_blueprint, "/api/packs"),
+    Mount(submodules_blueprint, "/api/submodules"),
     Mount(asu_blueprint, "/api/asu"),
-    Mount(compute_blueprint, "/api/compute", module="compute"),
-    Mount(alerts_blueprint, "/api/alerts", module="alerts"),
+    Mount(godfather_blueprint, "/api/compute", module="godfather"),
+    Mount(feeds_blueprint, "/api/feeds"),
     Mount(uptime_blueprint, "/api/uptime", module="uptime"),
     Mount(dashboard_blueprint, "/api/dashboard"),
 ]
