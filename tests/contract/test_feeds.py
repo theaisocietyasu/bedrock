@@ -195,7 +195,8 @@ def test_feed_lifecycle(client, officer_headers, alerts):
 
     updated = _put(client, officer_headers, every_hours=6, webhook_url=None)
     assert updated.status_code == 200 and updated.get_json()["feed"]["every_hours"] == 6
-    assert client.delete("/api/feeds/soda/feeds/internships", headers=officer_headers).get_json() == {"deleted": True}
+    deleted = client.delete("/api/feeds/soda/feeds/internships", headers=officer_headers)
+    assert deleted.get_json() == {"deleted": True}
     assert client.get("/api/feeds/soda/feeds/internships", headers=officer_headers).status_code == 404
 
 
