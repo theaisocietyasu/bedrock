@@ -214,7 +214,7 @@ export function CalendarPage() {
   return (
     <>
       <PageHeader
-        title="Calendar sync"
+        title="Calendar"
         description="Notion events copied to Google Calendar."
         action={
           <Button variant="primary" onClick={() => sync.mutate()} disabled={!configured || sync.isPending}>

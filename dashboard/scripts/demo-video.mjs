@@ -668,7 +668,7 @@ async function story(d) {
   d.zoomOut();
 
   // Webhooks and bots: job alerts and LeetCode.
-  await d.click(nav('Job alerts webhook'), { after: 0.1 });
+  await d.click(nav('Job alerts'), { after: 0.1 });
   d.caption('Post job and hackathon alerts to Discord');
   await d.click(page.getByRole('button', { name: 'History of internships' }), { animate: 180, after: 0.05 });
   await d.zoomTo(dialog(), { max: 1.4 });

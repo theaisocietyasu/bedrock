@@ -307,5 +307,5 @@ function FeedsPage({ kind, title }: { kind: Kind; title: string }) {
   );
 }
 
-export const JobWebhookPage = () => <FeedsPage kind="github_jobs" title="Job alerts webhook" />;
-export const HackathonWebhookPage = () => <FeedsPage kind="hackathons" title="Hackathon webhook" />;
+export const JobWebhookPage = () => <FeedsPage kind="github_jobs" title="Job alerts" />;
+export const HackathonWebhookPage = () => <FeedsPage kind="hackathons" title="Hackathons" />;

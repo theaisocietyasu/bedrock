@@ -10,8 +10,8 @@ import { Tooltip } from './tooltip';
 import { Badge, Button, cx, Mono, Spinner } from './ui';
 
 const MODULE_LABELS: Record<string, string> = {
-  job_webhook: 'Job alerts webhook',
-  hackathon_webhook: 'Hackathon webhook',
+  job_webhook: 'Job alerts',
+  hackathon_webhook: 'Hackathons',
   apps: 'Hosting',
   app: 'Hosting',
   knowledge: 'Knowledge',
